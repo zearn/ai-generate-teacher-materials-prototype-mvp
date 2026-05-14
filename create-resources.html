@@ -506,7 +506,7 @@
     const TARGET_WIDTH = 792;
     const stack = document.getElementById("pdfStack");
     try {
-      const pdf = await pdfjsLib.getDocument("Mini-lesson 1.pdf").promise;
+      const pdf = await pdfjsLib.getDocument("assets/pdf/Mini-lesson 1.pdf").promise;
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const baseViewport = page.getViewport({ scale: 1 });
