@@ -1,0 +1,22 @@
+# ===== Reference materials (not part of the prototype, kept locally only) =====
+webpage complete/
+webpage complete.zip
+
+# Design references / source files
+figma-screenshot.png
+Generated Content - Mini Lesson.pdf
+Generated Content - Mini Lesson.png
+
+# ===== OS / editor cruft =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ===== Claude Code local state =====
+.claude/settings.local.json
+
+# ===== Misc =====
+*.log
+.env
+.env.local

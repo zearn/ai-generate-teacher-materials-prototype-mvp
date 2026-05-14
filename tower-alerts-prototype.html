@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tower Alerts – Reports – Zearn (Figma)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&family=Oxygen:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --yellow:   #fad232;
+    --teal:     #007b94;
+    --purple:   #7029a5;
+    --ink:      #303b40;
+    --ink-2:    #435259;
+    --footer:   #444;
+    --gray-bg:  #f6f6f6;
+    --line:     #ccc;
+    --line-2:   #999;
+    --green:    #00875a;
+    --white:    #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--gray-bg);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
+  img { display: block; max-width: none; }
+
+  /* ===== Sticky header wrap ===== */
+  .header-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    background: var(--white);
+    height: 64px;
+    padding: 0 144px;
+    display: flex;
+  }
+  .yellow-bar { height: 4px; background: var(--yellow); }
+  /* Breadcrumb shadow on scroll */
+  .header-wrap.scrolled .breadcrumb { box-shadow: inset 0 -1px 0 0 var(--line), 0 4px 6px -2px rgba(0,0,0,0.15); }
+  .top-nav .nav {
+    display: flex; justify-content: space-between; max-width: 992px; width: 100%;
+  }
+  .top-nav .left { display: flex; align-items: center; }
+  .logo-wrap { width: 112px; padding-right: 16px; display: flex; align-items: center; }
+  .logo-wrap img { height: 31px; width: 112px; }
+  .top-tab {
+    height: 64px; padding: 0 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 16px; line-height: 24px;
+    text-transform: uppercase; color: var(--ink);
+  }
+  .top-tab.active { background: var(--yellow); color: #000; }
+
+  .top-nav .right { position: relative; width: 566px; height: 64px; }
+  .top-nav .right .link {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 64px; padding: 0 16px;
+    display: flex; align-items: center; gap: 4px;
+    font-weight: 600; font-size: 16px; line-height: 24px;
+    color: var(--ink); background: var(--white);
+  }
+  .link-assignments { left: 0; }
+  .link-roster      { left: 119.56px; }
+  .link-resources   { left: 195.77px; }
+  .link-help        { left: 297.6px; }
+  .link-help img { width: 14px; height: 13px; }
+  .account-box {
+    position: absolute; left: 381.68px; top: 0; bottom: 0;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    min-width: 120px;
+    display: flex; align-items: center; padding: 0 16px;
+    background: var(--white); gap: 8px;
+  }
+  .school-chip {
+    background: var(--green); color: var(--white);
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    line-height: 14.4px; text-align: center; padding: 4px 8px;
+  }
+  .account-name {
+    font-weight: 600; font-size: 16px; line-height: 24px;
+    color: var(--ink); margin-right: 4px;
+  }
+  .account-box .caret { width: 12px; height: 24px; display: inline-flex; }
+  .account-box .caret img { width: 12px; height: 24px; }
+
+  /* ===== Breadcrumb ===== */
+  .breadcrumb {
+    background: var(--gray-bg);
+    box-shadow: inset 0 -1px 0 0 var(--line);
+    padding: 0 144px;
+    height: 56px;
+    display: flex;
+  }
+  .breadcrumb ol {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; align-items: center; max-width: 928px; height: 100%;
+  }
+  .breadcrumb li { height: 56px; display: flex; align-items: center; }
+  .breadcrumb .crumb-link {
+    color: var(--ink-2);
+    font-weight: 600; font-size: 16px; line-height: 21px;
+    position: relative;
+    padding-bottom: 1px;
+  }
+  .breadcrumb .crumb-link::after {
+    content: "";
+    position: absolute; left: 0; right: 0; top: 100%;
+    height: 1px;
+    background: var(--ink-2);
+    transition: height 0.12s ease;
+  }
+  .breadcrumb .crumb-link:hover::after { height: 4px; }
+  .breadcrumb .crumb-sep {
+    width: 4.84px; height: 7.66px;
+    padding: 0 13.58px;
+    box-sizing: content-box;
+    display: flex; align-items: center;
+  }
+  .breadcrumb .crumb-sep img { width: 4.84px; height: 7.66px; }
+  .breadcrumb .crumb-select {
+    background: var(--white);
+    border: 1px solid var(--line);
+    padding: 1px 29px 1px 9px;
+    height: 32px;
+    display: flex; align-items: center;
+    color: var(--teal);
+    font-weight: 600; font-size: 16px; line-height: 20px;
+    position: relative; min-width: 64px;
+  }
+  .crumb-select .caret {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 12px; height: 24px;
+  }
+  .crumb-select .caret img { width: 12px; height: 24px; }
+
+  /* ===== Page area / card ===== */
+  .page-area {
+    background: var(--gray-bg);
+    padding: 24px 32px 48px;
+    display: flex; justify-content: center;
+  }
+  main {
+    width: 1024px;
+    background: var(--white);
+    padding: 0 16px;
+    border-radius: 4px;
+    box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 3px 0px;
+  }
+
+  /* Page Header */
+  .page-header { padding: 24px 0 32px; text-align: center; }
+  .page-header h1 {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 0;
+    font-weight: 600; font-size: 20px; line-height: 30px;
+    color: var(--ink);
+  }
+  .help-link {
+    display: inline-flex; align-items: center;
+    width: 24px; height: 24px; cursor: help;
+  }
+  .help-link img { width: 24px; height: 24px; }
+  .page-header .subtitle {
+    margin: 0; font-size: 16px; line-height: 24px; color: var(--ink);
+  }
+
+  /* Selector pill */
+  .selector { padding: 0 84px 0 100px; }
+  .pill {
+    display: inline-flex; align-items: center;
+    background: var(--gray-bg);
+    padding: 8px 16px;
+    color: var(--teal);
+    font-weight: 600; font-size: 16px; line-height: 24px;
+  }
+  .pill .caret {
+    margin-left: 8px; display: inline-flex;
+    width: 12px; height: 24px;
+  }
+  .pill .caret img { width: 12px; height: 24px; }
+
+  /* Hero */
+  .hero {
+    padding: 16px 84px 56px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .hero .left { display: flex; align-items: flex-start; gap: 16px; }
+  .hero .icon { width: 72px; height: 72px; padding-top: 6px; }
+  .hero .icon img { width: 72px; height: 72px; }
+  .hero h2 {
+    font-weight: 400; font-size: 32px; line-height: 48px;
+    margin: 0; color: var(--ink); white-space: nowrap;
+  }
+  .hero .meta { font-size: 20px; line-height: 30px; color: var(--ink); }
+  .print-btn {
+    margin-top: 38px; height: 40px; min-width: 104px;
+    border: 1px solid var(--teal); border-radius: 25px;
+    background: var(--white); color: var(--teal);
+    font-weight: 600; font-size: 16px;
+    padding: 0 21px;
+    display: inline-flex; align-items: center; gap: 0px;
+  }
+  .print-btn img { width: 24px; height: 16px; }
+
+  /* 2-col */
+  .columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; }
+
+  /* Filter sidebar */
+  .filter-header {
+    height: 56px; display: flex; align-items: center;
+    padding: 0 16px; font-weight: 400;
+  }
+  .filter-header span { color: var(--ink); font-size: 16px; line-height: 24px; }
+  .filter-box {
+    background: var(--gray-bg);
+    padding: 24px 16px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; }
+  .filter-row > label { color: var(--ink); font-size: 16px; line-height: 24px; }
+  .toggle {
+    position: relative; width: 117px; height: 24px;
+    display: flex; align-items: center;
+  }
+  .toggle .label-hide { position: absolute; left: 0; }
+  .toggle .label-show { position: absolute; left: 79px; }
+  .toggle .switch {
+    position: absolute; left: 39px; top: 1px;
+    width: 32px; height: 22px; cursor: pointer;
+  }
+  .toggle .switch .track {
+    position: absolute; inset: 1px 0;
+    background: var(--line);
+    border: 1px solid var(--teal);
+    border-radius: 10px;
+    box-shadow: inset 0 0 1px 1px var(--teal);
+    overflow: hidden;
+  }
+  .toggle .switch .track::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 20px; background: var(--teal);
+    transition: width 0.15s ease;
+  }
+  .toggle .switch .knob {
+    position: absolute; left: 10px; top: 0;
+    width: 22px; height: 22px;
+    background: var(--white);
+    border: 2px solid var(--teal); border-radius: 50%;
+    box-shadow: 1px 1px 3px 0 #b3b3b3;
+    transition: left 0.15s ease;
+  }
+  .toggle.off .switch .track::before { width: 0; }
+  .toggle.off .switch .knob { left: 0; }
+
+  .dropdown { position: relative; width: 136px; height: 40px; }
+  .dropdown.wide { width: 184px; }
+  .dropdown select {
+    appearance: none; -webkit-appearance: none;
+    width: 100%; height: 100%;
+    background: var(--white);
+    border: 1px solid var(--line-2); border-radius: 4px;
+    padding: 8px 35px 8px 11px;
+    font: inherit; color: var(--ink);
+    font-size: 14px; line-height: 21px;
+  }
+  .dropdown.lg select { font-size: 16px; line-height: 24px; }
+  .dropdown .caret {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px;
+    pointer-events: none;
+  }
+  .dropdown .caret img { width: 24px; height: 24px; }
+
+  /* Students / Content panels */
+  .panel {
+    background: var(--gray-bg); padding: 0 0 16px 0;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 16px;
+  }
+  .panel:last-child { margin-bottom: 0; }
+  .panel-header {
+    width: 100%; padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--teal); font-weight: 600; font-size: 16px; line-height: 24px;
+  }
+  .panel-header .chev { width: 16px; height: 8.298px; display: inline-flex; transition: transform 0.15s ease; }
+  .panel-header .chev img { width: 16px; height: 8.298px; }
+  .panel.collapsed .chev { transform: rotate(180deg); }
+  .panel.collapsed .list { display: none; }
+  .panel.collapsed { padding-bottom: 0; }
+  .list {
+    width: 288px;
+    background: var(--white);
+    border: 1px solid var(--line-2);
+    border-radius: 4px;
+    max-height: 258px; overflow: auto;
+    padding: 16px;
+  }
+  /* .alerts-filter-option — production parity */
+  .list .row {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+    line-height: 1.5;
+    border-radius: 12px;
+    padding: 0 8px;
+    margin-top: 8px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background-color: transparent;
+    transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .list .row > span:first-child {
+    width: 172px;
+    text-align: left;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .list .row .count {
+    font-size: 16px;
+    overflow: initial;
+  }
+  /* no-alerts (regular weight) */
+  .list .row.regular { font-weight: 400; }
+  /* hover/focus default */
+  .list .row:hover,
+  .list .row:focus,
+  .list .row:active { background-color: rgba(0, 0, 0, 0.078); }
+  /* selected */
+  .list .row.selected {
+    background-color: var(--teal);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .list .row.selected .count { color: var(--white); }
+  .list .row.selected:hover,
+  .list .row.selected:focus { background-color: #005c73; }
+  .list .row.selected:active { background-color: #003e4d; }
+  /* partially-selected (outlined teal) */
+  .list .row.partially-selected {
+    border-color: var(--teal);
+    color: var(--teal);
+    background-color: transparent;
+  }
+  .list .row.partially-selected:hover,
+  .list .row.partially-selected:focus {
+    border-color: #005c73;
+    color: #005c73;
+    background-color: var(--white);
+  }
+  .list .row.partially-selected:active {
+    border-color: #003e4d;
+    color: #003e4d;
+  }
+
+  /* Content list */
+  .list.content-list { padding: 17px 9px 13px; }
+  .list.content-list .row { padding: 0; margin-bottom: 0; }
+  .list.content-list .row .twirl {
+    width: 24px; height: 24px; margin: 8px 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .list.content-list .row .twirl img { width: 16px; height: 10.219px; }
+  .list.content-list .row .label-wrap {
+    flex: 1; padding: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 12px;
+  }
+  .list.content-list .row.selected .label-wrap { background: var(--teal); color: var(--white); }
+  .list.content-list .row.selected .label-wrap .count { color: var(--white); }
+  .list.content-list .row.selected { background: transparent; color: var(--ink); }
+
+  /* Right column: Sort + alerts list */
+  .sort-row {
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .sort-left { display: flex; align-items: center; }
+  .sort-left .label { padding: 0 16px 0 24px; font-weight: 600; font-size: 16px; line-height: 24px; }
+  .results-count {
+    padding: 16px;
+    font-weight: 600; font-size: 16px; line-height: 24px; color: var(--ink);
+  }
+  .results-count .rest { font-weight: 400; }
+
+  /* Alert list */
+  .alerts { display: flex; flex-direction: column; gap: 16px; }
+  .alert {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--purple);
+    border-left: 8px solid var(--purple);
+    border-radius: 4px;
+    padding: 16px 24px 24px 36px;
+    margin-bottom: 16px;
+  }
+  .alert-icon {
+    position: absolute; left: -28px; top: 16px;
+    width: 48px; height: 48px;
+  }
+  .alert-icon img { width: 48px; height: 48px; }
+
+  .alert-head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .alert-info { display: flex; flex-direction: column; gap: 8px; }
+  .student-row { display: flex; align-items: center; gap: 8px; }
+  .student-name {
+    font-weight: 400; font-size: 20px; line-height: 30px; color: var(--ink);
+  }
+  .student-report-link {
+    display: inline-flex; align-items: center; height: 24px; padding-left: 8px;
+  }
+  .student-report-link img { width: 16px; height: 12px; }
+
+  .breadcrumb-meta { font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--ink); margin: 8px 0; }
+  .lesson-link {
+    font-weight: 600; font-size: 20px; line-height: 30px; color: var(--teal);
+  }
+  .lesson-link:hover { text-decoration: underline; }
+
+  .alert-side {
+    display: flex; align-items: center; margin-left: 16px;
+    font-weight: 600; color: var(--purple);
+  }
+  .create-resources {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--teal);
+    font-weight: 600; font-size: 16px; line-height: 1.5;
+    white-space: nowrap;
+  }
+  .create-resources img { width: 18px; height: 18px; }
+  .alert-divider {
+    width: 1px; align-self: stretch;
+    background: var(--line);
+    min-height: 32px;
+    margin: 0 16px;
+  }
+  .alert-side .alert-count { margin-right: 1px; }
+  .alert-count {
+    font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple);
+  }
+  .bang-icon {
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .bang-icon img { width: 24px; height: 24px; }
+
+  .alert-desc {
+    padding: 8px 0 16px;
+    font-weight: 400; font-size: 14px; line-height: 21px;
+    color: var(--ink); max-width: 567px;
+  }
+  .sep { border-top: 1px solid var(--line); }
+
+  .event {
+    display: flex; align-items: center;
+    height: 24px; margin-top: 8px;
+    border: none; background: transparent;
+  }
+  .event:first-of-type { margin-top: 12px; }
+  .event .ico {
+    width: 14.5px; height: 14.5px;
+    margin-left: 4.7px; margin-right: 13px;
+    display: inline-flex; flex-shrink: 0;
+  }
+  .event.evt-alert .ico img { width: 14.5px; height: 14.5px; }
+  .event.evt-completed .ico {
+    background: var(--green); border-radius: 50%;
+    color: #fff; align-items: center; justify-content: center;
+    width: 14.5px; height: 14.5px;
+  }
+  .event.evt-completed .ico svg { width: 8px; height: 8px; }
+  .event .label {
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--ink);
+    margin-right: 8px;
+  }
+  .event .ts {
+    font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--ink);
+  }
+
+  /* Load More */
+  .load-more-wrap {
+    height: 56px;
+    display: flex; justify-content: center; align-items: flex-end;
+    padding-top: 16px; margin-top: 16px;
+  }
+  .load-more {
+    height: 40px; min-width: 104px;
+    border: 1px solid var(--teal); border-radius: 25px;
+    background: var(--white); color: var(--teal);
+    font-weight: 600; font-size: 16px;
+    text-transform: uppercase;
+    padding: 0 21px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 24px;
+    padding: 68px 16px 32px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    font-family: "Oxygen", -apple-system, sans-serif;
+    color: var(--footer); font-size: 12px;
+  }
+  footer .links { display: flex; padding-bottom: 5px; gap: 3px; }
+  footer .links a {
+    color: var(--footer); text-decoration: underline;
+    padding: 0 11px 0 10px;
+    border-right: 1px solid var(--footer);
+    line-height: 12px;
+  }
+  footer .links a:last-child { border-right: none; }
+  footer p { margin: 0; line-height: 18px; max-width: 1024px; text-align: center; }
+  footer p a { color: var(--footer); text-decoration: underline; }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute; pointer-events: none;
+    max-width: 280px;
+    background: var(--ink); color: #fff;
+    padding: 8px 10px; border-radius: 4px;
+    font-size: 13px; line-height: 1.4;
+    z-index: 50; box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    transform: translateY(calc(-100% - 8px));
+    opacity: 0; transition: opacity 0.12s;
+  }
+  .tooltip.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP NAV ===================== -->
+<div class="header-wrap">
+<nav class="top-nav">
+  <div class="nav">
+    <div class="left">
+      <a class="logo-wrap" href="#"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTEyLjAwNSIgaGVpZ2h0PSIzMS40MTQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDExMi4wMDUgMzEuNDE0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iTGF5ZXJfMS0yIj4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTg1LjA4NTIgMjEuNzg0MkM4Ny4xNzc4IDIwLjQ5NzEgODguNDYyNSAxOC4yMjUzIDg4LjQ4NzEgMTUuNzY4N0M4OC40ODcxIDEwLjM0MzkgODQuMDg5NCA4LjI5NTc5IDgxLjMwOTUgOC4yOTU3OUg3MS40NTU1QzcwLjIyNzMgOC4yOTU3OSA2OC41ODc1IDguOTI0MDMgNjguNTg3NSAxMS41ODQ2VjI4LjExNjhDNjguNTU4MyAyOS4wMDA1IDY4Ljg5NjkgMjkuODU2NyA2OS41MjI3IDMwLjQ4MTNDNzAuMTQ4NSAzMS4xMDU5IDcxLjAwNTQgMzEuNDQyOSA3MS44ODkgMzEuNDEyQzczLjkzMDggMzEuNDEyIDc1LjIxMjQgMzAuMjIxNSA3NS4yMTI0IDI4LjExNjhWMjMuNDA1SDc4LjI4NDVMODIuMjcwNyAyOS44NzkxQzgyLjg4ODEgMzAuODM5OSA4My45NTU3IDMxLjQxNjQgODUuMDk3OCAzMS40MDU3Qzg2Ljg4MiAzMS40MDU3IDg4LjU3ODIgMzAuMDQ4NyA4OC41NzgyIDI4LjI2NDVDODguNTQ2NSAyNy41NDI3IDg4LjMwODkgMjYuODQ1MiA4Ny44OTM1IDI2LjI1NDFMODUuMDg1MiAyMS43ODQyTTc5Ljc0NTEgMTcuOTk1OUg3NS4yNDM4VjE3Ljk5NTlWMTMuNzExMlYxMy43MTEySDc5Ljc1MTRDODAuODI4OSAxMy43MTEyIDgxLjk1MDMgMTQuNTAyOCA4MS45NTAzIDE1Ljc3ODJDODEuOTUwMyAxNy4xODIzIDgxLjA0NTYgMTcuOTk1OSA3OS43NTE0IDE3Ljk5NTlINzkuNzQ1MSIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRkFEMjMzKSIvPgo8cGF0aCBpZD0iVmVjdG9yXzIiIGQ9Ik0xMDguNjg4IDguMDk0NzVDMTA2LjU1NSA4LjA5NDc1IDEwNS4zNTUgOS4zNzk1IDEwNS4zNTUgMTEuNjc4OVYyMC4yODI3TDk3LjYxMjQgMTAuMjMwOEM5Ni4yNTIyIDguNDk5OTYgOTUuMjUwMiA4LjA4MjE4IDkzLjYxMzYgOC4wODg0N0M5MS4wMjUyIDguMDg4NDcgOTAuMTI2OSA5LjYwODgxIDkwLjEyNjkgMTIuMjM0OUM5MC4xMjY5IDEyLjIzNDkgOTAuMTI2OSAyOC4xMTY4IDkwLjEyNjkgMjguMTEzN0M5MC4wOTY5IDI4Ljk5NjIgOTAuNDMzOCAyOS44NTE3IDkxLjA1NzYgMzAuNDc2N0M5MS42ODE0IDMxLjEwMTcgOTIuNTM2MyAzMS40NDAzIDkzLjQxODggMzEuNDEyQzk1LjQ2MzggMzEuNDEyIDk2Ljc1MTcgMzAuMjIxNSA5Ni43NTE3IDI4LjExNjhWMTkuMjMzNUM5Ni43MzYgMTkuMjU1NSAxMDQuOTk0IDI5Ljg2OTYgMTA1LjAxNiAyOS44ODU0QzEwNi4yMjkgMzEuMjM5MiAxMDcuMDY0IDMxLjM5OTQgMTA4LjQ3MiAzMS4zOTYzQzExMS4wNTcgMzEuMzk2MyAxMTIuMDA1IDI5Ljk0MTkgMTEyLjAwNSAyNy4zMTI3VjExLjY3ODlDMTEyLjAwMiA5LjM3OTUgMTEwLjgxNSA4LjA5NDc1IDEwOC42ODggOC4wOTQ3NVY4LjA5NDc1IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfMyIgZD0iTTQwLjg1MzggMjUuNzg5MkgzMS4zMTA4QzMxLjA0NzEgMjUuNzg5MiAzMC44MzMzIDI1LjU3NTQgMzAuODMzMyAyNS4zMTE3VjIyLjkzMDdDMzAuODM1IDIyLjY2ODIgMzEuMDQ4MyAyMi40NTY0IDMxLjMxMDggMjIuNDU2NEgzOC42MzkyQzQwLjEzMjIgMjIuNDU0NiA0MS4zNDIxIDIxLjI0NDggNDEuMzQzOCAxOS43NTE4VjE5Ljc1MThDNDEuMzQ0NiAxOS4wMzM3IDQxLjA2MDIgMTguMzQ0NiA0MC41NTI5IDE3LjgzNjJDNDAuMDQ1NyAxNy4zMjc4IDM5LjM1NzMgMTcuMDQxOCAzOC42MzkyIDE3LjA0MDlIMzEuMzEwOEMzMS4wNDcxIDE3LjA0MDkgMzAuODMzMyAxNi44MjcyIDMwLjgzMzMgMTYuNTYzNVYxNC4xNzkzQzMwLjgzMzMgMTMuOTE1NiAzMS4wNDcxIDEzLjcwMTggMzEuMzEwOCAxMy43MDE4SDQwLjgzODFDNDIuMzMwNSAxMy42OTgzIDQzLjUzODEgMTIuNDg2NiA0My41MzY0IDEwLjk5NDFWMTAuOTk0MUM0My41MzQ2IDkuNTAxNjEgNDIuMzI0MyA4LjI5MjY0IDQwLjgzMTggOC4yOTI2NEgyNy4wMTY3QzI1Ljc4ODUgOC4yOTI2NCAyNC4xNDI1IDguOTIwODkgMjQuMTQyNSAxMS41ODE1VjI3LjkxNThDMjQuMTQyNSAzMC41NzMzIDI1Ljc4ODUgMzEuMjA0NyAyNy4wMTY3IDMxLjIwNDdINDAuODM4MUM0MS44MjU3IDMxLjIzODMgNDIuNzUzMSAzMC43MzA2IDQzLjI1NjkgMjkuODgwNUM0My43NjA4IDI5LjAzMDMgNDMuNzYwOCAyNy45NzMgNDMuMjU2OSAyNy4xMjI4QzQyLjc1MzEgMjYuMjcyNyA0MS44MjU3IDI1Ljc2NSA0MC44MzgxIDI1Ljc5ODZMNDAuODUzOCAyNS43ODkyIiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNCIgZD0iTTYxLjU3MDEgMTIuNzg0NkM2MS4xNTIzIDExLjczODYgNjAuNjI3NyAxMC4yMTUxIDU5LjQ3MTcgOS4yNDQ0M0M1OC40OTkxIDguNDg3NDIgNTcuMjk5MiA4LjA4MTE5IDU2LjA2NjcgOC4wOTE2MUM1NC45NDg0IDguMDkxNjEgNTMuNDU5NSA4LjQwNTczIDUyLjYyNyA5LjI0NDQzQzUxLjU5OTkgMTAuMjY1MyA1MC45OTY3IDExLjY4MiA1MC41NjY0IDEyLjc4NDZMNDUuMzk2IDI2Ljg2MzVDNDQuNjgyOSAyNy4wNDg4IDQ0Ljk1MyAyOC40MTUzIDQ1LjEzODQgMjkuMTI4M0M0NS41NzgyIDMwLjg0MDMgNDcuNTAwNiAzMS43MzU1IDQ5LjE3MTcgMzEuMzA1MkM1MC4xNzM3IDMxLjA0NzYgNTAuOTE1MSAzMC4yMjQ2IDUxLjQzNjUgMjkuMTUzNEw1Mi4wOTkzIDI3LjM2M0g2MC4wMzA5TDYwLjY5MzcgMjkuMTUzNEM2MS4xNjQ5IDMwLjM1NjUgNjEuOTUwMiAzMS4wMzgyIDYyLjk1ODUgMzEuMzA1MkM2NC42Mjk2IDMxLjczNTUgNjYuNTUyIDMwLjg0MDMgNjYuOTkxOCAyOS4xMjgzQzY3LjE3NzEgMjguNDE1MyA2Ni43Mzc0IDI2Ljg2MzUgNjYuNzM3NCAyNi44NjM1TDYxLjU3MDEgMTIuNzg0Nk01My43OTI0IDIyLjAxMDNMNTYuMDYzNSAxNC45NTgzTDU4LjMzNDYgMjIuMDEwM0g1My43OTI0IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNSIgZD0iTTQuNDUwMjMgMTMuNzM5NUgxMi43Nzc2TDYuOTk0NjEgMTkuNDc1NEgxNi4yNjQzTDIwLjIxOTEgMTUuMTMxMUMyMS42OTI0IDEzLjQwOTcgMjIuNjA2NCAxMi41OTMgMjIuNjA2NCAxMS4wNDc1QzIyLjYwNjQgOS41MDIwMSAyMS42NjQxIDguNjY2NDUgMjAuMzIyOCA3LjE4Njk0TDE0LjQ3NyAxLjA4OTg0QzEyLjk4ODEgLTAuMzk5MDk3IDExLjI0MTUgLTAuMzMzMTMxIDkuNzk2NTggMS4xMDg2OUM4LjQyNzAxIDIuNDc4MjYgOC42OTcxNSA0LjIxMjIxIDEwLjAyNTkgNS41NDA5NEwxMi44MTIxIDguMzIwOTFWOC4zMjA5MUg0LjQ1MDIzQzIuOTU3MjUgOC4zMjI2NSAxLjc0NzM3IDkuNTMyNTIgMS43NDU2NCAxMS4wMjU1VjExLjAyNTVDMS43NDM5OCAxMS43NDQyIDIuMDI4MDkgMTIuNDM0IDIuNTM1MzggMTIuOTQzMUMzLjA0MjY4IDEzLjQ1MjIgMy43MzE1NSAxMy43Mzg3IDQuNDUwMjMgMTMuNzM5NVYxMy43Mzk1IiBmaWxsPSJ2YXIoLS1maWxsLTAsICMzMEMzRTIpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNiIgZD0iTTE5Ljg3NjcgMjUuODI2OUgxMC4xMzlMMTUuNjU4MSAyMC4xMDM2SDYuMzY5NTFMMC45NzkxODcgMjUuNTMxNkMwLjAyMzI5MTcgMjYuNDg2NiAtMC4yNjI4MTQgMjcuOTIzNiAwLjI1NDM5NCAyOS4xNzE5QzAuNzcxNjAyIDMwLjQyMDMgMS45OTAxNiAzMS4yMzM4IDMuMzQxMzggMzEuMjMyOUgxOS44NzY3QzIxLjM2OTIgMzEuMjMyOSAyMi41Nzk2IDMwLjAyNCAyMi41ODEzIDI4LjUzMTVWMjguNTMxNUMyMi41ODEzIDI3LjAzNzggMjEuMzcwNCAyNS44MjY5IDE5Ljg3NjcgMjUuODI2OVYyNS44MjY5IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjwvZz4KPC9zdmc+Cg==" alt="Zearn" /></a>
+      <button class="top-tab">CURRICULUM</button>
+      <button class="top-tab active">REPORTS</button>
+    </div>
+    <div class="right">
+      <a class="link link-assignments" href="#">Assignments</a>
+      <a class="link link-roster" href="#">Roster</a>
+      <a class="link link-resources" href="#">Resources</a>
+      <a class="link link-help" href="#" aria-label="Help (opens in a new tab)">
+        Help
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTMiIHZpZXdCb3g9IjAgMCAxNCAxMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzIxMTgxXzUxNTIpIj4KPHBhdGggZD0iTTguMTI1IDBDNy42NzU1OSAwIDcuMzEyNSAwLjM2MzA4NiA3LjMxMjUgMC44MTI1QzcuMzEyNSAxLjI2MTkxIDcuNjc1NTkgMS42MjUgOC4xMjUgMS42MjVIMTAuMjI0OEw1LjExMTEzIDYuNzM4NjdDNC43OTM3NSA3LjA1NjA1IDQuNzkzNzUgNy41NzE0OCA1LjExMTEzIDcuODg4ODdDNS40Mjg1MiA4LjIwNjI1IDUuOTQzOTUgOC4yMDYyNSA2LjI2MTMzIDcuODg4ODdMMTEuMzc1IDIuNzc1MlY0Ljg3NUMxMS4zNzUgNS4zMjQ0MSAxMS43MzgxIDUuNjg3NSAxMi4xODc1IDUuNjg3NUMxMi42MzY5IDUuNjg3NSAxMyA1LjMyNDQxIDEzIDQuODc1VjAuODEyNUMxMyAwLjM2MzA4NiAxMi42MzY5IDAgMTIuMTg3NSAwSDguMTI1Wk0yLjAzMTI1IDIuNDM3NUMwLjkwODk4NCAyLjQzNzUgMCAzLjM0NjQ4IDAgNC40Njg3NVYxMC45Njg4QzAgMTIuMDkxIDAuOTA4OTg0IDEzIDIuMDMxMjUgMTNIOC41MzEyNUM5LjY1MzUyIDEzIDEwLjU2MjUgMTIuMDkxIDEwLjU2MjUgMTAuOTY4OFY4LjkzNzVDMTAuNTYyNSA4LjQ4ODA5IDEwLjE5OTQgOC4xMjUgOS43NSA4LjEyNUM5LjMwMDU5IDguMTI1IDguOTM3NSA4LjQ4ODA5IDguOTM3NSA4LjkzNzVWMTAuOTY4OEM4LjkzNzUgMTEuMTkyMiA4Ljc1NDY5IDExLjM3NSA4LjUzMTI1IDExLjM3NUgyLjAzMTI1QzEuODA3ODEgMTEuMzc1IDEuNjI1IDExLjE5MjIgMS42MjUgMTAuOTY4OFY0LjQ2ODc1QzEuNjI1IDQuMjQ1MzEgMS44MDc4MSA0LjA2MjUgMi4wMzEyNSA0LjA2MjVINC4wNjI1QzQuNTExOTEgNC4wNjI1IDQuODc1IDMuNjk5NDEgNC44NzUgMy4yNUM0Ljg3NSAyLjgwMDU5IDQuNTExOTEgMi40Mzc1IDQuMDYyNSAyLjQzNzVIMi4wMzEyNVoiIGZpbGw9IiMzMDNCNDAiLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF8yMTE4MV81MTUyIj4KPHJlY3Qgd2lkdGg9IjE0IiBoZWlnaHQ9IjEzIiBmaWxsPSJ3aGl0ZSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPgo=" alt="" />
+      </a>
+      <div class="account-box">
+        <span class="school-chip">School<br/>Account</span>
+        <span class="account-name">Ahmed</span>
+        <span class="caret"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDEyIDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2hldnJvbi1kb3duLW5hbWUiPgo8cGF0aCBpZD0iVmVjdG9yIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTUuOTk4IDEzLjU4OEw5LjUzMyAxMC4wNTNDOS45MjUzOCA5LjY3NDAzIDEwLjU0OTEgOS42Nzk0NSAxMC45MzQ4IDEwLjA2NTJDMTEuMzIwNiAxMC40NTA5IDExLjMyNiAxMS4wNzQ2IDEwLjk0NyAxMS40NjdMNi43MDUgMTUuNzFDNi41MTc4NyAxNS44OTgyIDYuMjYzNDEgMTYuMDA0IDUuOTk4IDE2LjAwNEM1LjczMjU5IDE2LjAwNCA1LjQ3ODE0IDE1Ljg5ODIgNS4yOTEgMTUuNzFMMS4wNDggMTEuNDY3QzAuNjY5MDI4IDExLjA3NDYgMC42NzQ0NDggMTAuNDUwOSAxLjA2MDE4IDEwLjA2NTJDMS40NDU5MiA5LjY3OTQ1IDIuMDY5NjIgOS42NzQwMyAyLjQ2MiAxMC4wNTNMNS45OTggMTMuNTg4VjEzLjU4OCIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMzAzQjQwKSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></span>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="yellow-bar"></div>
+
+<!-- ===================== BREADCRUMB ===================== -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li>
+      <a class="crumb-link" href="#">Reports</a>
+      <span class="crumb-sep" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNC44NDI4NSIgaGVpZ2h0PSI3LjY1NzAyIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiAgIHZpZXdCb3g9IjAgMCA0Ljg0Mjg1IDcuNjU3MDIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJWZWN0b3IiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMi40MjYzMSAzLjg0MDMxTDAuMzA1MzEzIDUuOTYyMzFDLTAuMDczNjU5MiA2LjM1NDY5IC0wLjA2ODIzOTQgNi45Nzg0IDAuMzE3NDk0IDcuMzY0MTNDMC43MDMyMjggNy43NDk4NyAxLjMyNjkzIDcuNzU1MjkgMS43MTkzMSA3LjM3NjMxTDQuNTQ4MzEgNC41NDgzMUM0LjczNjgzIDQuMzYxMTQgNC44NDI4NSA0LjEwNjQ3IDQuODQyODUgMy44NDA4MUM0Ljg0Mjg1IDMuNTc1MTYgNC43MzY4MyAzLjMyMDQ5IDQuNTQ4MzEgMy4xMzMzMUwxLjcxOTMxIDAuMzA1MzEzQzEuNDY4MjQgMC4wNDUzNTY0IDEuMDk2NDQgLTAuMDU4ODk5NiAwLjc0NjgwNiAwLjAzMjYxNThDMC4zOTcxNzYgMC4xMjQxMzEgMC4xMjQxMzEgMC4zOTcxNzYgMC4wMzI2MTU4IDAuNzQ2ODA2Qy0wLjA1ODg5OTYgMS4wOTY0NCAwLjA0NTM1NjQgMS40NjgyNCAwLjMwNTMxMyAxLjcxOTMxTDIuNDI2MzEgMy44NDAzMVYzLjg0MDMxIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM0MzUyNTkpIi8+Cjwvc3ZnPgo=" alt="" /></span>
+    </li>
+    <li>
+      <a class="crumb-link" href="#">Class Reports</a>
+      <span class="crumb-sep" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNC44NDI4NSIgaGVpZ2h0PSI3LjY1NzAyIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiAgIHZpZXdCb3g9IjAgMCA0Ljg0Mjg1IDcuNjU3MDIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJWZWN0b3IiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMi40MjYzMSAzLjg0MDMxTDAuMzA1MzEzIDUuOTYyMzFDLTAuMDczNjU5MiA2LjM1NDY5IC0wLjA2ODIzOTQgNi45Nzg0IDAuMzE3NDk0IDcuMzY0MTNDMC43MDMyMjggNy43NDk4NyAxLjMyNjkzIDcuNzU1MjkgMS43MTkzMSA3LjM3NjMxTDQuNTQ4MzEgNC41NDgzMUM0LjczNjgzIDQuMzYxMTQgNC44NDI4NSA0LjEwNjQ3IDQuODQyODUgMy44NDA4MUM0Ljg0Mjg1IDMuNTc1MTYgNC43MzY4MyAzLjMyMDQ5IDQuNTQ4MzEgMy4xMzMzMUwxLjcxOTMxIDAuMzA1MzEzQzEuNDY4MjQgMC4wNDUzNTY0IDEuMDk2NDQgLTAuMDU4ODk5NiAwLjc0NjgwNiAwLjAzMjYxNThDMC4zOTcxNzYgMC4xMjQxMzEgMC4xMjQxMzEgMC4zOTcxNzYgMC4wMzI2MTU4IDAuNzQ2ODA2Qy0wLjA1ODg5OTYgMS4wOTY0NCAwLjA0NTM1NjQgMS40NjgyNCAwLjMwNTMxMyAxLjcxOTMxTDIuNDI2MzEgMy44NDAzMVYzLjg0MDMxIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM0MzUyNTkpIi8+Cjwvc3ZnPgo=" alt="" /></span>
+    </li>
+    <li>
+      <button class="crumb-select" aria-haspopup="true">
+        Tower Alerts
+        <span class="caret"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDEyIDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2hldnJvbi1kb3duIj4KPHBhdGggaWQ9IlZlY3RvciIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01Ljk5OCAxMy41ODhMOS41MzMgMTAuMDUzQzkuOTI1MzggOS42NzQwMyAxMC41NDkxIDkuNjc5NDUgMTAuOTM0OCAxMC4wNjUyQzExLjMyMDYgMTAuNDUwOSAxMS4zMjYgMTEuMDc0NiAxMC45NDcgMTEuNDY3TDYuNzA1IDE1LjcxQzYuNTE3ODcgMTUuODk4MiA2LjI2MzQxIDE2LjAwNCA1Ljk5OCAxNi4wMDRDNS43MzI1OSAxNi4wMDQgNS40NzgxNCAxNS44OTgyIDUuMjkxIDE1LjcxTDEuMDQ4IDExLjQ2N0MwLjY2OTAyOCAxMS4wNzQ2IDAuNjc0NDQ4IDEwLjQ1MDkgMS4wNjAxOCAxMC4wNjUyQzEuNDQ1OTIgOS42Nzk0NSAyLjA2OTYyIDkuNjc0MDMgMi40NjIgMTAuMDUzTDUuOTk4IDEzLjU4OFYxMy41ODgiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="" /></span>
+      </button>
+    </li>
+  </ol>
+</nav>
+</div>
+
+<!-- ===================== MAIN ===================== -->
+<div class="page-area">
+<main>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <h1>
+      Tower Alerts
+      <span class="help-link" id="helpIcon" tabindex="0" data-tip="An alert is triggered when a student struggles repeatedly on the same concept in a tower.">
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iU1ZHIj4KPHBhdGggaWQ9IlZlY3RvciIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMS45NzYgMTMuOTdIMTEuNzM2QzExLjM4MTggMTMuOTcgMTEuMDk0NiAxMy42ODMyIDExLjA5NCAxMy4zMjlWMTIuOUMxMS4wOTQgMTIuNTQ1IDExLjM4MSAxMi4yNTcgMTEuNzM3IDEyLjI1N0gxMS45NzZDMTIuOTg0MiAxMi4yNTU5IDEzLjgwMTMgMTEuNDM5MiAxMy44MDMgMTAuNDMxQzEzLjgwMTkgOS40MjIyNyAxMi45ODQ3IDguNjA0NjUgMTEuOTc2IDguNjAzQzExLjIxIDguNjA0MDIgMTAuNTI1NSA5LjA4MTQ5IDEwLjI2IDkuOEMxMC4xMzcgMTAuMTM0IDkuOTA4IDEwLjQzIDkuNjEyIDEwLjQzSDkuMDc2QzguNzIxIDEwLjQzIDguNDI3IDEwLjE0IDguNDkyIDkuNzlDOC44Mjk0MyA3Ljk0NzMxIDEwLjU0MzQgNi42ODYgMTIuNDAzIDYuOTExODNDMTQuMjYyNyA3LjEzNzY2IDE1LjYyNSA4Ljc3MjUxIDE1LjUxMTYgMTAuNjQyNEMxNS4zOTgyIDEyLjUxMjMgMTMuODQ4MyAxMy45NzA2IDExLjk3NSAxMy45N0gxMS45NzZNMTIuOTQgMTYuNTY5QzEyLjkzODkgMTYuOTY4IDEyLjYxNiAxNy4yOTE0IDEyLjIxNyAxNy4yOTNIMTEuNzM0QzExLjMzNSAxNy4yOTE0IDExLjAxMjEgMTYuOTY4IDExLjAxMSAxNi41NjlWMTYuMDg3QzExLjAxMSAxNS42OSAxMS4zMzcgMTUuMzY0IDExLjczNCAxNS4zNjRIMTIuMjE3QzEyLjYxNSAxNS4zNjQgMTIuOTQgMTUuNjkgMTIuOTQgMTYuMDg3VjE2LjU2OVYxNi41NjlNMTIgNC41QzcuODYwNjQgNC41IDQuNSA3Ljg2MDY0IDQuNSAxMkM0LjUgMTYuMTM5NCA3Ljg2MDY0IDE5LjUgMTIgMTkuNUMxNi4xMzk0IDE5LjUgMTkuNSAxNi4xMzk0IDE5LjUgMTJDMTkuNSA3Ljg2MDY0IDE2LjEzOTQgNC41IDEyIDQuNVY0LjUiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="Help" />
+      </span>
+    </h1>
+    <p class="subtitle">An alert is triggered when a student struggles repeatedly on the same concept in a tower.</p>
+  </section>
+
+  <!-- Selector pill -->
+  <section class="selector">
+    <button class="pill">
+      Kleinfeldt - Grade 3
+      <span class="caret" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAuNDYwNCIgaGVpZ2h0PSI2LjIzMTc1IiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiAgIHZpZXdCb3g9IjAgMCAxMC40NjA0IDYuMjMxNzUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJWZWN0b3IiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNS4yMzA3MSAzLjgxNTcxTDguNzY1NzEgMC4yODA3MTJDOS4xNTgwOSAtMC4wOTgyNjAyIDkuNzgxOCAtMC4wOTI4NDA0IDEwLjE2NzUgMC4yOTI4OTNDMTAuNTUzMyAwLjY3ODYyNyAxMC41NTg3IDEuMzAyMzMgMTAuMTc5NyAxLjY5NDcxTDUuOTM3NzEgNS45Mzc3MUM1Ljc1MDU4IDYuMTI1OTIgNS40OTYxMiA2LjIzMTc1IDUuMjMwNzEgNi4yMzE3NUM0Ljk2NTMgNi4yMzE3NSA0LjcxMDg1IDYuMTI1OTIgNC41MjM3MSA1LjkzNzcxTDAuMjgwNzEyIDEuNjk0NzFDLTAuMDk4MjYwMiAxLjMwMjMzIC0wLjA5Mjg0MDQgMC42Nzg2MjcgMC4yOTI4OTMgMC4yOTI4OTNDMC42Nzg2MjcgLTAuMDkyODQwNCAxLjMwMjMzIC0wLjA5ODI2MDIgMS42OTQ3MSAwLjI4MDcxMkw1LjIzMDcxIDMuODE1NzFWMy44MTU3MSIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Qjk0KSIvPgo8L3N2Zz4K" alt="" /></span>
+    </button>
+  </section>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="left">
+      <div class="icon"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDYwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iR3JvdXAiPgo8cGF0aCBpZD0iVmVjdG9yIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTAgMzBDMCA0Ni41NTc1IDEzLjQ0MjUgNjAgMzAgNjBDNDYuNTU3NSA2MCA2MCA0Ni41NTc1IDYwIDMwQzYwIDEzLjQ0MjUgNDYuNTU3NSAwIDMwIDBDMTMuNDQyNSAwIDAgMTMuNDQyNSAwIDMwVjMwIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM3MDI5QTUpIi8+CjxwYXRoIGlkPSJWZWN0b3JfMiIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0zMCAzMkMzNS4yNTcgMzIgMzkuNjc3IDM0LjE2NyAzOS45OCAzOS4wMDJMMzkuOTkyIDM5LjI3M0wzOS45OTYgMzkuNTQ1TDM5Ljk5OSA0MS45ODVMMzkuOTkyIDQyLjEyQzM5Ljk0NSA0Mi41NjQgMzkuNjY0IDQyLjk0NiAzOS4yNjQgNDMuMTI2TDM5LjE0MSA0My4xNzRMMzkuMDIxIDQzLjIwN0wzOC41NjcgNDMuMjk4TDM4LjMyIDQzLjM0M0wzNy43OSA0My40MjlMMzYuOTE2IDQzLjU1TDM2LjI5MSA0My42MjVMMzUuNjQxIDQzLjY5NUwzNC45NzEgNDMuNzU4TDM0LjI4OCA0My44MTVMMzMuNTk5IDQzLjg2NUwzMi41NjkgNDMuOTI3TDMxLjg5NCA0My45NThMMzEuMjM3IDQzLjk4MUwzMC42MDMgNDMuOTk1TDMwIDQ0TDI5LjM5NiA0My45OTVMMjguNzYzIDQzLjk4MUwyOC4xMDUgNDMuOTU4TDI3LjQzIDQzLjkyN0wyNi40IDQzLjg2NUwyNS43MTIgNDMuODE1TDI1LjAyOSA0My43NThMMjQuMzU5IDQzLjY5NEwyMy43MDkgNDMuNjI0TDIzLjA4NCA0My41NUwyMi4zNSA0My40NUwyMS42OCA0My4zNDNMMjEuNDMzIDQzLjI5OEwyMS4xOTkgNDMuMjUzTDIwLjc3NCA0My4xNkwyMC42NjQgNDMuMTI2QzIwLjMwOCA0Mi45OTYgMjAuMDU1IDQyLjY3NyAyMC4wMDggNDIuMzAyTDIwLjAwMSA0Mi4xNzVMMjAuMDA0IDM5LjU0NUwyMC4wMDggMzkuMjczQzIwLjE2IDM0LjI0OCAyNC42NDUgMzIgMzAgMzJWMzJNNDMgMjZDNDYuNzQ4IDI2IDQ5Ljg4OSAyNy44NzQgNDkuOTk1IDMyLjA2MUw0OS45OTggMzIuMjg4TDUwIDM0LjMyQzUwIDM0Ljc3NSA0OS43NTQgMzUuMTczIDQ5LjM5OSAzNS4zMUw0OS4zMTUgMzUuMzM4TDQ4Ljk5NyAzNS40MTRMNDguODI0IDM1LjQ1MUw0OC40NTMgMzUuNTIzTDQ3Ljg0MSAzNS42MjRMNDcuNDA0IDM1LjY4Nkw0Ni45NDkgMzUuNzQ0TDQ2LjQ3OSAzNS43OTdMNDYuMDAyIDM1Ljg0NUw0NS41MiAzNS44ODZMNDQuNzk5IDM1LjkzOEw0NC4zMjYgMzUuOTY0TDQzLjg2NiAzNS45ODRMNDMuNDIyIDM1Ljk5NUw0MyAzNkw0Mi41NzcgMzUuOTk2TDQyLjEzNCAzNS45ODRMNDEuNjc0IDM1Ljk2NUw0MS4zMTUgMzUuOTQ1QzQwLjM4NSAzMy42ODkgMzguNTQ2IDMyLjA0MiAzNi4wOTQgMzEuMDYyQzM2LjYzOCAyNy41NzUgMzkuNTY0IDI2IDQzIDI2VjI2TTE3IDI2QzIwLjQzNSAyNiAyMy4zNiAyNy41NzQgMjMuOTA2IDMxLjA2QzIxLjQ0NSAzMi4wNDMgMTkuNjA0IDMzLjY5MiAxOC42NzYgMzUuOTQ2TDE4LjMyNiAzNS45NjZMMTcuODY2IDM1Ljk4NEwxNy40MjIgMzUuOTk2TDE3IDM2TDE2LjU3NyAzNS45OTZMMTYuMTM0IDM1Ljk4NEwxNS42NzQgMzUuOTY1TDE1LjIwMSAzNS45MzlMMTQuNDggMzUuODg3TDEzLjk5OCAzNS44NDZMMTMuNTIgMzUuNzk4TDEzLjA1IDM1Ljc0NUwxMi41OTUgMzUuNjg3TDEyLjE1OCAzNS42MjVMMTEuNjQ0IDM1LjU0MkwxMS4xNzUgMzUuNDUyQzExLjA1NyAzNS40MjggMTAuOTQ1IDM1LjQwMiAxMC44MzkgMzUuMzc3TDEwLjU0MSAzNS4zQzEwLjIyMyAzNS4yMDkgOS45OTkgMzQuODcgMTAgMzQuNDc5TDEwLjAwMiAzMi4yODhDOS45OTkgMjcuOTQgMTMuMTg0IDI2IDE3IDI2VjI2TTMwIDE4QzMzLjMxNCAxOCAzNiAyMC42ODYgMzYgMjRDMzYgMjcuMDg2IDMzLjY3IDI5LjYyOCAzMC42NzQgMjkuOTYzTDMwLjQ0OCAyOS45ODNMMzAuMjI1IDI5Ljk5NkwzMCAzMEwyOS43NzUgMjkuOTk2TDI5LjU1MiAyOS45ODRDMjYuNDQ4IDI5Ljc1NCAyNCAyNy4xNjQgMjQgMjRDMjQgMjAuNjg2IDI2LjY4NiAxOCAzMCAxOFYxOE00MyAxNkM0NS4yMSAxNiA0NyAxNy43OSA0NyAyMEM0NyAyMi4xMDkgNDUuMzY4IDIzLjgzNiA0My4yOTkgMjMuOTg5TDQzLjE1IDIzLjk5N0w0MyAyNEw0Mi44NSAyMy45OTdDNDAuNzEgMjMuOTE4IDM5IDIyLjE2IDM5IDIwQzM5IDE3Ljc5IDQwLjc5IDE2IDQzIDE2VjE2TTE3IDE2QzE5LjIxIDE2IDIxIDE3Ljc5IDIxIDIwQzIxIDIyLjEwOSAxOS4zNjggMjMuODM2IDE3LjI5OSAyMy45ODlMMTcuMTUgMjMuOTk3TDE3IDI0TDE2Ljg1IDIzLjk5N0MxNC43MSAyMy45MTggMTMgMjIuMTYgMTMgMjBDMTMgMTcuNzkgMTQuNzkgMTYgMTcgMTZWMTYiIGZpbGw9InZhcigtLWZpbGwtMCwgd2hpdGUpIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></div>
+      <div>
+        <h2>Kleinfeldt - Grade 3</h2>
+        <div class="meta">Grade 3 | 25 students</div>
+      </div>
+    </div>
+    <button class="print-btn">
+      <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDI0IDE2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iSW1nIj4KPHBhdGggaWQ9IlN5bWJvbCIgZD0iTTE0IDZDMTQuNTYyNSA2IDE1LjAzNjUgNi4xOTI3MSAxNS40MjE5IDYuNTc4MTJDMTUuODA3MyA2Ljk2MzU0IDE2IDcuNDM3NSAxNiA4VjExLjVDMTYgMTEuNjQ1OCAxNS45NTMxIDExLjc2NTYgMTUuODU5NCAxMS44NTk0QzE1Ljc2NTYgMTEuOTUzMSAxNS42NDU4IDEyIDE1LjUgMTJIMTRWMTVDMTQgMTUuMjcwOCAxMy45MDEgMTUuNTA1MiAxMy43MDMxIDE1LjcwMzFDMTMuNTA1MiAxNS45MDEgMTMuMjcwOCAxNiAxMyAxNkgzQzIuNzI5MTcgMTYgMi40OTQ3OSAxNS45MDEgMi4yOTY4OCAxNS43MDMxQzIuMDk4OTYgMTUuNTA1MiAyIDE1LjI3MDggMiAxNVYxMkgwLjVDMC4zNTQxNjcgMTIgMC4yMzQzNzUgMTEuOTUzMSAwLjE0MDYyNSAxMS44NTk0QzAuMDQ2ODc1IDExLjc2NTYgMCAxMS42NDU4IDAgMTEuNVY4QzAgNy40Mzc1IDAuMTkyNzA4IDYuOTYzNTQgMC41NzgxMjUgNi41NzgxMkMwLjk2MzU0MiA2LjE5MjcxIDEuNDM3NSA2IDIgNlYxQzIgMC43MjkxNjcgMi4wOTg5NiAwLjQ5NDc5MiAyLjI5Njg4IDAuMjk2ODc1QzIuNDk0NzkgMC4wOTg5NTgzIDIuNzI5MTcgMCAzIDBIMTEuNTkzOEMxMS44NjQ2IDAgMTIuMDkzOCAwLjA5Mzc1IDEyLjI4MTIgMC4yODEyNUwxMy43MTg4IDEuNzE4NzVDMTMuOTA2MiAxLjkwNjI1IDE0IDIuMTM1NDIgMTQgMi40MDYyNVY2VjZNMTIgMTRWMTFINFYxNEgxMlYxNE0xMiA3VjRIMTAuNUMxMC4zNTQyIDQgMTAuMjM0NCAzLjk1MzEyIDEwLjE0MDYgMy44NTkzOEMxMC4wNDY5IDMuNzY1NjIgMTAgMy42NDU4MyAxMCAzLjVWMkg0VjdIMTJWN00xMi45Njg4IDkuMDMxMjVDMTMuMTE0NiA5LjE3NzA4IDEzLjI5MTcgOS4yNSAxMy41IDkuMjVDMTMuNzA4MyA5LjI1IDEzLjg4NTQgOS4xNzcwOCAxNC4wMzEyIDkuMDMxMjVDMTQuMTc3MSA4Ljg4NTQyIDE0LjI1IDguNzA4MzMgMTQuMjUgOC41QzE0LjI1IDguMjkxNjcgMTQuMTc3MSA4LjExNDU4IDE0LjAzMTIgNy45Njg3NUMxMy44ODU0IDcuODIyOTIgMTMuNzA4MyA3Ljc1IDEzLjUgNy43NUMxMy4yOTE3IDcuNzUgMTMuMTE0NiA3LjgyMjkyIDEyLjk2ODggNy45Njg3NUMxMi44MjI5IDguMTE0NTggMTIuNzUgOC4yOTE2NyAxMi43NSA4LjVDMTIuNzUgOC43MDgzMyAxMi44MjI5IDguODg1NDIgMTIuOTY4OCA5LjAzMTI1VjkuMDMxMjUiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="" /> Print
+    </button>
+  </section>
+
+  <!-- Two-column area -->
+  <section class="columns">
+
+    <!-- Filter sidebar -->
+    <aside>
+      <div class="filter-header"><span>Filter by</span></div>
+
+      <div class="filter-box">
+        <div class="filter-row">
+          <label>Completed Towers</label>
+          <div class="toggle on" id="completedToggle" role="switch" aria-checked="true">
+            <span class="label-hide">Hide</span>
+            <span class="switch" tabindex="0">
+              <span class="track"></span>
+              <span class="knob"></span>
+            </span>
+            <span class="label-show">Show</span>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <label for="dateFilter">Date</label>
+          <div class="dropdown">
+            <select id="dateFilter">
+              <option>All</option>
+              <option>Past Week</option>
+              <option selected>Past 2 Weeks</option>
+              <option>Past 3 Weeks</option>
+              <option>Past Month</option>
+              <option>Past 6 Months</option>
+            </select>
+            <span class="caret"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2hldnJvbi1kb3duIj4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTExLjUzNSAxNS44MUw1LjE5MyA5LjQ4NEM1LjA2OTc4IDkuMzY0MDggNS4wMDAyNyA5LjE5OTQ0IDUuMDAwMjcgOS4wMjc1QzUuMDAwMjcgOC44NTU1NiA1LjA2OTc4IDguNjkwOTIgNS4xOTMgOC41NzFMNS41ODEgOC4xODlDNS44Mzk0NiA3LjkzNjE5IDYuMjUyNTQgNy45MzYxOSA2LjUxMSA4LjE4OUwxMiAxMy42ODNMMTcuNDkgOC4xOTVDMTcuNzQ4NSA3Ljk0MjE5IDE4LjE2MTUgNy45NDIxOSAxOC40MiA4LjE5NUwxOC44MDcgOC41NzZDMTguOTMwMiA4LjY5NTkyIDE4Ljk5OTcgOC44NjA1NiAxOC45OTk3IDkuMDMyNUMxOC45OTk3IDkuMjA0NDQgMTguOTMwMiA5LjM2OTA4IDE4LjgwNyA5LjQ4OUwxMi40NjUgMTUuODE1QzEyLjIwNDEgMTYuMDYzOCAxMS43OTMyIDE2LjA2MTYgMTEuNTM1IDE1LjgxVjE1LjgxIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMzMDNCNDApIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></span>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <label for="strugglesFilter">Struggles</label>
+          <div class="dropdown">
+            <select id="strugglesFilter">
+              <option selected>1 or more</option>
+              <option>2 or more</option>
+              <option>3 or more</option>
+            </select>
+            <span class="caret"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2hldnJvbi1kb3duIj4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTExLjUzNSAxNS44MUw1LjE5MyA5LjQ4NEM1LjA2OTc4IDkuMzY0MDggNS4wMDAyNyA5LjE5OTQ0IDUuMDAwMjcgOS4wMjc1QzUuMDAwMjcgOC44NTU1NiA1LjA2OTc4IDguNjkwOTIgNS4xOTMgOC41NzFMNS41ODEgOC4xODlDNS44Mzk0NiA3LjkzNjE5IDYuMjUyNTQgNy45MzYxOSA2LjUxMSA4LjE4OUwxMiAxMy42ODNMMTcuNDkgOC4xOTVDMTcuNzQ4NSA3Ljk0MjE5IDE4LjE2MTUgNy45NDIxOSAxOC40MiA4LjE5NUwxOC44MDcgOC41NzZDMTguOTMwMiA4LjY5NTkyIDE4Ljk5OTcgOC44NjA1NiAxOC45OTk3IDkuMDMyNUMxOC45OTk3IDkuMjA0NDQgMTguOTMwMiA5LjM2OTA4IDE4LjgwNyA5LjQ4OUwxMi40NjUgMTUuODE1QzEyLjIwNDEgMTYuMDYzOCAxMS43OTMyIDE2LjA2MTYgMTEuNTM1IDE1LjgxVjE1LjgxIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMzMDNCNDApIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students panel -->
+      <div class="panel" id="studentsPanel">
+        <button class="panel-header" data-toggle="studentsPanel">
+          Students
+          <span class="chev" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOC4yOTc5MiIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCIgICB2aWV3Qm94PSIwIDAgMTYgOC4yOTc5MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImNoZXZyb24tdXAiPgo8cGF0aCBpZD0iaWNvbi1jaGFydCIgZD0iTTguNTMxMjUgMC4yNUwxNC41OTM4IDYuMzEyNUMxNC43Mzk2IDYuNDU4MzMgMTQuODEyNSA2LjYzNTQyIDE0LjgxMjUgNi44NDM3NUMxNC44MTI1IDcuMDUyMDggMTQuNzM5NiA3LjIyOTE3IDE0LjU5MzggNy4zNzVMMTMuOTA2MiA4LjA2MjVDMTMuNzYwNCA4LjIwODMzIDEzLjU4MzMgOC4yODY0NiAxMy4zNzUgOC4yOTY4OEMxMy4xNjY3IDguMzA3MjkgMTIuOTg5NiA4LjIzOTU4IDEyLjg0MzggOC4wOTM3NUw4IDMuMjVMMy4xNTYyNSA4LjA5Mzc1QzMuMDEwNDIgOC4yMzk1OCAyLjgzMzMzIDguMzA3MjkgMi42MjUgOC4yOTY4OEMyLjQxNjY3IDguMjg2NDYgMi4yMzk1OCA4LjIwODMzIDIuMDkzNzUgOC4wNjI1TDEuNDA2MjUgNy4zNzVDMS4yNjA0MiA3LjIyOTE3IDEuMTg3NSA3LjA1MjA4IDEuMTg3NSA2Ljg0Mzc1QzEuMTg3NSA2LjYzNTQyIDEuMjYwNDIgNi40NTgzMyAxLjQwNjI1IDYuMzEyNUw3LjQ2ODc1IDAuMjVDNy42MTQ1OCAwLjA4MzMzMzMgNy43OTE2NyAwIDggMEM4LjIwODMzIDAgOC4zODU0MiAwLjA4MzMzMzMgOC41MzEyNSAwLjI1VjAuMjUiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="" /></span>
+        </button>
+        <div class="list" id="studentList"></div>
+      </div>
+
+      <!-- Content panel -->
+      <div class="panel" id="contentPanel">
+        <button class="panel-header" data-toggle="contentPanel">
+          Content
+          <span class="chev" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOC4yOTc5MiIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCIgICB2aWV3Qm94PSIwIDAgMTYgOC4yOTc5MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImNoZXZyb24tdXAiPgo8cGF0aCBpZD0iaWNvbi1jaGFydCIgZD0iTTguNTMxMjUgMC4yNUwxNC41OTM4IDYuMzEyNUMxNC43Mzk2IDYuNDU4MzMgMTQuODEyNSA2LjYzNTQyIDE0LjgxMjUgNi44NDM3NUMxNC44MTI1IDcuMDUyMDggMTQuNzM5NiA3LjIyOTE3IDE0LjU5MzggNy4zNzVMMTMuOTA2MiA4LjA2MjVDMTMuNzYwNCA4LjIwODMzIDEzLjU4MzMgOC4yODY0NiAxMy4zNzUgOC4yOTY4OEMxMy4xNjY3IDguMzA3MjkgMTIuOTg5NiA4LjIzOTU4IDEyLjg0MzggOC4wOTM3NUw4IDMuMjVMMy4xNTYyNSA4LjA5Mzc1QzMuMDEwNDIgOC4yMzk1OCAyLjgzMzMzIDguMzA3MjkgMi42MjUgOC4yOTY4OEMyLjQxNjY3IDguMjg2NDYgMi4yMzk1OCA4LjIwODMzIDIuMDkzNzUgOC4wNjI1TDEuNDA2MjUgNy4zNzVDMS4yNjA0MiA3LjIyOTE3IDEuMTg3NSA3LjA1MjA4IDEuMTg3NSA2Ljg0Mzc1QzEuMTg3NSA2LjYzNTQyIDEuMjYwNDIgNi40NTgzMyAxLjQwNjI1IDYuMzEyNUw3LjQ2ODc1IDAuMjVDNy42MTQ1OCAwLjA4MzMzMzMgNy43OTE2NyAwIDggMEM4LjIwODMzIDAgOC4zODU0MiAwLjA4MzMzMzMgOC41MzEyNSAwLjI1VjAuMjUiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="" /></span>
+        </button>
+        <div class="list content-list" id="contentList"></div>
+      </div>
+    </aside>
+
+    <!-- Right column -->
+    <section>
+      <div class="sort-row">
+        <div class="sort-left">
+          <span class="label">Sort by</span>
+          <div class="dropdown wide lg">
+            <select id="sortBy">
+              <option selected>Date: Newest</option>
+              <option>Date: Earliest</option>
+              <option>Content: Newest</option>
+              <option>Content: Earliest</option>
+            </select>
+            <span class="caret"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2hldnJvbi1kb3duIj4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTExLjUzNSAxNS44MUw1LjE5MyA5LjQ4NEM1LjA2OTc4IDkuMzY0MDggNS4wMDAyNyA5LjE5OTQ0IDUuMDAwMjcgOS4wMjc1QzUuMDAwMjcgOC44NTU1NiA1LjA2OTc4IDguNjkwOTIgNS4xOTMgOC41NzFMNS41ODEgOC4xODlDNS44Mzk0NiA3LjkzNjE5IDYuMjUyNTQgNy45MzYxOSA2LjUxMSA4LjE4OUwxMiAxMy42ODNMMTcuNDkgOC4xOTVDMTcuNzQ4NSA3Ljk0MjE5IDE4LjE2MTUgNy45NDIxOSAxOC40MiA4LjE5NUwxOC44MDcgOC41NzZDMTguOTMwMiA4LjY5NTkyIDE4Ljk5OTcgOC44NjA1NiAxOC45OTk3IDkuMDMyNUMxOC45OTk3IDkuMjA0NDQgMTguOTMwMiA5LjM2OTA4IDE4LjgwNyA5LjQ4OUwxMi40NjUgMTUuODE1QzEyLjIwNDEgMTYuMDYzOCAxMS43OTMyIDE2LjA2MTYgMTEuNTM1IDE1LjgxVjE1LjgxIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMzMDNCNDApIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></span>
+          </div>
+        </div>
+        <div class="results-count"><span>40</span><span class="rest">&nbsp;Results</span></div>
+      </div>
+
+      <div class="alerts" id="alerts"></div>
+
+      <div class="load-more-wrap">
+        <button class="load-more">LOAD MORE</button>
+      </div>
+    </section>
+
+  </section>
+
+</main>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Help</a>
+    <a href="#">About Us</a>
+    <a href="#">Donate</a>
+    <a href="#">Terms</a>
+  </div>
+  <p>© 2026 Zearn. Licensed to you pursuant to Zearn's <a href="#">Terms of Use</a>.</p>
+  <p>Portions of Zearn Math are derivative of Open Up Resources' 6-8 Math curriculum, used under the CC BY 4.0 license. Download the original for free at <a href="#">openupresources.org</a>.</p>
+  <p>Portions of Zearn Math are derivative of Eureka Math and licensed by Great Minds. © 2012–2026 Great Minds. All rights reserved.</p>
+</footer>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  // ---- Data ----
+  const STUDENTS = [
+    { name: "Suzanne Alvarez",  count: 3 },
+    { name: "Brianna Barrios",  count: 5 },
+    { name: "Trina Brown",      count: 0 },
+    { name: "Paul Derrick",     count: 2 },
+    { name: "Sebastian Diaz",   count: 0 },
+    { name: "Janiya DuBuque",   count: 2 },
+    { name: "Fernando Garcia",  count: 3 },
+    { name: "Jordan Goldstein", count: 2 },
+    { name: "Roxanne Jacobson", count: 0 },
+    { name: "Franklin Joseph",  count: 0 },
+    { name: "Alexia Lee",       count: 0 },
+    { name: "Porter Levy",      count: 1 },
+    { name: "Alberto Martinez", count: 3 },
+    { name: "Grace McCarty",    count: 0 },
+    { name: "Elijah Park",      count: 4 },
+    { name: "Ashin Patel",      count: 4 },
+    { name: "Jose Perez",       count: 3 },
+    { name: "Iliana Peters",    count: 4 },
+    { name: "Naomi Sachs",      count: 1 },
+    { name: "Jaiden Thomas",    count: 0 },
+    { name: "Olivia Tran",      count: 0 },
+    { name: "Jada Williams",    count: 0 },
+    { name: "Jesse Williamson", count: 3 },
+    { name: "Sam Wyman",        count: 0 },
+    { name: "Benjamin Young",   count: 0 }
+  ];
+
+  const GRADES = [
+    "Kindergarten","Grade 1","Grade 2","Grade 3",
+    { name: "Grade 4", count: 40 },
+    "Grade 5","Grade 6","Grade 7","Grade 8"
+  ];
+
+  const ALERTS = [
+    { student: "Elijah Park", loc: "Grade 4 | Mission 3 | Topic B",
+      lesson: "Lesson 4: Leftward Ho",
+      desc: "Interpret and represent patterns when multiplying by 10, 100, and 1,000 in arrays and numerically.",
+      events: [
+        { type: "alert", ts: "Wed, May 6, 2026, 3:37 PM" },
+        { type: "alert", ts: "Wed, May 6, 2026, 3:32 PM" },
+        { type: "alert", ts: "Tue, May 5, 2026, 3:48 PM" },
+        { type: "alert", ts: "Tue, May 5, 2026, 3:11 PM" }
+      ], count: 4 },
+    { student: "Porter Levy", loc: "Grade 4 | Mission 1 | Topic D",
+      lesson: "Lesson 12: Sum Sense",
+      desc: "Solve multi-step word problems using the standard addition algorithm modeled with tape diagrams and assess the reasonableness of answers using rounding.",
+      events: [
+        { type: "alert", ts: "Wed, May 6, 2026, 3:11 PM" },
+        { type: "alert", ts: "Wed, May 6, 2026, 3:06 PM" }
+      ], count: 2 },
+    { student: "Jesse Williamson", loc: "Grade 4 | Mission 3 | Topic A",
+      lesson: "Lesson 2: Dynamic Dimensions",
+      desc: "Solve multiplicative comparison word problems by applying the area and perimeter formulas.",
+      events: [
+        { type: "completed", ts: "Wed, May 6, 2026, 2:53 PM" },
+        { type: "alert",     ts: "Tue, May 5, 2026, 2:52 PM" }
+      ], count: 1 },
+    { student: "Paul Derrick", loc: "Grade 4 | Mission 2 | Topic B",
+      lesson: "Lesson 4: Like This Like That",
+      desc: "Know and relate metric units to place value units in order to express measurements in different units.",
+      events: [
+        { type: "completed", ts: "Wed, May 6, 2026, 2:50 PM" },
+        { type: "alert",     ts: "Wed, May 6, 2026, 2:46 PM" }
+      ], count: 1 },
+    { student: "Iliana Peters", loc: "Grade 4 | Mission 3 | Topic C",
+      lesson: "Lesson 9: Twinsies!",
+      desc: "Multiply three- and four-digit numbers by one-digit numbers applying the standard algorithm.",
+      events: [
+        { type: "completed", ts: "Wed, May 6, 2026, 2:47 PM" },
+        { type: "alert",     ts: "Wed, May 6, 2026, 2:44 PM" }
+      ], count: 1 },
+    { student: "Ashin Patel", loc: "Grade 4 | Mission 3 | Topic A",
+      lesson: "Lesson 1: In 'n' Out",
+      desc: "Investigate and use the formulas for area and perimeter of rectangles.",
+      events: [
+        { type: "completed", ts: "Wed, May 6, 2026, 2:46 PM" },
+        { type: "alert",     ts: "Wed, May 6, 2026, 2:39 PM" }
+      ], count: 1 },
+    { student: "Jose Perez", loc: "Grade 4 | Mission 3 | Topic A",
+      lesson: "Lesson 2: Dynamic Dimensions",
+      desc: "Solve multiplicative comparison word problems by applying the area and perimeter formulas.",
+      events: [
+        { type: "completed", ts: "Tue, May 5, 2026, 3:19 PM" },
+        { type: "alert",     ts: "Tue, May 5, 2026, 3:15 PM" }
+      ], count: 1 },
+    { student: "Brianna Barrios", loc: "Grade 4 | Mission 3 | Topic B",
+      lesson: "Lesson 4: Leftward Ho",
+      desc: "Interpret and represent patterns when multiplying by 10, 100, and 1,000 in arrays and numerically.",
+      events: [
+        { type: "alert", ts: "Tue, May 5, 2026, 2:57 PM" },
+        { type: "alert", ts: "Tue, May 5, 2026, 2:54 PM" }
+      ], count: 2 },
+    { student: "Suzanne Alvarez", loc: "Grade 4 | Mission 2 | Topic B",
+      lesson: "Lesson 4: Like This Like That",
+      desc: "Know and relate metric units to place value units in order to express measurements in different units.",
+      events: [
+        { type: "alert", ts: "Tue, May 5, 2026, 2:46 PM" }
+      ], count: 1 },
+    { student: "Iliana Peters", loc: "Grade 4 | Mission 3 | Topic C",
+      lesson: "Lesson 8: Twice Is Nice",
+      desc: "Use place value disks to represent two-digit by one-digit multiplication.",
+      events: [
+        { type: "completed", ts: "Tue, May 5, 2026, 2:36 PM" },
+        { type: "alert",     ts: "Tue, May 5, 2026, 2:30 PM" }
+      ], count: 1 }
+  ];
+
+  // ---- Sidebar ----
+  const studentList = document.getElementById("studentList");
+  studentList.insertAdjacentHTML("afterbegin",
+    `<div class="row selected"><span>ALL</span><span class="count">40&nbsp;Results</span></div>`
+  );
+  STUDENTS.forEach(s => {
+    const cls = s.count > 0 ? "semibold" : "regular";
+    const countHtml = s.count > 0 ? `<span class="count">${s.count}</span>` : "";
+    studentList.insertAdjacentHTML("beforeend",
+      `<div class="row ${cls}"><span>${s.name}</span>${countHtml}</div>`
+    );
+  });
+
+  const contentList = document.getElementById("contentList");
+  contentList.insertAdjacentHTML("afterbegin",
+    `<div class="row selected"><span class="label-wrap"><span>ALL</span><span class="count">40&nbsp;Results</span></span></div>`
+  );
+  GRADES.forEach(g => {
+    const name = typeof g === "string" ? g : g.name;
+    const count = typeof g === "string" ? null : g.count;
+    const cls = count != null ? "semibold" : "regular";
+    const countHtml = count != null ? `<span class="count">${count}</span>` : "";
+    contentList.insertAdjacentHTML("beforeend",
+      `<div class="row ${cls}">
+        <span class="twirl"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTAuMjE4OCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCIgICB2aWV3Qm94PSIwIDAgMTYgMTAuMjE4OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbnRhaW5lciI+CjxwYXRoIGlkPSJpY29uLWNoYXJ0IiBkPSJNMTAuOTI0MiA1LjUwNzgxTDYuMzc3MzQgMTAuMDU0N0M2LjI2Nzk3IDEwLjE2NDEgNi4xMzUxNiAxMC4yMTg4IDUuOTc4OTEgMTAuMjE4OEM1LjgyMjY2IDEwLjIxODggNS42ODk4NCAxMC4xNjQxIDUuNTgwNDcgMTAuMDU0N0w1LjA2NDg0IDkuNTM5MDZDNC45NTU0NyA5LjQyOTY5IDQuODk2ODggOS4yOTY4OCA0Ljg4OTA2IDkuMTQwNjJDNC44ODEyNSA4Ljk4NDM4IDQuOTMyMDMgOC44NTE1NiA1LjA0MTQxIDguNzQyMTlMOC42NzQyMiA1LjEwOTM4TDUuMDQxNDEgMS40NzY1NkM0LjkzMjAzIDEuMzY3MTkgNC44ODEyNSAxLjIzNDM4IDQuODg5MDYgMS4wNzgxMkM0Ljg5Njg4IDAuOTIxODc1IDQuOTU1NDcgMC43ODkwNjIgNS4wNjQ4NCAwLjY3OTY4OEw1LjU4MDQ3IDAuMTY0MDYyQzUuNjg5ODQgMC4wNTQ2ODc1IDUuODIyNjYgMCA1Ljk3ODkxIDBDNi4xMzUxNiAwIDYuMjY3OTcgMC4wNTQ2ODc1IDYuMzc3MzQgMC4xNjQwNjJMMTAuOTI0MiA0LjcxMDk0QzExLjA0OTIgNC44MjAzMSAxMS4xMTE3IDQuOTUzMTIgMTEuMTExNyA1LjEwOTM4QzExLjExMTcgNS4yNjU2MiAxMS4wNDkyIDUuMzk4NDQgMTAuOTI0MiA1LjUwNzgxVjUuNTA3ODEiIGZpbGw9InZhcigtLWZpbGwtMCwgIzMwM0I0MCkiLz4KPC9nPgo8L3N2Zz4K" alt="" /></span>
+        <span class="label-wrap"><span>${name}</span>${countHtml}</span>
+      </div>`
+    );
+  });
+
+  // ---- Alerts ----
+  function alertIconHtml(type) {
+    if (type === "completed") {
+      return `<span class="ico"><svg viewBox="0 0 16 16" fill="currentColor" style="background:var(--green);color:#fff;border-radius:50%;width:14.5px;height:14.5px;padding:3px"><path d="M6 11.2L2.8 8 1.4 9.4 6 14l9-9-1.4-1.4z"/></svg></span>`;
+    }
+    return `<span class="ico"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQuNTMxMiIgaGVpZ2h0PSIxNC41MzEyIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiAgIHZpZXdCb3g9IjAgMCAxNC41MzEyIDE0LjUzMTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJpY29uLWJhbmciIGQ9Ik0xMi40MDcyIDIuMTI0MDJDMTMuODIzMiAzLjU0MDA0IDE0LjUzMTIgNS4yNTM5MSAxNC41MzEyIDcuMjY1NjJDMTQuNTMxMiA5LjI3NzM0IDEzLjgyMzIgMTAuOTkxMiAxMi40MDcyIDEyLjQwNzJDMTAuOTkxMiAxMy44MjMyIDkuMjc3MzQgMTQuNTMxMiA3LjI2NTYyIDE0LjUzMTJDNS4yNTM5MSAxNC41MzEyIDMuNTQwMDQgMTMuODIzMiAyLjEyNDAyIDEyLjQwNzJDMC43MDgwMDggMTAuOTkxMiAwIDkuMjc3MzQgMCA3LjI2NTYyQzAgNS4yNTM5MSAwLjcwODAwOCAzLjU0MDA0IDIuMTI0MDIgMi4xMjQwMkMzLjU0MDA0IDAuNzA4MDA4IDUuMjUzOTEgMCA3LjI2NTYyIDBDOS4yNzczNCAwIDEwLjk5MTIgMC43MDgwMDggMTIuNDA3MiAyLjEyNDAyVjIuMTI0MDJNOC4yMTc3NyA5LjEyNTk4QzcuOTU0MSA4Ljg2MjMgNy42MzY3MiA4LjczMDQ3IDcuMjY1NjIgOC43MzA0N0M2Ljg5NDUzIDguNzMwNDcgNi41NzcxNSA4Ljg2MjMgNi4zMTM0OCA5LjEyNTk4QzYuMDQ5OCA5LjM4OTY1IDUuOTE3OTcgOS43MDcwMyA1LjkxNzk3IDEwLjA3ODFDNS45MTc5NyAxMC40NDkyIDYuMDQ5OCAxMC43NjY2IDYuMzEzNDggMTEuMDMwM0M2LjU3NzE1IDExLjI5MzkgNi44OTQ1MyAxMS40MjU4IDcuMjY1NjIgMTEuNDI1OEM3LjYzNjcyIDExLjQyNTggNy45NTQxIDExLjI5MzkgOC4yMTc3NyAxMS4wMzAzQzguNDgxNDUgMTAuNzY2NiA4LjYxMzI4IDEwLjQ0OTIgOC42MTMyOCAxMC4wNzgxQzguNjEzMjggOS43MDcwMyA4LjQ4MTQ1IDkuMzg5NjUgOC4yMTc3NyA5LjEyNTk4VjkuMTI1OThNNS45NzY1NiAzLjg5NjQ4TDYuMjEwOTQgNy44ODA4NkM2LjIxMDk0IDguMDk1NyA2LjMyODEyIDguMjAzMTIgNi41NjI1IDguMjAzMTJINy45Njg3NUM4LjIwMzEyIDguMjAzMTIgOC4zMjAzMSA4LjA5NTcgOC4zMjAzMSA3Ljg4MDg2TDguNTU0NjkgMy44OTY0OEM4LjU1NDY5IDMuNzc5MyA4LjUyMDUxIDMuNjg2NTIgOC40NTIxNSAzLjYxODE2QzguMzgzNzkgMy41NDk4IDguMzAwNzggMy41MTU2MiA4LjIwMzEyIDMuNTE1NjJINi4zMjgxMkM2LjIzMDQ3IDMuNTE1NjIgNi4xNDc0NiAzLjU0OTggNi4wNzkxIDMuNjE4MTZDNi4wMTA3NCAzLjY4NjUyIDUuOTc2NTYgMy43NzkzIDUuOTc2NTYgMy44OTY0OFYzLjg5NjQ4IiBmaWxsPSJ2YXIoLS1maWxsLTAsICM3MDI5QTUpIi8+Cjwvc3ZnPgo=" alt="" /></span>`;
+  }
+  function eventHtml(e) {
+    return `
+      <div class="event evt-${e.type}">
+        ${alertIconHtml(e.type)}
+        <span class="label">${e.type === "completed" ? "Completed" : "Alert"}</span>
+        <span class="ts">${e.ts}</span>
+      </div>`;
+  }
+  function alertHtml(a) {
+    return `
+      <article class="alert">
+        <div class="alert-icon"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDQwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0idG93ZXItY2lyY2xlIj4KPGNpcmNsZSBpZD0iRWxsaXBzZSAxIiBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9InZhcigtLWZpbGwtMCwgIzcwMjlBNSkiLz4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTE5Ljk4MDkgMTAuNzE1NEwyMC44NjU1IDdMMjAuOTUzOSAxMC44MDM4TDIyLjU0NjMgOS4zTDIxLjkyNyAxMS4yNDYyTDI0LjMxNTUgMTAuNzE1NEwyMi41NDYzIDEyLjA0MjNMMjUuMjAwMSAxMi45MjY5TDIyLjYzNDcgMTMuMzY5MkwyMy42MDc4IDE0Ljc4NDZMMjIuMTA0IDE0LjI1MzhMMjIuNDU3OCAxNi4xMTE1TDIwLjk1MzkgMTUuMTM4NUwyMC42MDAxIDE3LjA4NDZMMTkuOTgwOSAxNC44NzMxTDE4LjU2NTUgMTYuMjg4NUwxOC45MTkzIDE0LjA3NjlMMTcuMTUwMSAxNC42MDc3TDE4LjQ3NyAxMy4zNjkyTDE2LjUzMDkgMTIuNTczMUwxOC43NDI0IDEyLjQ4NDZMMTYuNzk2MyAxMC42MjY5TDE5LjUzODYgMTEuNkwxOC40NzcgOS41NjUzOEwxOS45ODA5IDEwLjcxNTRaIiBmaWxsPSJ2YXIoLS1maWxsLTAsIHdoaXRlKSIvPgo8cGF0aCBpZD0iVmVjdG9yXzIiIGQ9Ik0xNiAxOC4yMzQ2TDI0LjQwMzggMTcuMzVMMjQuNDkyMyAzMEwxOC4xMjMxIDI5LjI5MjNMMTYgMTguMjM0NloiIGZpbGw9InZhcigtLWZpbGwtMCwgd2hpdGUpIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></div>
+        <div class="alert-head">
+          <div class="alert-info">
+            <div class="student-row">
+              <span class="student-name">${a.student}</span>
+              <a class="student-report-link" href="#" title="View student report">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDE2IDEyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iSW1nIj4KPHBhdGggaWQ9Imljb24tY2hhcnQiIGQ9Ik0xMC40MDYyIDhDMTAuMzAyMSA4IDEwLjIwODMgNy45NTgzMyAxMC4xMjUgNy44NzVDMTAuMDQxNyA3Ljc5MTY3IDEwIDcuNjk3OTIgMTAgNy41OTM3NVYzLjQwNjI1QzEwIDMuMzAyMDggMTAuMDQxNyAzLjIwODMzIDEwLjEyNSAzLjEyNUMxMC4yMDgzIDMuMDQxNjcgMTAuMzAyMSAzIDEwLjQwNjIgM0gxMS41OTM4QzExLjY5NzkgMyAxMS43OTE3IDMuMDQxNjcgMTEuODc1IDMuMTI1QzExLjk1ODMgMy4yMDgzMyAxMiAzLjMwMjA4IDEyIDMuNDA2MjVWNy41OTM3NUMxMiA3LjY5NzkyIDExLjk1ODMgNy43OTE2NyAxMS44NzUgNy44NzVDMTEuNzkxNyA3Ljk1ODMzIDExLjY5NzkgOCAxMS41OTM4IDhIMTAuNDA2MlY4TTEzLjQwNjIgOEMxMy4zMDIxIDggMTMuMjA4MyA3Ljk1ODMzIDEzLjEyNSA3Ljg3NUMxMy4wNDE3IDcuNzkxNjcgMTMgNy42OTc5MiAxMyA3LjU5Mzc1VjAuNDA2MjVDMTMgMC4zMDIwODMgMTMuMDQxNyAwLjIwODMzMyAxMy4xMjUgMC4xMjVDMTMuMjA4MyAwLjA0MTY2NjcgMTMuMzAyMSAwIDEzLjQwNjIgMEgxNC41OTM4QzE0LjY5NzkgMCAxNC43OTE3IDAuMDQxNjY2NyAxNC44NzUgMC4xMjVDMTQuOTU4MyAwLjIwODMzMyAxNSAwLjMwMjA4MyAxNSAwLjQwNjI1VjcuNTkzNzVDMTUgNy42OTc5MiAxNC45NTgzIDcuNzkxNjcgMTQuODc1IDcuODc1QzE0Ljc5MTcgNy45NTgzMyAxNC42OTc5IDggMTQuNTkzOCA4SDEzLjQwNjJWOE00LjQwNjI1IDhDNC4zMDIwOCA4IDQuMjA4MzMgNy45NTgzMyA0LjEyNSA3Ljg3NUM0LjA0MTY3IDcuNzkxNjcgNCA3LjY5NzkyIDQgNy41OTM3NVY1LjQwNjI1QzQgNS4zMDIwOCA0LjA0MTY3IDUuMjA4MzMgNC4xMjUgNS4xMjVDNC4yMDgzMyA1LjA0MTY3IDQuMzAyMDggNSA0LjQwNjI1IDVINS41OTM3NUM1LjY5NzkyIDUgNS43OTE2NyA1LjA0MTY3IDUuODc1IDUuMTI1QzUuOTU4MzMgNS4yMDgzMyA2IDUuMzAyMDggNiA1LjQwNjI1VjcuNTkzNzVDNiA3LjY5NzkyIDUuOTU4MzMgNy43OTE2NyA1Ljg3NSA3Ljg3NUM1Ljc5MTY3IDcuOTU4MzMgNS42OTc5MiA4IDUuNTkzNzUgOEg0LjQwNjI1VjhNNy40MDYyNSA4QzcuMzAyMDggOCA3LjIwODMzIDcuOTU4MzMgNy4xMjUgNy44NzVDNy4wNDE2NyA3Ljc5MTY3IDcgNy42OTc5MiA3IDcuNTkzNzVWMS40MDYyNUM3IDEuMzAyMDggNy4wNDE2NyAxLjIwODMzIDcuMTI1IDEuMTI1QzcuMjA4MzMgMS4wNDE2NyA3LjMwMjA4IDEgNy40MDYyNSAxSDguNTkzNzVDOC42OTc5MiAxIDguNzkxNjcgMS4wNDE2NyA4Ljg3NSAxLjEyNUM4Ljk1ODMzIDEuMjA4MzMgOSAxLjMwMjA4IDkgMS40MDYyNVY3LjU5Mzc1QzkgNy42OTc5MiA4Ljk1ODMzIDcuNzkxNjcgOC44NzUgNy44NzVDOC43OTE2NyA3Ljk1ODMzIDguNjk3OTIgOCA4LjU5Mzc1IDhINy40MDYyNVY4TTE1LjUgMTBDMTUuNjQ1OCAxMCAxNS43NjU2IDEwLjA0NjkgMTUuODU5NCAxMC4xNDA2QzE1Ljk1MzEgMTAuMjM0NCAxNiAxMC4zNTQyIDE2IDEwLjVWMTEuNUMxNiAxMS42NDU4IDE1Ljk1MzEgMTEuNzY1NiAxNS44NTk0IDExLjg1OTRDMTUuNzY1NiAxMS45NTMxIDE1LjY0NTggMTIgMTUuNSAxMkgxQzAuNzI5MTY3IDEyIDAuNDk0NzkyIDExLjkwMSAwLjI5Njg3NSAxMS43MDMxQzAuMDk4OTU4MyAxMS41MDUyIDAgMTEuMjcwOCAwIDExVjAuNUMwIDAuMzU0MTY3IDAuMDQ2ODc1IDAuMjM0Mzc1IDAuMTQwNjI1IDAuMTQwNjI1QzAuMjM0Mzc1IDAuMDQ2ODc1IDAuMzU0MTY3IDAgMC41IDBIMS41QzEuNjQ1ODMgMCAxLjc2NTYyIDAuMDQ2ODc1IDEuODU5MzggMC4xNDA2MjVDMS45NTMxMiAwLjIzNDM3NSAyIDAuMzU0MTY3IDIgMC41VjEwSDE1LjVWMTAiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwN0I5NCkiLz4KPC9nPgo8L3N2Zz4K" alt="" />
+              </a>
+            </div>
+            <div class="breadcrumb-meta">${a.loc}</div>
+            <a class="lesson-link" href="#">${a.lesson}</a>
+          </div>
+          <div class="alert-side">
+            <a class="create-resources" href="create-resources.html?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}">
+              <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyLjIzNDQgMi42NjI1QzEyLjA5MzggMi43MTU2MiAxMiAyLjg1IDEyIDNDMTIgMy4xNSAxMi4wOTM4IDMuMjg0MzggMTIuMjM0NCAzLjMzNzVMMTQgNEwxNC42NjI1IDUuNzY1NjJDMTQuNzE1NiA1LjkwNjI1IDE0Ljg1IDYgMTUgNkMxNS4xNSA2IDE1LjI4NDQgNS45MDYyNSAxNS4zMzc1IDUuNzY1NjJMMTYgNEwxNy43NjU2IDMuMzM3NUMxNy45MDYyIDMuMjg0MzggMTggMy4xNSAxOCAzQzE4IDIuODUgMTcuOTA2MiAyLjcxNTYyIDE3Ljc2NTYgMi42NjI1TDE2IDJMMTUuMzM3NSAwLjIzNDM3NUMxNS4yODQ0IDAuMDkzNzUgMTUuMTUgMCAxNSAwQzE0Ljg1IDAgMTQuNzE1NiAwLjA5Mzc1IDE0LjY2MjUgMC4yMzQzNzVMMTQgMkwxMi4yMzQ0IDIuNjYyNVpNNi40NTMxMiAzLjI5MDYzQzYuMzcxODcgMy4xMTI1IDYuMTkzNzUgMyA2IDNDNS44MDYyNSAzIDUuNjI4MTMgMy4xMTI1IDUuNTQ2ODggMy4yOTA2M0wzLjg4NzUgNi44ODQzOEwwLjI5Mzc1IDguNTQzNzVDMC4xMTI1IDguNjI4MTMgMCA4LjgwNjI1IDAgOUMwIDkuMTkzNzUgMC4xMTI1IDkuMzcxODcgMC4yOTA2MjUgOS40NTMxMkwzLjg4NDM4IDExLjExMjVMNS41NDM3NSAxNC43MDYzQzUuNjI1IDE0Ljg4NDQgNS44MDMxMiAxNC45OTY5IDUuOTk2ODcgMTQuOTk2OUM2LjE5MDYyIDE0Ljk5NjkgNi4zNjg3NSAxNC44ODQ0IDYuNDUgMTQuNzA2M0w4LjEwOTM4IDExLjExMjVMMTEuNzAzMSA5LjQ1MzEyQzExLjg4MTMgOS4zNzE4NyAxMS45OTM3IDkuMTkzNzUgMTEuOTkzNyA5QzExLjk5MzcgOC44MDYyNSAxMS44ODEzIDguNjI4MTMgMTEuNzAzMSA4LjU0Njg4TDguMTA5MzggNi44ODc1TDYuNDUgMy4yOTM3NUw2LjQ1MzEyIDMuMjkwNjNaTTEzIDE0TDExLjIzNDQgMTQuNjYyNUMxMS4wOTM4IDE0LjcxNTYgMTEgMTQuODUgMTEgMTVDMTEgMTUuMTUgMTEuMDkzOCAxNS4yODQ0IDExLjIzNDQgMTUuMzM3NUwxMyAxNkwxMy42NjI1IDE3Ljc2NTZDMTMuNzE1NiAxNy45MDYyIDEzLjg1IDE4IDE0IDE4QzE0LjE1IDE4IDE0LjI4NDQgMTcuOTA2MiAxNC4zMzc1IDE3Ljc2NTZMMTUgMTZMMTYuNzY1NiAxNS4zMzc1QzE2LjkwNjIgMTUuMjg0NCAxNyAxNS4xNSAxNyAxNUMxNyAxNC44NSAxNi45MDYyIDE0LjcxNTYgMTYuNzY1NiAxNC42NjI1TDE1IDE0TDE0LjMzNzUgMTIuMjM0NEMxNC4yODQ0IDEyLjA5MzggMTQuMTUgMTIgMTQgMTJDMTMuODUgMTIgMTMuNzE1NiAxMi4wOTM4IDEzLjY2MjUgMTIuMjM0NEwxMyAxNFoiIGZpbGw9IiMwMDc2OTQiLz4KPC9zdmc+Cg==" alt="" />
+              Create Resources
+            </a>
+            <span class="alert-divider"></span>
+            <span class="alert-count">${a.count}</span>
+            <span class="bang-icon"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzEuMjUiIGhlaWdodD0iMjMuMjUiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDMxLjI1IDIzLjI1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iY2lyY2xlLWJhbmciPgo8cGF0aCBpZD0iaWNvbi1iYW5nIiBkPSJNMjcuODUxNiAzLjM5ODQ0QzMwLjExNzIgNS42NjQwNiAzMS4yNSA4LjQwNjI1IDMxLjI1IDExLjYyNUMzMS4yNSAxNC44NDM4IDMwLjExNzIgMTcuNTg1OSAyNy44NTE2IDE5Ljg1MTZDMjUuNTg1OSAyMi4xMTcyIDIyLjg0MzggMjMuMjUgMTkuNjI1IDIzLjI1QzE2LjQwNjIgMjMuMjUgMTMuNjY0MSAyMi4xMTcyIDExLjM5ODQgMTkuODUxNkM5LjEzMjgxIDE3LjU4NTkgOCAxNC44NDM4IDggMTEuNjI1QzggOC40MDYyNSA5LjEzMjgxIDUuNjY0MDYgMTEuMzk4NCAzLjM5ODQ0QzEzLjY2NDEgMS4xMzI4MSAxNi40MDYyIDAgMTkuNjI1IDBDMjIuODQzOCAwIDI1LjU4NTkgMS4xMzI4MSAyNy44NTE2IDMuMzk4NDRWMy4zOTg0NE0yMS4xNDg0IDE0LjYwMTZDMjAuNzI2NiAxNC4xNzk3IDIwLjIxODggMTMuOTY4OCAxOS42MjUgMTMuOTY4OEMxOS4wMzEyIDEzLjk2ODggMTguNTIzNCAxNC4xNzk3IDE4LjEwMTYgMTQuNjAxNkMxNy42Nzk3IDE1LjAyMzQgMTcuNDY4OCAxNS41MzEyIDE3LjQ2ODggMTYuMTI1QzE3LjQ2ODggMTYuNzE4OCAxNy42Nzk3IDE3LjIyNjYgMTguMTAxNiAxNy42NDg0QzE4LjUyMzQgMTguMDcwMyAxOS4wMzEyIDE4LjI4MTIgMTkuNjI1IDE4LjI4MTJDMjAuMjE4OCAxOC4yODEyIDIwLjcyNjYgMTguMDcwMyAyMS4xNDg0IDE3LjY0ODRDMjEuNTcwMyAxNy4yMjY2IDIxLjc4MTIgMTYuNzE4OCAyMS43ODEyIDE2LjEyNUMyMS43ODEyIDE1LjUzMTIgMjEuNTcwMyAxNS4wMjM0IDIxLjE0ODQgMTQuNjAxNlYxNC42MDE2TTE3LjU2MjUgNi4yMzQzOEwxNy45Mzc1IDEyLjYwOTRDMTcuOTM3NSAxMi45NTMxIDE4LjEyNSAxMy4xMjUgMTguNSAxMy4xMjVIMjAuNzVDMjEuMTI1IDEzLjEyNSAyMS4zMTI1IDEyLjk1MzEgMjEuMzEyNSAxMi42MDk0TDIxLjY4NzUgNi4yMzQzOEMyMS42ODc1IDYuMDQ2ODggMjEuNjMyOCA1Ljg5ODQ0IDIxLjUyMzQgNS43ODkwNkMyMS40MTQxIDUuNjc5NjkgMjEuMjgxMiA1LjYyNSAyMS4xMjUgNS42MjVIMTguMTI1QzE3Ljk2ODggNS42MjUgMTcuODM1OSA1LjY3OTY5IDE3LjcyNjYgNS43ODkwNkMxNy42MTcyIDUuODk4NDQgMTcuNTYyNSA2LjA0Njg4IDE3LjU2MjUgNi4yMzQzOFY2LjIzNDM4IiBmaWxsPSJ2YXIoLS1maWxsLTAsICM3MDI5QTUpIi8+CjwvZz4KPC9zdmc+Cg==" alt="" /></span>
+          </div>
+        </div>
+        <div class="alert-desc">${a.desc}</div>
+        <div class="sep"></div>
+        ${a.events.map(eventHtml).join("")}
+      </article>`;
+  }
+  document.getElementById("alerts").innerHTML = ALERTS.map(alertHtml).join("");
+
+  // ---- Interactions ----
+  document.querySelectorAll("[data-toggle]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById(btn.dataset.toggle).classList.toggle("collapsed");
+    });
+  });
+  const tog = document.getElementById("completedToggle");
+  tog.querySelector(".switch").addEventListener("click", () => {
+    tog.classList.toggle("on"); tog.classList.toggle("off");
+    tog.setAttribute("aria-checked", String(tog.classList.contains("on")));
+  });
+
+  const tip = document.getElementById("tooltip");
+  const helpIcon = document.getElementById("helpIcon");
+  function showTip() {
+    tip.textContent = helpIcon.dataset.tip;
+    tip.classList.add("show");
+    const r = helpIcon.getBoundingClientRect();
+    tip.style.left = (r.left + window.scrollX) + "px";
+    tip.style.top  = (r.top + window.scrollY) + "px";
+  }
+  function hideTip() { tip.classList.remove("show"); }
+  helpIcon.addEventListener("mouseenter", showTip);
+  helpIcon.addEventListener("mouseleave", hideTip);
+  helpIcon.addEventListener("focus", showTip);
+  helpIcon.addEventListener("blur", hideTip);
+
+  // Scroll shadow on breadcrumb
+  const headerWrap = document.querySelector(".header-wrap");
+  function onScroll() { headerWrap.classList.toggle("scrolled", window.scrollY > 0); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>
