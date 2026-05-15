@@ -59,13 +59,13 @@ Destination page. The teacher sees:
 |---|---|---|
 | `--yellow` | `#fad232` | Active nav tab background, yellow stripe under top nav, yellow underline below Lesson Objective |
 | `--aqua` | `#007694` | Links, lesson titles, primary/secondary buttons + icons (across both pages) |
-| `--aqua-pressed` | `#00647e` | `--aqua` darkened 15%; used for `:active` press state on secondary buttons |
+| `--aqua-pressed` | `#005c73` | `--aqua` darkened 22%; used for `:active` press state on secondary buttons |
 | `--purple` | `#7029a5` | Alert card border, alert count, tower circle, BETA pill border/text |
 | `--purple-bg` | `#faf1ff` | Active sidenav background, CTA card background |
 | `--fuchsia` | `#f182ea` | Active sidenav left border (4px) |
 | `--fuchsia-spark` | `#ea74e3` | Big sparkle icon fill |
-| `--ink` | `#303b40` | Primary text |
-| `--ink-2` | `#435259` | Breadcrumb text |
+| `--charcoal` | `#303b40` | Primary text |
+| `--charcoal-2` | `#435259` | Breadcrumb text |
 | `--gray-bg` | `#f6f6f6` | Page background |
 | `--gray-10` | `#ebebeb` | Section header bands (PROBLEM / TEACHER GUIDANCE) |
 | `--gray-15` | `#e1e1e1` | Subnav item bottom border, skeleton bars |
@@ -181,7 +181,7 @@ padding on the container. Each card:
 - 8px inner padding, flex row, items-center, justify-between.
 - **Left content** (flex row, 8px gap): 56×56 white-bg circle with 1.167px purple/15
   border containing a 30×29 pink sparkle icon. Then a text block with the
-  CTA title (18px SemiBold ink) and description (16px Regular ink).
+  CTA title (18px SemiBold charcoal) and description (16px Regular charcoal).
 - **Right**: 32px-tall pill button, white bg, 1px aqua border, 16px
   SemiBold aqua "CREATE" with 16px aqua sparkle icon to its left.
 

@@ -69,7 +69,6 @@ When the user does ask for a commit:
 | `tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html` | The Tower Alerts source page (Create Resources link → modal → create-resources-95a534VKBScVGb3WUOvN.html) |
 | `assets/` | SVG icons, sparkles, design references. SVGs base64-inlined into HTML. |
 | `assets/pdf/` | Runtime PDFs loaded by PDF.js (Mini Lesson A.pdf, Worksheet A.pdf, Sample Script A.pdf, etc.) |
-| `webpage complete/` | Production HTML save + 51 CSS files. Gold-standard reference for production tokens. Gitignored. |
 | `.claude/launch.json` | Preview server config (Python http.server on port 8765) |
 | `.claude/settings.local.json` | Claude Code permissions / settings (local-only, gitignored) |
 
@@ -96,11 +95,11 @@ hard-code hex values inline. The key tokens:
 
 ```
 --yellow:  #fad232    (active nav tab, yellow stripe)
---aqua:    #007694    (links, lessons, primary buttons; hover inverts to aqua fill + white text; --aqua-pressed #00647e for :active)
+--aqua:    #007694    (links, lessons, primary buttons; hover inverts to aqua fill + white text; --aqua-pressed #005c73 for :active)
 --purple:  #7029a5    (alert card border, alert count, tower-circle, exclamation)
 --purple-bg: #faf1ff  (active sidenav background, Mini Lesson highlight)
 --fuchsia: #f182ea    (active sidenav left border, sparkles accent)
---ink:     #303b40    (primary text)
+--charcoal:     #303b40    (primary text)
 --gray-bg: #f6f6f6    (page background, filter container backgrounds)
 --gray-30: #c7c7c7    (sub-nav border, modal divider)
 --gray-15: #e1e1e1    (subnav item bottom border)
@@ -108,8 +107,7 @@ hard-code hex values inline. The key tokens:
 ```
 
 Fonts: Source Sans Pro 400 / 600 / 700 for the app. Oxygen on a few rare
-places (check production CSS in `webpage complete/_files/` if matching an
-existing component).
+places.
 
 ---
 
@@ -136,6 +134,20 @@ All icons are inlined as base64 data URIs (NOT URL-encoded — `#` colors break)
 Before inlining: strip `width="100%" height="100%"`, replace
 `preserveAspectRatio="none"` with `xMidYMid meet`, add explicit width/height
 from the viewBox. Otherwise `<img>` renders at 0×0.
+
+> **Heads-up on color**: each base64-inlined SVG has its `fill="#..."`
+> **baked into the encoded string**. CSS custom properties (`var(--aqua)`)
+> can't reach inside an `<img src="data:…">`. Consequences:
+>
+> - If the brand color ever changes (e.g. `--aqua` → some other hex), every
+>   inlined icon currently using that color must be **re-encoded** from
+>   source. Search the HTML for the literal hex inside `data:image/svg+xml;
+>   base64,…` payloads.
+> - For state-driven recolors (hover invert, press darken) we don't re-encode
+>   per state — we apply `filter: brightness(0) invert(1)` (white) or
+>   `filter: brightness(0.78)` (22% darker) on the `<img>` itself. That's
+>   how the secondary-button + create-resources-link hover/press treatments
+>   work today.
 
 ### PDF rendering (PDF.js)
 
@@ -183,8 +195,6 @@ from the viewBox. Otherwise `<img>` renders at 0×0.
 - **`assets/*.png`** — design references and screenshots used during
   development. Files suffixed with `-not-used` (e.g. `rainfall-chart-not-used.png`)
   are intentionally retained as historical references; do not delete or rely on them.
-- **Anything in `webpage complete/`** — production HTML save from Zearn's site,
-  used as a reference for exact production tokens. Gitignored. Don't modify.
 - **Naming**: kebab-case for SVGs (`back-arrow.svg`, `modal-close-x.svg`),
   Title Case with spaces for PDFs (`Mini Lesson A.pdf`) since those are
   user-facing filenames that match what the user uploads.

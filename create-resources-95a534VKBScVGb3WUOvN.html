@@ -11,7 +11,7 @@
   :root {
     --yellow:        #fad232;
     --aqua:          #007694;
-    --aqua-pressed:  #00647e;  /* --aqua darkened by 15% for :active state */
+    --aqua-pressed: #005c73;  /* --aqua darkened by 22% for :active state */
     --purple:        #7029a5;
     --purple-bg:     #faf1ff;
     --fuchsia:       #f182ea;
@@ -19,8 +19,8 @@
     --fuchsia-spark: #ea74e3;
     --gray-60:       #8e8e8e;
     --gray-75:       #6e6e6e;
-    --ink:           #303b40;
-    --ink-2:         #435259;
+    --charcoal:           #303b40;
+    --charcoal-2:         #435259;
     --gray-bg:       #f6f6f6;
     --gray-10:       #ebebeb;
     --gray-15:       #e1e1e1;
@@ -43,7 +43,7 @@
   html, body { margin: 0; padding: 0; }
   body {
     font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
-    color: var(--ink);
+    color: var(--charcoal);
     background: var(--gray-bg);
     font-size: 16px;
     line-height: 24px;
@@ -83,7 +83,7 @@
   .page-title .sparkle-big { width: 20px; height: 20px; flex: none; }
   .page-title .sparkle-big img { width: 20px; height: 20px; }
   .page-title .title-text {
-    font-size: 22px; line-height: 1.5; color: var(--ink);
+    font-size: 22px; line-height: 1.5; color: var(--charcoal);
     text-transform: uppercase; font-weight: 400;
   }
   .beta-pill {
@@ -108,7 +108,7 @@
   }
   .sub-nav .center-title {
     font-weight: 600; font-size: 20px; line-height: 1.5;
-    color: var(--ink);
+    color: var(--charcoal);
   }
   .back-btn {
     position: absolute; left: 0; top: 8px;
@@ -118,21 +118,21 @@
   .back-btn .icon { width: 32px; height: 32px; flex: none; }
   .back-btn .icon img { width: 32px; height: 32px; }
   .back-btn .label {
-    font-size: 16px; line-height: 24px; color: var(--ink);
+    font-size: 16px; line-height: 24px; color: var(--charcoal);
     font-weight: 400;
     /* Pre-set the underline thickness/offset so :hover only needs to turn the
        line on. Modern browsers honor these even when no decoration is drawn. */
     text-decoration-thickness: 4px;
     text-underline-offset: 4px;
   }
-  /* Hover: 4px aqua underline; text stays ink. */
+  /* Hover: 4px aqua underline; text stays charcoal. */
   .back-btn:hover .label {
     text-decoration-line: underline;
     text-decoration-color: var(--aqua);
   }
-  /* Press: text + line both darken by 15%. */
+  /* Press: text + line both darken by 22%. */
   .back-btn:active .label {
-    color: #293236;   /* var(--ink) darkened 15% */
+    color: #252e32;   /* var(--charcoal) darkened 22% */
     text-decoration-line: underline;
     text-decoration-color: var(--aqua-pressed);
   }
@@ -285,13 +285,7 @@
   .button-group .generated {
     position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
     font-size: 14px; line-height: 24px; color: var(--gray-65);
-    /* Hidden until a PDF is actually on screen. The button-group itself
-       stays visible during recreate (so the RECREATE button still anchors
-       the header), but the "Generated …" text is only meaningful once a
-       material is rendered. */
-    display: none;
   }
-  html.loaded:not(.recreating) .button-group .generated { display: block; }
   .button-group .btn-cluster {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: flex; gap: 12px; align-items: center;
@@ -321,7 +315,7 @@
      All aqua-outlined buttons (aqua border + aqua text/icon + white fill)
      share the same hover/press treatment:
        - hover : invert → aqua fill + white text/icon
-       - press : darken filled state by 15% (var --aqua-pressed)
+       - press : darken filled state by 22% (var --aqua-pressed)
      SVG icons (inlined as <img>) are recolored to white via
      `filter: brightness(0) invert(1)` since we can't restyle their fills. */
   .btn-secondary:hover,
@@ -352,7 +346,11 @@
     filter: brightness(0) invert(1);
   }
 
-  /* ===== Page area card ===== */
+  /* ===== Page area card =====
+     Heights for the loading / recreating / loaded states are set via the
+     three state-class rules below. In the loaded state JS further trims
+     the height with an inline style so the card never grows past the PDF
+     content OR the viewport, but always caps at 920px. */
   .page-area {
     background: var(--white);
     border-radius: 0 0 4px 4px;
@@ -360,7 +358,7 @@
     padding: 0;
     position: relative;
     width: 792px;
-    height: 840px;
+    max-height: 920px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;       /* Firefox */
@@ -560,7 +558,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     text-decoration: none;
   }
-  .byg-btn-primary:hover { background: #005c73; }
+  .byg-btn-primary:hover { background: var(--aqua-pressed); }
   .byg-btn-icon {
     background: #fff;
     border: 1px solid #007694;
@@ -687,7 +685,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     gap: 6px;
   }
-  .ays-btn-primary:hover { background: #005c73; }
+  .ays-btn-primary:hover { background: var(--aqua-pressed); }
   .ays-btn-primary img { display: block; }
   .ays-close {
     position: absolute; top: 20px; right: 16px;
@@ -704,9 +702,24 @@
   }
   .nav-skeleton .skel-bar {
     height: 18px;
-    background: var(--gray-15);
     border-radius: 5px;
     margin: 12px 16px;
+    /* Animated shimmer: a left-to-right sweep that fades the bar between
+       10% and 100% opacity as the gradient passes. Same gray as before
+       (--gray-15), just alpha-varying across the bar's width. */
+    background-image: linear-gradient(
+      90deg,
+      rgba(225, 225, 225, 0.1) 0%,
+      rgba(225, 225, 225, 1)   50%,
+      rgba(225, 225, 225, 0.1) 100%
+    );
+    background-color: var(--gray-15);
+    background-size: 200% 100%;
+    animation: skel-shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes skel-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
   }
   /* Loading content inside the page-area card */
   .loading-content {
@@ -717,7 +730,7 @@
   }
   .loading-content .loading-message {
     font-size: 24px; font-weight: 600; line-height: 1.5;
-    color: var(--ink); text-align: center;
+    color: var(--charcoal); text-align: center;
     margin: 0;
     /* width:fit-content so the clip-path wipe lines up with the text edges,
        not the full container width. */
@@ -781,7 +794,9 @@
   .loaded .sidenav > .coming-soon { display: flex; }
   .loaded .main-col > .button-group { display: block; }
   .loaded .page-area > .pdf-stack { display: flex; }
-  .loaded .page-area { height: 840px; }
+  /* JS sets the height inline after each render based on PDF content,
+     viewport, and the 920px cap above. We omit a CSS height here so the
+     card matches its content until JS measures. */
 
   /* Recreating state: applies on top of .loaded so the sidenav and button-group
      stay visible (real content, not skeleton), but the PDF area shows the
@@ -803,8 +818,8 @@
     display: none;        /* hidden until .loaded */
     flex-direction: column;
     gap: 8px;
-    padding: 16px 36px 24px;
-    background: #fff;
+    padding: 36px;        /* even 36px gutter on all four sides */
+    background: var(--white);
     width: 792px;
     box-sizing: border-box;
   }
@@ -824,7 +839,7 @@
     background: #faf1ff;       /* purple/5 */
     border: 1px solid #f1d9fe; /* purple/15 */
     border-radius: 4px;
-    padding: 9px 1px;
+    padding: 9px 24px;          /* 24px horizontal gutter inside each CTA card */
     display: flex; align-items: center; justify-content: center;
   }
   .pdf-cta-frame {
@@ -1037,10 +1052,26 @@
     ? `Create Resources – ${student} – ${lesson} – Zearn (Figma)`
     : `Create Resources – ${student} – Zearn (Figma)`;
 
+  // Available Mini Lesson variants. We pick one at random on initial load
+  // (so every visit can start on a different lesson) and also use this list
+  // to pick "one of the other two" when the user recreates the Mini Lesson.
+  const MINI_LESSON_VARIANTS = [
+    "assets/pdf/Mini Lesson A.pdf",
+    "assets/pdf/Mini Lesson B.pdf",
+    "assets/pdf/Mini Lesson C.pdf",
+  ];
+  function pickRandomMiniLesson() {
+    return MINI_LESSON_VARIANTS[Math.floor(Math.random() * MINI_LESSON_VARIANTS.length)];
+  }
+  function pickOtherMiniLesson() {
+    const others = MINI_LESSON_VARIANTS.filter(p => p !== currentPdfUrl);
+    return others[Math.floor(Math.random() * others.length)];
+  }
+
   // The current PDF being rendered. Updated whenever a CTA generates a new
   // material (Worksheet, Sample Script, etc.) so subsequent recreate clicks
   // continue showing the most recently generated PDF.
-  let currentPdfUrl = "assets/pdf/Mini Lesson A.pdf";
+  let currentPdfUrl = pickRandomMiniLesson();
 
   // ---- Render PDF pages as stacked canvases (no gray chrome, no gaps) ----
   async function renderPdf(pdfUrl) {
@@ -1053,6 +1084,12 @@
     // Always start from an empty stack — subsequent renders (swap, recreate)
     // must not stack new canvases on top of old ones.
     if (stack) stack.innerHTML = "";
+    // The Worksheet A.pdf source has ~24px more white space above its title
+    // than the other PDFs. Compensate by pulling the canvas stack up by 24px
+    // so all PDFs read with the same top inset.
+    if (stack) {
+      stack.style.marginTop = /Worksheet/.test(currentPdfUrl) ? "-24px" : "";
+    }
     try {
       const pdf = await pdfjsLib.getDocument(currentPdfUrl).promise;
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -1081,10 +1118,40 @@
     } catch (err) {
       console.error("PDF render failed:", err);
     }
+    // Resize the .page-area card to fit the freshly rendered PDF.
+    adjustPageAreaHeight();
+    // Schedule the CTA footer reveal — but only if the user isn't already
+    // looking at CTAs (i.e. we're coming out of a loading/recreate flow,
+    // not an instant swap-to-view). The 1.5s delay starts NOW, so the CTAs
+    // can never appear before the PDF has finished drawing.
+    if (!document.documentElement.classList.contains("ctas-visible")) {
+      scheduleCtas();
+    }
   }
 
+  // Size the page-area card to min(content, viewport-available, 920px).
+  // Called after every renderPdf, when CTAs come in, and on window resize.
+  function adjustPageAreaHeight() {
+    const pageArea = document.querySelector(".page-area");
+    const stack    = document.getElementById("pdfStack");
+    const ctas     = document.getElementById("pdfCtas");
+    if (!pageArea || !stack) return;
+    // Only resize once we're showing real content. During initial load /
+    // recreating, the CSS-driven 532px height is correct.
+    if (!document.documentElement.classList.contains("loaded") ||
+        document.documentElement.classList.contains("recreating")) return;
+    const ctasHeight = (ctas && getComputedStyle(ctas).display !== "none")
+      ? ctas.scrollHeight : 0;
+    const contentHeight = stack.scrollHeight + ctasHeight;
+    const rect = pageArea.getBoundingClientRect();
+    const viewportAvailable = window.innerHeight - rect.top - 16;  // small bottom breathing room
+    const target = Math.min(contentHeight, viewportAvailable, 920);
+    pageArea.style.height = Math.max(target, 0) + "px";
+  }
+  window.addEventListener("resize", () => adjustPageAreaHeight());
+
   // ---- Loading state: cycle through messages (3s each) ----
-  const loadingMessages = [
+  const LOADING_MESSAGES = [
     "Zearn AI is creating materials for your student right now.",
     "Remember that AI can make mistakes.",
     "Please check your materials carefully for relevance and accuracy."
@@ -1092,15 +1159,27 @@
   const msgEl = document.querySelector(".loading-message");
   let msgIndex = 0;
   let cycleInterval = null;
+  // Shuffled copy of LOADING_MESSAGES; freshly re-shuffled each cycle so
+  // the user sees them in a different order every load / recreate.
+  let shuffledMessages = [...LOADING_MESSAGES];
+  function shuffleMessages() {
+    // Fisher–Yates in-place shuffle on a fresh copy.
+    shuffledMessages = [...LOADING_MESSAGES];
+    for (let i = shuffledMessages.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledMessages[i], shuffledMessages[j]] = [shuffledMessages[j], shuffledMessages[i]];
+    }
+  }
   function showLoadingMessage() {
     msgEl.classList.remove("fade-in");
     // Force reflow so the animation restarts when we re-add the class.
     void msgEl.offsetWidth;
-    msgEl.textContent = loadingMessages[msgIndex];
+    msgEl.textContent = shuffledMessages[msgIndex];
     msgEl.classList.add("fade-in");
-    msgIndex = (msgIndex + 1) % loadingMessages.length;
+    msgIndex = (msgIndex + 1) % shuffledMessages.length;
   }
   function startLoadingCycle() {
+    shuffleMessages();
     msgIndex = 0;
     showLoadingMessage();
     clearInterval(cycleInterval);
@@ -1115,15 +1194,11 @@
   setTimeout(() => {
     stopLoadingCycle();
     document.documentElement.classList.add("loaded");
-    renderPdf();
+    renderPdf();   // renderPdf itself schedules the CTA reveal once it resolves
     // Mini Lesson is "generated" as soon as the initial PDF finishes loading.
     state.generatedAt.miniLesson = formatNow();
     setTimestamp(state.generatedAt.miniLesson);
-    scheduleCtas();
   }, 9000);
-
-  // Build a "generated" timestamp anchored to "now" for variety, but keep the figma reference
-  // when no params provided. (Keep static to match Figma 1:1 by default.)
 
   // ---- Download / Print of the currently loaded PDF ----
   // Both actions operate on `currentPdfUrl` — whatever PDF the page area is
@@ -1195,23 +1270,14 @@
   // ---- State: which materials have been generated, what we're viewing ----
   // In-memory only — a reload (e.g. clicking "Back to Tower Alerts") wipes
   // it, which matches the spec: this MVP doesn't save generated materials.
+  // miniLesson is initialised to the randomly chosen variant so that swapping
+  // back to "Mini Lesson" from another view returns to the same one the user
+  // started on (or the last one they recreated to).
   const MATERIAL_PDF = {
-    miniLesson:   "assets/pdf/Mini Lesson A.pdf",
+    miniLesson:   currentPdfUrl,
     worksheet:    "assets/pdf/Worksheet A.pdf",
     sampleScript: "assets/pdf/Sample Script A.pdf",
   };
-  // When the user recreates a Mini Lesson, we randomly pick one of the
-  // OTHER variants in the folder so the result visibly differs from the
-  // current one. Worksheet / Sample Script have no variants yet.
-  const MINI_LESSON_VARIANTS = [
-    "assets/pdf/Mini Lesson A.pdf",
-    "assets/pdf/Mini Lesson B.pdf",
-    "assets/pdf/Mini Lesson C.pdf",
-  ];
-  function pickOtherMiniLesson() {
-    const others = MINI_LESSON_VARIANTS.filter(p => p !== currentPdfUrl);
-    return others[Math.floor(Math.random() * others.length)];
-  }
   const state = {
     generated: { worksheet: false, sampleScript: false },
     currentView: "miniLesson",
@@ -1244,6 +1310,8 @@
     clearTimeout(ctasDelayTimer);
     ctasDelayTimer = setTimeout(() => {
       document.documentElement.classList.add("ctas-visible");
+      // CTAs add to the content height — re-fit the card now that they show.
+      adjustPageAreaHeight();
     }, 1500);
   }
   function hideCtasNow() {
@@ -1323,8 +1391,11 @@
           syncSidenavAndCtas();
           renderPdf(MATERIAL_PDF[material]);
         } else if (state.currentView === "miniLesson") {
-          // Mini Lesson recreate: cycle to a different variant.
-          renderPdf(pickOtherMiniLesson());
+          // Mini Lesson recreate: cycle to a different variant, and remember
+          // it so subsequent swap-backs from another view land on this one.
+          const next = pickOtherMiniLesson();
+          MATERIAL_PDF.miniLesson = next;
+          renderPdf(next);
         } else {
           renderPdf();  // re-render whatever currentPdfUrl points at
         }
@@ -1334,7 +1405,9 @@
         const view = state.currentView;
         state.generatedAt[view] = formatNow();
         setTimestamp(state.generatedAt[view]);
-        scheduleCtas();
+        // renderPdf above will schedule the CTA reveal once it resolves;
+        // we already called hideCtasNow() at the start of this flow, so
+        // .ctas-visible is absent and scheduleCtas will run inside renderPdf.
         const pa = document.querySelector(".page-area");
         if (pa) pa.scrollTop = 0;
       }, 9000);
