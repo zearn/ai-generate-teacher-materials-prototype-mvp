@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Components/Icons/24/Checkbox/Checked">
+<rect id="Checkbox" x="4.5" y="4.5" width="15" height="15" rx="2.5" fill="var(--fill-0, white)" stroke="var(--stroke-0, #647077)"/>
+<path id="Checkmark" d="M10.3887 15.8145L7.14648 12.5723C6.95117 12.377 6.95117 12.0449 7.14648 11.8496L7.84961 11.1465C8.04492 10.9512 8.35742 10.9512 8.55273 11.1465L10.7598 13.334L15.4473 8.64648C15.6426 8.45117 15.9551 8.45117 16.1504 8.64648L16.8535 9.34961C17.0488 9.54492 17.0488 9.87695 16.8535 10.0723L11.1113 15.8145C10.916 16.0098 10.584 16.0098 10.3887 15.8145Z" fill="var(--fill-0, #59656B)"/>
+</g>
+</svg>

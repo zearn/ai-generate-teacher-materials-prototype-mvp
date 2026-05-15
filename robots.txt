@@ -1,0 +1,5 @@
+# Block all well-behaved search engines from indexing anything in this project.
+# The prototype is meant to be shareable by direct link only, not surfaced via
+# search results.
+User-agent: *
+Disallow: /

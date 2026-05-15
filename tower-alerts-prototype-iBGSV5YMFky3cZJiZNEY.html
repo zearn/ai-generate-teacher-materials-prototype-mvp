@@ -10,7 +10,8 @@
 <style>
   :root {
     --yellow:   #fad232;
-    --teal:     #007b94;
+    --aqua:     #007694;
+    --aqua-pressed: #00647e;   /* --aqua darkened by 15% for :active state */
     --purple:   #7029a5;
     --ink:      #303b40;
     --ink-2:    #435259;
@@ -140,7 +141,7 @@
     padding: 1px 29px 1px 9px;
     height: 32px;
     display: flex; align-items: center;
-    color: var(--teal);
+    color: var(--aqua);
     font-weight: 600; font-size: 16px; line-height: 20px;
     position: relative; min-width: 64px;
   }
@@ -187,7 +188,7 @@
     display: inline-flex; align-items: center;
     background: var(--gray-bg);
     padding: 8px 16px;
-    color: var(--teal);
+    color: var(--aqua);
     font-weight: 600; font-size: 16px; line-height: 24px;
   }
   .pill .caret {
@@ -211,8 +212,8 @@
   .hero .meta { font-size: 20px; line-height: 30px; color: var(--ink); }
   .print-btn {
     margin-top: 38px; height: 40px; min-width: 104px;
-    border: 1px solid var(--teal); border-radius: 25px;
-    background: var(--white); color: var(--teal);
+    border: 1px solid var(--aqua); border-radius: 25px;
+    background: var(--white); color: var(--aqua);
     font-weight: 600; font-size: 16px;
     padding: 0 21px;
     display: inline-flex; align-items: center; gap: 0px;
@@ -249,21 +250,21 @@
   .toggle .switch .track {
     position: absolute; inset: 1px 0;
     background: var(--line);
-    border: 1px solid var(--teal);
+    border: 1px solid var(--aqua);
     border-radius: 10px;
-    box-shadow: inset 0 0 1px 1px var(--teal);
+    box-shadow: inset 0 0 1px 1px var(--aqua);
     overflow: hidden;
   }
   .toggle .switch .track::before {
     content: ""; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 20px; background: var(--teal);
+    width: 20px; background: var(--aqua);
     transition: width 0.15s ease;
   }
   .toggle .switch .knob {
     position: absolute; left: 10px; top: 0;
     width: 22px; height: 22px;
     background: var(--white);
-    border: 2px solid var(--teal); border-radius: 50%;
+    border: 2px solid var(--aqua); border-radius: 50%;
     box-shadow: 1px 1px 3px 0 #b3b3b3;
     transition: left 0.15s ease;
   }
@@ -299,7 +300,7 @@
   .panel-header {
     width: 100%; padding: 16px;
     display: flex; align-items: center; justify-content: space-between;
-    color: var(--teal); font-weight: 600; font-size: 16px; line-height: 24px;
+    color: var(--aqua); font-weight: 600; font-size: 16px; line-height: 24px;
   }
   .panel-header .chev { width: 16px; height: 8.298px; display: inline-flex; transition: transform 0.15s ease; }
   .panel-header .chev img { width: 16px; height: 8.298px; }
@@ -350,7 +351,7 @@
   .list .row:active { background-color: rgba(0, 0, 0, 0.078); }
   /* selected */
   .list .row.selected {
-    background-color: var(--teal);
+    background-color: var(--aqua);
     color: var(--white);
     font-weight: 600;
   }
@@ -358,10 +359,10 @@
   .list .row.selected:hover,
   .list .row.selected:focus { background-color: #005c73; }
   .list .row.selected:active { background-color: #003e4d; }
-  /* partially-selected (outlined teal) */
+  /* partially-selected (outlined aqua) */
   .list .row.partially-selected {
-    border-color: var(--teal);
-    color: var(--teal);
+    border-color: var(--aqua);
+    color: var(--aqua);
     background-color: transparent;
   }
   .list .row.partially-selected:hover,
@@ -389,7 +390,7 @@
     display: flex; align-items: center; justify-content: space-between;
     border-radius: 12px;
   }
-  .list.content-list .row.selected .label-wrap { background: var(--teal); color: var(--white); }
+  .list.content-list .row.selected .label-wrap { background: var(--aqua); color: var(--white); }
   .list.content-list .row.selected .label-wrap .count { color: var(--white); }
   .list.content-list .row.selected { background: transparent; color: var(--ink); }
 
@@ -435,7 +436,7 @@
 
   .breadcrumb-meta { font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--ink); margin: 8px 0; }
   .lesson-link {
-    font-weight: 600; font-size: 20px; line-height: 30px; color: var(--teal);
+    font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua);
   }
   .lesson-link:hover { text-decoration: underline; }
 
@@ -445,11 +446,29 @@
   }
   .create-resources {
     display: inline-flex; align-items: center; gap: 8px;
-    color: var(--teal);
+    color: var(--aqua);
     font-weight: 600; font-size: 16px; line-height: 1.5;
     white-space: nowrap;
+    /* Pre-set underline thickness/offset; :hover toggles it on. */
+    text-decoration-thickness: 4px;
+    text-underline-offset: 4px;
   }
   .create-resources img { width: 18px; height: 18px; }
+  /* Hover: text + icon darken 15% (aqua → aqua-pressed); 4px aqua underline. */
+  .create-resources:hover {
+    color: var(--aqua-pressed);
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua);
+  }
+  .create-resources:hover img { filter: brightness(0.85); }
+  /* Press: text + icon darken an ADDITIONAL 15% (combined 0.85×0.85 ≈ 0.7225);
+     underline darkens by 15% (aqua → aqua-pressed). */
+  .create-resources:active {
+    color: #00556b;   /* var(--aqua) × 0.85 × 0.85 */
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-pressed);
+  }
+  .create-resources:active img { filter: brightness(0.7225); }
   .alert-divider {
     width: 1px; align-self: stretch;
     background: var(--line);
@@ -507,11 +526,33 @@
   }
   .load-more {
     height: 40px; min-width: 104px;
-    border: 1px solid var(--teal); border-radius: 25px;
-    background: var(--white); color: var(--teal);
+    border: 1px solid var(--aqua); border-radius: 25px;
+    background: var(--white); color: var(--aqua);
     font-weight: 600; font-size: 16px;
     text-transform: uppercase;
     padding: 0 21px;
+  }
+
+  /* ===== Shared secondary-button interaction states =====
+     Aqua-outlined buttons (aqua border + aqua text/icon + white fill):
+       - hover : invert → aqua fill + white text/icon
+       - press : darken filled state by 15% (var --aqua-pressed)
+     SVG icons (inlined as <img>) get recolored to white via
+     `filter: brightness(0) invert(1)`. */
+  .print-btn:hover,
+  .load-more:hover {
+    background: var(--aqua);
+    color: var(--white);
+  }
+  .print-btn:active,
+  .load-more:active {
+    background: var(--aqua-pressed);
+    border-color: var(--aqua-pressed);
+    color: var(--white);
+  }
+  .print-btn:hover img,
+  .print-btn:active img {
+    filter: brightness(0) invert(1);
   }
 
   /* Footer */
@@ -545,6 +586,139 @@
     opacity: 0; transition: opacity 0.12s;
   }
   .tooltip.show { opacity: 1; }
+
+  /* ===== Modal: Create Targeted Materials (Figma node 17491:1953) ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.70);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    position: relative;
+    background: #fff;
+    border-top: 16px solid #1cc7e6;     /* aqua/40 */
+    border-radius: 4px;
+    box-shadow: 1px 1px 1.5px rgba(128,128,128,0.5);
+    width: 774px; max-width: 100%;
+    padding: 32px 32px 48px;
+    font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #303b40;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 24px; height: 24px;
+    background: transparent; border: none; cursor: pointer; padding: 0;
+  }
+  .modal-close img { width: 24px; height: 24px; }
+  .modal-heading {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .modal-heading .sparkles { width: 21.1654px; height: 20.7946px; flex: none; }
+  .modal-heading h1 {
+    margin: 0;
+    font-size: 32px; font-weight: 400; line-height: 48px;
+    color: #303b40; white-space: nowrap;
+  }
+  .modal-intro {
+    font-size: 20px; line-height: 1.5; color: #303b40;
+    text-align: center; margin: 0 0 8px;
+  }
+  .modal-intro strong { font-weight: 600; }
+  .objective-card {
+    background: #f0f5f8;       /* charcoal/5 */
+    border-radius: 4px;
+    padding: 24px 32px 32px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .objective-card p {
+    margin: 0; font-size: 20px; font-weight: 600; line-height: 1.5; color: #303b40;
+  }
+  .modal-select-label {
+    font-size: 20px; font-weight: 400; line-height: 1.5;
+    color: #000; text-align: center;
+    margin: 0 0 16px;
+  }
+  .modal-options {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .modal-option {
+    width: 364px; height: 64px;
+    border-radius: 40px;
+    display: flex; align-items: center;
+    padding: 0 19px;
+    background: #fff;
+    box-sizing: border-box;
+  }
+  .modal-option.selected {
+    background: #d9f7ff;                 /* aqua/10 */
+    border: 3px solid #09b;              /* aqua/radio selected */
+  }
+  .modal-option.disabled {
+    border: 1px solid #b4b4b4;           /* disabled-light */
+    color: #b4b4b4;
+  }
+  .modal-option .checkbox {
+    width: 24px; height: 24px; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-right: 4px;
+  }
+  .modal-option .checkbox img { width: 24px; height: 24px; }
+  .modal-option .checkbox-empty {
+    width: 21.333px; height: 21.333px;
+    border: 1.333px solid #ababab;
+    background: #fff;
+    border-radius: 3px;
+    box-sizing: border-box;
+  }
+  .modal-option .label {
+    font-size: 20px; font-weight: 600; line-height: 1.5; color: #303b40;
+  }
+  .modal-option.disabled .label { color: #b4b4b4; }
+  .modal-option.disabled {
+    justify-content: flex-start;
+  }
+  .modal-option.disabled .label-wrap {
+    display: flex; align-items: center; gap: 28px;
+    flex: 1; min-width: 0;
+  }
+  .modal-option.disabled .coming-soon {
+    font-size: 16px; font-weight: 400; line-height: 24px;
+    color: #b4b4b4;
+    margin-left: auto;
+  }
+  .modal-create-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    background: #007694;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 24px;
+    margin: 0 auto 24px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .modal-create-btn:hover { background: #005c73; }
+  .modal-create-btn img { width: 16px; height: 16px; }
+  .modal-disclaimer {
+    background: #fff5c3;
+    border-radius: 4px;
+    padding: 8px 32px;
+    text-align: center;
+    font-size: 16px; line-height: 1.5; color: #000;
+  }
+  .modal-disclaimer a { color: #007694; font-weight: 600; text-decoration: none; }
+  .modal-disclaimer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -918,7 +1092,12 @@
             <a class="lesson-link" href="#">${a.lesson}</a>
           </div>
           <div class="alert-side">
-            <a class="create-resources" href="create-resources.html?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}">
+            <a class="create-resources"
+               href="create-resources-95a534VKBScVGb3WUOvN.html?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}"
+               data-student="${a.student.replace(/"/g, "&quot;")}"
+               data-lesson="${a.lesson.replace(/"/g, "&quot;")}"
+               data-loc="${a.loc.replace(/"/g, "&quot;")}"
+               data-desc="${a.desc.replace(/"/g, "&quot;")}">
               <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyLjIzNDQgMi42NjI1QzEyLjA5MzggMi43MTU2MiAxMiAyLjg1IDEyIDNDMTIgMy4xNSAxMi4wOTM4IDMuMjg0MzggMTIuMjM0NCAzLjMzNzVMMTQgNEwxNC42NjI1IDUuNzY1NjJDMTQuNzE1NiA1LjkwNjI1IDE0Ljg1IDYgMTUgNkMxNS4xNSA2IDE1LjI4NDQgNS45MDYyNSAxNS4zMzc1IDUuNzY1NjJMMTYgNEwxNy43NjU2IDMuMzM3NUMxNy45MDYyIDMuMjg0MzggMTggMy4xNSAxOCAzQzE4IDIuODUgMTcuOTA2MiAyLjcxNTYyIDE3Ljc2NTYgMi42NjI1TDE2IDJMMTUuMzM3NSAwLjIzNDM3NUMxNS4yODQ0IDAuMDkzNzUgMTUuMTUgMCAxNSAwQzE0Ljg1IDAgMTQuNzE1NiAwLjA5Mzc1IDE0LjY2MjUgMC4yMzQzNzVMMTQgMkwxMi4yMzQ0IDIuNjYyNVpNNi40NTMxMiAzLjI5MDYzQzYuMzcxODcgMy4xMTI1IDYuMTkzNzUgMyA2IDNDNS44MDYyNSAzIDUuNjI4MTMgMy4xMTI1IDUuNTQ2ODggMy4yOTA2M0wzLjg4NzUgNi44ODQzOEwwLjI5Mzc1IDguNTQzNzVDMC4xMTI1IDguNjI4MTMgMCA4LjgwNjI1IDAgOUMwIDkuMTkzNzUgMC4xMTI1IDkuMzcxODcgMC4yOTA2MjUgOS40NTMxMkwzLjg4NDM4IDExLjExMjVMNS41NDM3NSAxNC43MDYzQzUuNjI1IDE0Ljg4NDQgNS44MDMxMiAxNC45OTY5IDUuOTk2ODcgMTQuOTk2OUM2LjE5MDYyIDE0Ljk5NjkgNi4zNjg3NSAxNC44ODQ0IDYuNDUgMTQuNzA2M0w4LjEwOTM4IDExLjExMjVMMTEuNzAzMSA5LjQ1MzEyQzExLjg4MTMgOS4zNzE4NyAxMS45OTM3IDkuMTkzNzUgMTEuOTkzNyA5QzExLjk5MzcgOC44MDYyNSAxMS44ODEzIDguNjI4MTMgMTEuNzAzMSA4LjU0Njg4TDguMTA5MzggNi44ODc1TDYuNDUgMy4yOTM3NUw2LjQ1MzEyIDMuMjkwNjNaTTEzIDE0TDExLjIzNDQgMTQuNjYyNUMxMS4wOTM4IDE0LjcxNTYgMTEgMTQuODUgMTEgMTVDMTEgMTUuMTUgMTEuMDkzOCAxNS4yODQ0IDExLjIzNDQgMTUuMzM3NUwxMyAxNkwxMy42NjI1IDE3Ljc2NTZDMTMuNzE1NiAxNy45MDYyIDEzLjg1IDE4IDE0IDE4QzE0LjE1IDE4IDE0LjI4NDQgMTcuOTA2MiAxNC4zMzc1IDE3Ljc2NTZMMTUgMTZMMTYuNzY1NiAxNS4zMzc1QzE2LjkwNjIgMTUuMjg0NCAxNyAxNS4xNSAxNyAxNUMxNyAxNC44NSAxNi45MDYyIDE0LjcxNTYgMTYuNzY1NiAxNC42NjI1TDE1IDE0TDE0LjMzNzUgMTIuMjM0NEMxNC4yODQ0IDEyLjA5MzggMTQuMTUgMTIgMTQgMTJDMTMuODUgMTIgMTMuNzE1NiAxMi4wOTM4IDEzLjY2MjUgMTIuMjM0NEwxMyAxNFoiIGZpbGw9IiMwMDc2OTQiLz4KPC9zdmc+Cg==" alt="" />
               Create Resources
             </a>
@@ -966,7 +1145,112 @@
   function onScroll() { headerWrap.classList.toggle("scrolled", window.scrollY > 0); }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+
+  // ---- Shared modal helper ----
+  // Wires open/close/overlay-click/Escape on any element with the structure:
+  //   <div class="modal-overlay" hidden>
+  //     <button class="modal-close">...</button> [optional]
+  //     ...
+  //   </div>
+  // Returns { open, close } so callers can trigger the modal programmatically.
+  // The DOMContentLoaded wrapper is required because each modal's markup lives
+  // AFTER the inline script in the document body.
+  function wireModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+    if (!modal) return null;
+    function open()  { modal.hidden = false; modal.classList.add("open");    document.body.style.overflow = "hidden"; }
+    function close() { modal.classList.remove("open"); modal.hidden = true;  document.body.style.overflow = ""; }
+    modal.querySelector(".modal-close")?.addEventListener("click", close);
+    modal.addEventListener("click", e => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) close(); });
+    return { open, close };
+  }
+
+  // ---- Modal: Create Targeted Materials ----
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctm = wireModal("#ctmModal");
+    if (!ctm) return;
+
+    const ctmStudent       = document.getElementById("ctmStudent");
+    const ctmMissionLesson = document.getElementById("ctmMissionLesson");
+    const ctmObjective     = document.getElementById("ctmObjective");
+    const modalCreate      = document.getElementById("ctmCreateBtn");
+
+    function extractMissionLesson(loc, lesson) {
+      // loc example: "Grade 4 | Mission 3 | Topic B"
+      // lesson example: "Lesson 4: Leftward Ho"
+      const m = (loc || "").match(/Mission\s+\d+/i);
+      const l = (lesson || "").match(/Lesson\s+\d+/i);
+      return [m?.[0], l?.[0]].filter(Boolean).join(", ");
+    }
+
+    let pendingHref = "";
+    function openCtm(link) {
+      pendingHref = link.getAttribute("href");
+      ctmStudent.textContent       = link.dataset.student || "";
+      ctmMissionLesson.textContent = extractMissionLesson(link.dataset.loc, link.dataset.lesson);
+      ctmObjective.textContent     = link.dataset.desc || "";
+      ctm.open();
+    }
+
+    document.addEventListener("click", e => {
+      const link = e.target.closest("a.create-resources");
+      if (link) { e.preventDefault(); openCtm(link); }
+    });
+
+    modalCreate.addEventListener("click", () => {
+      if (pendingHref) window.location.href = pendingHref;
+    });
+  });
 </script>
+
+
+<!-- ===================== MODAL: Create Targeted Materials ===================== -->
+<div class="modal-overlay" id="ctmModal" role="dialog" aria-modal="true" aria-labelledby="ctmModalTitle" hidden>
+  <div class="modal-card" role="document">
+    <button class="modal-close" type="button" aria-label="Close" id="ctmClose">
+      <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbXBvbmVudHMvSWNvbnMvMjQvQ2xvc2VfRHVtbXkvRGVmYXVsdCIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfMjEpIj4KPGcgaWQ9IkFyZWEiPgo8L2c+CjxwYXRoIGlkPSJmYWwgZmEtdGltZXMiIGQ9Ik0xMy42OTczIDEyLjAwMDJMMTguODI1NSA2Ljg3MjA5TDE5Ljg4MyA1LjgxNDU2QzIwLjAzOSA1LjY1ODU1IDIwLjAzOSA1LjQwNTA0IDE5Ljg4MyA1LjI0OTA0TDE4Ljc1MTUgNC4xMTc1QzE4LjU5NTUgMy45NjE1IDE4LjM0MTkgMy45NjE1IDE4LjE4NTkgNC4xMTc1TDEyLjAwMDIgMTAuMzAzMkw1LjgxNDU2IDQuMTE3QzUuNjU4NTUgMy45NjEgNS40MDUwNCAzLjk2MSA1LjI0OTA0IDQuMTE3TDQuMTE3IDUuMjQ4NTRDMy45NjEgNS40MDQ1NCAzLjk2MSA1LjY1ODA1IDQuMTE3IDUuODE0MDZMMTAuMzAzMiAxMi4wMDAyTDQuMTE3IDE4LjE4NTlDMy45NjEgMTguMzQxOSAzLjk2MSAxOC41OTU1IDQuMTE3IDE4Ljc1MTVMNS4yNDg1NCAxOS44ODNDNS40MDQ1NCAyMC4wMzkgNS42NTgwNSAyMC4wMzkgNS44MTQwNiAxOS44ODNMMTIuMDAwMiAxMy42OTczTDE3LjEyODQgMTguODI1NUwxOC4xODU5IDE5Ljg4M0MxOC4zNDE5IDIwLjAzOSAxOC41OTU1IDIwLjAzOSAxOC43NTE1IDE5Ljg4M0wxOS44ODMgMTguNzUxNUMyMC4wMzkgMTguNTk1NSAyMC4wMzkgMTguMzQxOSAxOS44ODMgMTguMTg1OUwxMy42OTczIDEyLjAwMDJaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM0MTRDNTIpIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMF8yMSI+CjxyZWN0IHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="Close" />
+    </button>
+
+    <div class="modal-heading">
+      <span class="sparkles" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjEuMTY1NCIgaGVpZ2h0PSIyMC43OTQ2IiB2aWV3Qm94PSIwIDAgMjEuMTY1NCAyMC43OTQ2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0ic3BhcmtsZXMiPgo8cGF0aCBpZD0iU3BhcmtsZXMiIGQ9Ik0xMS4zODc5IDAuNTAzNzVDMTEuMjQ0NSAwLjE5NSAxMC45MzAxIDAgMTAuNTg4MiAwQzEwLjI0NjMgMCA5LjkzMTk5IDAuMTk1IDkuNzg4NiAwLjUwMzc1QzkuNzg4NiAwLjUwMzc1IDguNzY5OSA0Ljg0MTEyIDYuODYwMjkgNi43MzI5MkM0Ljk1MDY4IDguNjI0NzEgMC41MTgzODIgOS42MDkxNyAwLjUxODM4MiA5LjYwOTE3QzAuMTk4NTI5IDkuNzU1NDIgMCAxMC4wNjQyIDAgMTAuNEMwIDEwLjczNTggMC4xOTg1MjkgMTEuMDQ0NiAwLjUxMjg2OCAxMS4xODU0QzAuNTEyODY4IDExLjE4NTQgNC45NDUxNyAxMi4xNjk5IDYuODU0NzggMTQuMDYxN0M4Ljc2NDM5IDE1Ljk1MzUgOS43ODMwOSAyMC4yOTA4IDkuNzgzMDkgMjAuMjkwOEM5LjkyNjQ3IDIwLjU5OTYgMTAuMjQwOCAyMC43OTQ2IDEwLjU4MjcgMjAuNzk0NkMxMC45MjQ2IDIwLjc5NDYgMTEuMjM5IDIwLjU5OTYgMTEuMzgyNCAyMC4yOTA4QzExLjM4MjQgMjAuMjkwOCAxMi40MDExIDE1Ljk1MzUgMTQuMzEwNyAxNC4wNjE3QzE2LjIyMDMgMTIuMTY5OSAyMC42NTI2IDExLjE4NTQgMjAuNjUyNiAxMS4xODU0QzIwLjk2NjkgMTEuMDQ0NiAyMS4xNjU0IDEwLjczNTggMjEuMTY1NCAxMC40QzIxLjE2NTQgMTAuMDY0MiAyMC45NjY5IDkuNzU1NDIgMjAuNjUyNiA5LjYxNDU4QzIwLjY1MjYgOS42MTQ1OCAxNi4yMjAzIDguNjMwMTMgMTQuMzEwNyA2LjczODMzQzEyLjQwMTEgNC44NDY1NCAxMS4zODI0IDAuNTA5MTY3IDExLjM4MjQgMC41MDkxNjdMMTEuMzg3OSAwLjUwMzc1WiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRUE3NEUzKSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></span>
+      <h1 id="ctmModalTitle">Create Targeted Materials</h1>
+    </div>
+
+    <p class="modal-intro"><strong id="ctmStudent">Elijah Park</strong> struggled on <span id="ctmMissionLesson">Mission 3, Lesson 4</span>, and may need support on the following objective:</p>
+
+    <div class="objective-card">
+      <p id="ctmObjective">Interpret and represent patterns when multiplying by 10, 100, and 1,000 in arrays and numerically.</p>
+    </div>
+
+    <p class="modal-select-label">Select what you want Zearn AI to create:</p>
+
+    <div class="modal-options">
+      <div class="modal-option selected">
+        <span class="checkbox" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbXBvbmVudHMvSWNvbnMvMjQvQ2hlY2tib3gvQ2hlY2tlZCI+CjxyZWN0IGlkPSJDaGVja2JveCIgeD0iNC41IiB5PSI0LjUiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSIgcng9IjIuNSIgZmlsbD0idmFyKC0tZmlsbC0wLCB3aGl0ZSkiIHN0cm9rZT0idmFyKC0tc3Ryb2tlLTAsICM2NDcwNzcpIi8+CjxwYXRoIGlkPSJDaGVja21hcmsiIGQ9Ik0xMC4zODg3IDE1LjgxNDVMNy4xNDY0OCAxMi41NzIzQzYuOTUxMTcgMTIuMzc3IDYuOTUxMTcgMTIuMDQ0OSA3LjE0NjQ4IDExLjg0OTZMNy44NDk2MSAxMS4xNDY1QzguMDQ0OTIgMTAuOTUxMiA4LjM1NzQyIDEwLjk1MTIgOC41NTI3MyAxMS4xNDY1TDEwLjc1OTggMTMuMzM0TDE1LjQ0NzMgOC42NDY0OEMxNS42NDI2IDguNDUxMTcgMTUuOTU1MSA4LjQ1MTE3IDE2LjE1MDQgOC42NDY0OEwxNi44NTM1IDkuMzQ5NjFDMTcuMDQ4OCA5LjU0NDkyIDE3LjA0ODggOS44NzY5NSAxNi44NTM1IDEwLjA3MjNMMTEuMTExMyAxNS44MTQ1QzEwLjkxNiAxNi4wMDk4IDEwLjU4NCAxNi4wMDk4IDEwLjM4ODcgMTUuODE0NVoiIGZpbGw9InZhcigtLWZpbGwtMCwgIzU5NjU2QikiLz4KPC9nPgo8L3N2Zz4K" alt="" /></span>
+        <span class="label">Mini Lesson</span>
+      </div>
+      <div class="modal-option disabled" aria-disabled="true">
+        <span class="checkbox" aria-hidden="true"><span class="checkbox-empty"></span></span>
+        <span class="label-wrap">
+          <span class="label">Problem Set</span>
+          <span class="coming-soon">Coming Soon</span>
+        </span>
+      </div>
+    </div>
+
+    <button class="modal-create-btn" type="button" id="ctmCreateBtn">
+      <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlNwYXJrbGVzIiBkPSJNOC42MDg2NSAwLjM4NzYwMUM4LjUwMDI2IDAuMTUwMDM5IDguMjYyNjQgMCA4LjAwNDE3IDBDNy43NDU3IDAgNy41MDgwOCAwLjE1MDAzOSA3LjM5OTY5IDAuMzg3NjAxQzcuMzk5NjkgMC4zODc2MDEgNi42NDIwMyAzLjcyMzA0IDUuMTg2MDMgNS4xODA1MkMzLjczMDA0IDYuNjM3OTkgMC4zOTE4NzEgNy4zOTM1OSAwLjM5MTg3MSA3LjM5MzU5QzAuMTUwMDc4IDcuNTA2MTIgMCA3Ljc0MzY4IDAgOC4wMDIwOEMwIDguMjYwNDggMC4xNTAwNzggOC40OTgwNSAwLjM4NzcwMiA4LjYwNjQxQzAuMzg3NzAyIDguNjA2NDEgMy43MjU4NyA5LjM2MjAxIDUuMTgxODcgMTAuODE5NUM2LjYzNzg2IDEyLjI3NyA3LjM5NTUyIDE1LjYxMjQgNy4zOTU1MiAxNS42MTI0QzcuNTAzOTEgMTUuODUgNy43NDE1MyAxNiA4IDE2QzguMjU4NDcgMTYgOC40OTYwOSAxNS44NSA4LjYwNDQ4IDE1LjYxMjRDOC42MDQ0OCAxNS42MTI0IDkuMzYyMTQgMTIuMjc3IDEwLjgxODEgMTAuODE5NUMxMi4yNzQxIDkuMzYyMDEgMTUuNjEyMyA4LjYwNjQxIDE1LjYxMjMgOC42MDY0MUMxNS44NDk5IDguNDk4MDUgMTYgOC4yNjA0OCAxNiA4LjAwMjA4QzE2IDcuNzQzNjggMTUuODQ5OSA3LjUwNjEyIDE1LjYxMjMgNy4zOTc3NkMxNS42MTIzIDcuMzk3NzYgMTIuMjc0MSA2LjY0MjE2IDEwLjgxODEgNS4xODQ2OEM5LjM2MjE0IDMuNzI3MjEgOC42MDQ0OCAwLjM5MTc2OSA4LjYwNDQ4IDAuMzkxNzY5TDguNjA4NjUgMC4zODc2MDFaIiBmaWxsPSJ2YXIoLS1maWxsLTAsIHdoaXRlKSIvPgo8L3N2Zz4K" alt="" />
+      <span>CREATE</span>
+    </button>
+
+    <div class="modal-disclaimer">
+      Reminder: AI can make mistakes! Review this content for accuracy.<br />
+      We do not use student data with generative AI.&nbsp;<a href="#">View Zearn's AI data policy.</a>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>

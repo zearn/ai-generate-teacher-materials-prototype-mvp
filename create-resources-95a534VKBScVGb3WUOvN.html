@@ -1,0 +1,1476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Create Resources – Zearn (Figma)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Oxygen:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --yellow:        #fad232;
+    --aqua:          #007694;
+    --aqua-pressed:  #00647e;  /* --aqua darkened by 15% for :active state */
+    --purple:        #7029a5;
+    --purple-bg:     #faf1ff;
+    --fuchsia:       #f182ea;
+    --fuchsia-5:     #ffeffe;
+    --fuchsia-spark: #ea74e3;
+    --gray-60:       #8e8e8e;
+    --gray-75:       #6e6e6e;
+    --ink:           #303b40;
+    --ink-2:         #435259;
+    --gray-bg:       #f6f6f6;
+    --gray-10:       #ebebeb;
+    --gray-15:       #e1e1e1;
+    --gray-30:       #c7c7c7;
+    --gray-40:       #b4b4b4;
+    --gray-55:       #989898;
+    --gray-65:       #838383;
+    --line:          #ccc;
+    --line-2:        #999;
+    --green:         #00875a;
+    --white:         #fff;
+    --help-bg:       #fff5c3;
+    --answer-red:    #d2000f;
+
+    /* Card drop shadow — X 1, Y 1, Blur 3, Spread 0, Color #000000 @ 24% */
+    --card-dropshadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.24);
+  }
+  .card-dropshadow { box-shadow: var(--card-dropshadow); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--gray-bg);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
+  img { display: block; max-width: none; }
+
+  /* ===== Sticky header (top nav + bottom nav) ===== */
+  .header-wrap {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--white);
+  }
+  .top-nav {
+    background: var(--white);
+    height: 64px;
+    border-bottom: 4px solid var(--yellow);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.24);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .nav-inner {
+    width: 992px;
+    height: 100%;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .top-nav .logo {
+    position: absolute; left: 0; top: 0; height: 64px;
+    display: flex; align-items: center; width: 112px;
+  }
+  .top-nav .logo img { width: 112px; height: 31.412px; }
+  .page-title {
+    display: flex; align-items: center; gap: 8px; height: 33px;
+  }
+  .page-title .sparkle-big { width: 20px; height: 20px; flex: none; }
+  .page-title .sparkle-big img { width: 20px; height: 20px; }
+  .page-title .title-text {
+    font-size: 22px; line-height: 1.5; color: var(--ink);
+    text-transform: uppercase; font-weight: 400;
+  }
+  .beta-pill {
+    background: var(--purple-bg);
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    font-size: 12px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+    padding: 0 8px;
+    border-radius: 4px;
+    height: 18px;
+    display: inline-flex; align-items: center;
+  }
+
+  /* ===== Bottom nav (Back + page title) ===== */
+  .sub-nav {
+    background: var(--white);
+    height: 48px;
+    border-bottom: 1px solid var(--gray-30);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sub-nav .center-title {
+    font-weight: 600; font-size: 20px; line-height: 1.5;
+    color: var(--ink);
+  }
+  .back-btn {
+    position: absolute; left: 0; top: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 32px;
+  }
+  .back-btn .icon { width: 32px; height: 32px; flex: none; }
+  .back-btn .icon img { width: 32px; height: 32px; }
+  .back-btn .label {
+    font-size: 16px; line-height: 24px; color: var(--ink);
+    font-weight: 400;
+    /* Pre-set the underline thickness/offset so :hover only needs to turn the
+       line on. Modern browsers honor these even when no decoration is drawn. */
+    text-decoration-thickness: 4px;
+    text-underline-offset: 4px;
+  }
+  /* Hover: 4px aqua underline; text stays ink. */
+  .back-btn:hover .label {
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua);
+  }
+  /* Press: text + line both darken by 15%. */
+  .back-btn:active .label {
+    color: #293236;   /* var(--ink) darkened 15% */
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-pressed);
+  }
+
+  /* ===== Page content wrapper ===== */
+  .content-wrap {
+    width: 1024px; margin: 0 auto;
+    padding-top: 16px; padding-bottom: 32px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .disclaimer {
+    height: 40px;
+    background: var(--help-bg);
+    border: 1px solid var(--gray-30);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 9px 33px;
+    font-size: 16px; line-height: 1.5; color: #000;
+    text-align: center;
+  }
+  .disclaimer a { color: var(--aqua); font-weight: 600; }
+  .disclaimer a:hover { text-decoration: underline; }
+
+  .side-by-side {
+    display: flex; gap: 16px; align-items: flex-start;
+    width: 100%;
+  }
+
+  /* ===== Side nav (Figma node 17730:1213) ===== */
+  .sidenav {
+    width: 214px;
+    background: var(--white);
+    border-radius: 4px;
+    box-shadow: var(--card-dropshadow);
+    padding: 16px 12px 8px;
+    flex: none;
+    display: flex; flex-direction: column; align-items: flex-start;
+    overflow: hidden;
+  }
+  .sidenav-active {
+    width: 100%;
+    background: var(--purple-bg);
+    border-left: 4px solid var(--fuchsia);
+    padding: 12px 16px;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  }
+  .sidenav-active .label {
+    font-size: 18px; font-weight: 600; line-height: 24px; color: #000;
+    white-space: nowrap;
+  }
+  .subnav-item {
+    padding-left: 16px;
+    width: 100%;
+    display: flex; flex-direction: column; justify-content: center;
+    box-sizing: border-box;
+  }
+  .subnav-item .content {
+    border-bottom: 1px solid var(--gray-15);
+    display: flex; align-items: center; justify-content: space-between;
+    /* No right padding — the sparkle button is flush-right with the gray stroke
+       below it (the stroke runs the full width of .content). */
+    padding: 12px 0 12px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .subnav-item .text {
+    font-size: 16px; font-weight: 400; line-height: 1.5; color: #000;
+    white-space: nowrap;
+  }
+  .subnav-item .sparkle-btn {
+    width: 24px; height: 24px;
+    border: 1px solid var(--aqua);
+    border-radius: 999px;
+    background: var(--white);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+    cursor: pointer;
+    padding: 0;        /* reset user-agent <button> padding */
+  }
+  .subnav-item .sparkle-btn img { width: 12px; height: 12px; }
+  /* Sparkle buttons share the same hover/press recolor as other secondary
+     buttons. Defined inline here (rather than in the shared block far below)
+     so the per-button rules stay grouped. */
+  .subnav-item .sparkle-btn:hover {
+    background: var(--aqua);
+  }
+  .subnav-item .sparkle-btn:active {
+    background: var(--aqua-pressed);
+    border-color: var(--aqua-pressed);
+  }
+  .subnav-item .sparkle-btn:hover img,
+  .subnav-item .sparkle-btn:active img {
+    filter: brightness(0) invert(1);
+  }
+
+  /* "Current view" indicator on a subnav item: short fuchsia bar, vertically
+     centered with the text and indented 16px from where the Mini Lesson
+     active bar sits (so the subnav bar is clearly subordinate to the
+     section-level active state). Doesn't span the full row height.
+     Mini Lesson keeps its own full-height active treatment; the subnav
+     fuchsia bar only marks which generated material is currently being shown. */
+  .subnav-item { position: relative; }
+  .subnav-item.current::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 24px;
+    background: var(--fuchsia);
+  }
+  /* When a subnav item is the currently-viewed material, its label goes
+     SemiBold to match the section-level Mini Lesson active treatment. */
+  .subnav-item.current .text { font-weight: 600; }
+  /* Generated subitems become clickable navigation; ungenerated ones aren't. */
+  .subnav-item.generated { cursor: pointer; }
+  .subnav-item.generated:hover { background: var(--purple-bg); }
+  /* Mini Lesson is always clickable (loads Mini Lesson A.pdf back). */
+  .sidenav-active { cursor: pointer; }
+
+  .coming-soon {
+    width: 100%;
+    padding: 12px 16px;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  }
+  .coming-soon .label {
+    font-size: 16px; font-weight: 600; line-height: 24px;
+    color: var(--gray-75);
+    white-space: nowrap;
+  }
+  .coming-soon .tag {
+    font-size: 16px; font-weight: 400; line-height: 24px;
+    color: var(--gray-60);
+    white-space: nowrap;
+  }
+
+  /* ===== Main content column ===== */
+  .main-col {
+    width: 792px;
+    display: flex; flex-direction: column; gap: 8px;
+    flex: none;
+  }
+  .button-group {
+    background: var(--white);
+    height: 48px;
+    box-shadow: var(--card-dropshadow);
+    position: relative;
+  }
+  .button-group .generated {
+    position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; line-height: 24px; color: var(--gray-65);
+    /* Hidden until a PDF is actually on screen. The button-group itself
+       stays visible during recreate (so the RECREATE button still anchors
+       the header), but the "Generated …" text is only meaningful once a
+       material is rendered. */
+    display: none;
+  }
+  html.loaded:not(.recreating) .button-group .generated { display: block; }
+  .button-group .btn-cluster {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .btn-secondary {
+    border: 1px solid var(--aqua);
+    background: var(--white);
+    color: var(--aqua);
+    border-radius: 999px;
+    height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 14px; font-weight: 600; line-height: 1.5;
+  }
+  .btn-secondary img { display: block; }
+  .btn-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--aqua);
+    background: var(--white);
+    border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+
+  /* ===== Shared secondary-button interaction states =====
+     All aqua-outlined buttons (aqua border + aqua text/icon + white fill)
+     share the same hover/press treatment:
+       - hover : invert → aqua fill + white text/icon
+       - press : darken filled state by 15% (var --aqua-pressed)
+     SVG icons (inlined as <img>) are recolored to white via
+     `filter: brightness(0) invert(1)` since we can't restyle their fills. */
+  .btn-secondary:hover,
+  .btn-icon:hover,
+  .pdf-cta-btn:hover,
+  .ays-btn-secondary:hover,
+  .byg-btn-icon:hover {
+    background: var(--aqua);
+    color: var(--white);
+  }
+  .btn-secondary:active,
+  .btn-icon:active,
+  .pdf-cta-btn:active,
+  .ays-btn-secondary:active,
+  .byg-btn-icon:active {
+    background: var(--aqua-pressed);
+    border-color: var(--aqua-pressed);
+    color: var(--white);
+  }
+  .btn-secondary:hover img,
+  .btn-icon:hover img,
+  .pdf-cta-btn:hover img,
+  .byg-btn-icon:hover img,
+  .btn-secondary:active img,
+  .btn-icon:active img,
+  .pdf-cta-btn:active img,
+  .byg-btn-icon:active img {
+    filter: brightness(0) invert(1);
+  }
+
+  /* ===== Page area card ===== */
+  .page-area {
+    background: var(--white);
+    border-radius: 0 0 4px 4px;
+    box-shadow: var(--card-dropshadow);
+    padding: 0;
+    position: relative;
+    width: 792px;
+    height: 840px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;       /* Firefox */
+    scrollbar-color: rgba(0,0,0,0.35) transparent;
+  }
+  /* Chrome/Safari: thin floating-style scrollbar that visually sits over the PDF's right edge */
+  .page-area::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+  .page-area::-webkit-scrollbar-track { background: transparent; }
+  .page-area::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.35);
+    border-radius: 4px;
+  }
+  .page-area::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.55); }
+  .pdf-stack {
+    /* Stacked PDF page canvases — no gaps, white throughout. */
+    display: flex; flex-direction: column;
+    background: var(--white);
+    width: 792px;
+  }
+  .pdf-stack canvas {
+    display: block;
+    width: 792px;
+    height: auto;
+    background: var(--white);
+  }
+  .lesson-header {
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .lesson-header .top {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 0 17px 1px;
+  }
+  .lesson-header .label {
+    font-size: 24px; font-weight: 600; line-height: 16px;
+    color: #000; padding-top: 4px;
+  }
+  .lesson-header .objective-text {
+    font-size: 18px; font-weight: 400; line-height: 22.5px;
+    color: #000;
+  }
+  .yellow-line {
+    height: 2px; background: var(--yellow); width: 100%;
+  }
+  .lesson-header .bottom {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 0 17px;
+  }
+  .lesson-header .materials-label {
+    font-size: 18px; font-weight: 600; line-height: 16px;
+    color: #000;
+  }
+  .lesson-header .materials-text {
+    font-size: 16px; font-weight: 400; line-height: 16px;
+    color: #000;
+  }
+
+  /* ===== Problem / Teacher Guidance table ===== */
+  .pt-table {
+    border: 0;
+    overflow: hidden;
+  }
+  .pt-header-row {
+    display: flex;
+    background: var(--gray-10);
+    height: 48px;
+  }
+  .pt-header-cell {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 20px;
+  }
+  .pt-header-cell.problem { width: 436px; }
+  .pt-header-cell.guidance { width: auto; flex: 1; }
+  .pt-header-bar {
+    width: 6px; height: 16px; background: var(--gray-40);
+    border-radius: 999px; flex: none;
+  }
+  .pt-header-label {
+    font-size: 16px; font-weight: 600; line-height: 24px;
+    letter-spacing: 1.6px; text-transform: uppercase; color: #000;
+  }
+  .pt-body-row {
+    display: flex; align-items: flex-start;
+    padding: 16px;
+    background: var(--white);
+  }
+  .pt-problem-cell {
+    width: 422.66px; flex: none;
+    padding-right: 16px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .pt-guidance-cell {
+    flex: 1;
+    padding-left: 16px;
+    align-self: stretch;
+  }
+
+  .problem-number {
+    background: var(--yellow);
+    border: 1.167px solid var(--yellow);
+    border-radius: 999px;
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Source Sans Pro";
+    font-size: 14px; font-weight: 600; line-height: 1; color: #000;
+    flex: none;
+  }
+  .problem-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  .problem-stem {
+    font-size: 14px; line-height: 19px; color: #000;
+  }
+  .problem-stem .stem-title { font-weight: 700; display: block; margin-bottom: 12px; }
+  .question-list { display: flex; flex-direction: column; gap: 8px; }
+  .question-row { display: flex; gap: 2px; align-items: flex-start; }
+  .question-row .letter {
+    width: 14px; flex: none;
+    font-size: 14px; font-weight: 600; line-height: 19px; color: #000;
+  }
+  .question-row .q-body {
+    flex: 1; font-size: 14px; line-height: 19px; color: #000;
+  }
+  .question-row .answer {
+    color: var(--answer-red); font-style: italic; display: block;
+  }
+  .chart-wrap {
+    margin-top: 12px;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .chart-wrap img {
+    width: 372px; height: 280px; object-fit: contain;
+  }
+
+  .guidance-text { font-size: 14px; line-height: 19px; color: #000; }
+  .guidance-text p { margin: 0 0 12px; }
+  .guidance-text p:last-child { margin-bottom: 0; }
+  .guidance-text .lead { font-weight: 700; }
+
+  /* ===== Before You Go modal (Figma node 17776:8319) ===== */
+  .byg-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.70);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .byg-modal-overlay.open { display: flex; }
+  .byg-modal-card {
+    position: relative;
+    background: #fff;
+    border-top: 16px solid #1cc7e6;     /* aqua/40 */
+    border-radius: 4px;
+    box-shadow: 1px 1px 1.5px rgba(128,128,128,0.5);
+    width: 600px; max-width: 100%;
+    padding: 0 64px;
+    font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #303b40;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .byg-modal-card .body {
+    padding-top: 64px;
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%;
+  }
+  .byg-modal-card .title {
+    font-size: 22px; font-weight: 400; line-height: 1.5;
+    color: #303b40;
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    text-align: center;
+  }
+  .byg-modal-card .msg {
+    font-size: 16px; font-weight: 400; line-height: 24px; color: #000;
+    text-align: center;
+    margin: 0 0 64px;
+  }
+  .byg-modal-card .buttons {
+    border-top: 1px solid #c7c7c7;     /* gray/30 */
+    padding: 32px 0;
+    display: flex; gap: 24px; align-items: center; justify-content: center;
+    width: 100%;
+  }
+  .byg-btn-primary {
+    background: #007694;
+    color: #fff;
+    border: 1px solid #007694;
+    height: 40px;
+    border-radius: 999px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    text-decoration: none;
+  }
+  .byg-btn-primary:hover { background: #005c73; }
+  .byg-btn-icon {
+    background: #fff;
+    border: 1px solid #007694;
+    width: 40px; height: 40px;
+    border-radius: 999px;
+    padding: 0;
+    cursor: pointer;
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .byg-btn-icon img { display: block; }
+  .byg-close {
+    position: absolute; top: 20px; right: 16px;
+    width: 24px; height: 24px;
+    background: transparent; border: none; cursor: pointer; padding: 0;
+  }
+  .byg-close img { width: 24px; height: 24px; }
+
+  /* ===== Are You Sure modal (Figma node 17776:8320) ===== */
+  .ays-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.70);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .ays-modal-overlay.open { display: flex; }
+  .ays-modal-card {
+    position: relative;
+    background: #fff;
+    border-top: 16px solid #1cc7e6;     /* aqua/40 */
+    border-radius: 4px;
+    box-shadow: 1px 1px 1.5px rgba(128,128,128,0.5);
+    width: 470px; max-width: 100%;
+    padding: 0 64px;
+    font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #303b40;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .ays-modal-card .body {
+    padding: 64px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+    width: 100%;
+  }
+  .ays-modal-card .title {
+    font-size: 22px; font-weight: 400; line-height: 1.5;
+    color: #303b40;
+    text-transform: uppercase;
+    margin: 0;
+    text-align: center;
+  }
+  .ays-modal-card .msg-stack {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    width: 100%;
+  }
+  .ays-modal-card .msg {
+    font-size: 16px; font-weight: 400; line-height: 24px; color: #000;
+    text-align: center;
+    margin: 0;
+  }
+  .ays-modal-card .dontshow {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 16px; font-weight: 400; line-height: 1.5; color: #303b40;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .ays-modal-card .dontshow input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border: 1px solid #59656b;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    margin: 0;
+    flex: none;
+    position: relative;
+  }
+  .ays-modal-card .dontshow input[type="checkbox"]:checked {
+    background: #007694;
+    border-color: #007694;
+  }
+  .ays-modal-card .dontshow input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 4px; height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .ays-modal-card .buttons {
+    border-top: 1px solid #c7c7c7;
+    padding: 32px 0;
+    display: flex; gap: 24px; align-items: center; justify-content: center;
+    width: 100%;
+  }
+  .ays-btn-secondary {
+    background: #fff;
+    color: #007694;
+    border: 1px solid #007694;
+    height: 40px;
+    border-radius: 999px;
+    padding: 0 16px;
+    min-width: 125px;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .ays-btn-primary {
+    background: #007694;
+    color: #fff;
+    border: 1px solid #007694;
+    height: 40px;
+    border-radius: 999px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px;
+  }
+  .ays-btn-primary:hover { background: #005c73; }
+  .ays-btn-primary img { display: block; }
+  .ays-close {
+    position: absolute; top: 20px; right: 16px;
+    width: 24px; height: 24px;
+    background: transparent; border: none; cursor: pointer; padding: 0;
+  }
+  .ays-close img { width: 24px; height: 24px; }
+
+  /* ===== Loading state (Figma node 17505:1810) ===== */
+  /* Sidenav skeleton: 4 gray pill bars instead of nav items */
+  .nav-skeleton {
+    display: flex; flex-direction: column;
+    width: 100%;
+  }
+  .nav-skeleton .skel-bar {
+    height: 18px;
+    background: var(--gray-15);
+    border-radius: 5px;
+    margin: 12px 16px;
+  }
+  /* Loading content inside the page-area card */
+  .loading-content {
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%; height: 100%;
+    padding: 64px 36px 0;
+    box-sizing: border-box;
+  }
+  .loading-content .loading-message {
+    font-size: 24px; font-weight: 600; line-height: 1.5;
+    color: var(--ink); text-align: center;
+    margin: 0;
+    /* width:fit-content so the clip-path wipe lines up with the text edges,
+       not the full container width. */
+    width: fit-content;
+    max-width: 100%;
+  }
+  /* Reveal each new message left → right over 2s (no movement). */
+  .loading-content .loading-message.fade-in {
+    animation: msg-reveal 2s ease-out;
+  }
+  @keyframes msg-reveal {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 0 0 0); }
+  }
+  .loading-content .sparkle-anim {
+    margin-top: 48px;
+    width: 147.333px; height: 176.661px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .loading-content .sparkle-anim svg {
+    width: 130.447px; height: 163.54px;
+    transform: rotate(6.19deg);
+  }
+  /* Each sparkle fades independently between the lightest (#FFEFFE) and darkest (#D65CD0)
+     colors from the original illustration. Staggered delays keep them out of sync. */
+  @keyframes sparkle-fade {
+    0%, 100% { fill: #FFEFFE; }
+    50%      { fill: #D65CD0; }
+  }
+  .loading-content .sparkle-anim .sparkle-1 {
+    animation: sparkle-fade 2.4s ease-in-out infinite;
+  }
+  .loading-content .sparkle-anim .sparkle-2 {
+    animation: sparkle-fade 2.4s ease-in-out infinite;
+    animation-delay: -0.8s;
+  }
+  .loading-content .sparkle-anim .sparkle-3 {
+    animation: sparkle-fade 2.4s ease-in-out infinite;
+    animation-delay: -1.6s;
+  }
+
+  /* Toggle: while body.loading, hide real content; show skeleton/loading content. */
+  /* DEFAULT = loading state. Real content is hidden, loading elements are shown.
+     After 3s, JS adds `loaded` class to <html>, flipping to the real state.
+     (Inverted logic so the loading state survives without depending on a class — some
+     preview environments strip class additions made during page load.) */
+  .sidenav > .sidenav-active,
+  .sidenav > .subnav-item,
+  .sidenav > .coming-soon,
+  .main-col > .button-group,
+  .page-area > .pdf-stack { display: none; }
+  .nav-skeleton { display: flex; }
+  .loading-content { display: flex; }
+  .page-area { height: 532px; }
+
+  /* Loaded state: hide loading, show real */
+  .loaded .nav-skeleton,
+  .loaded .loading-content { display: none; }
+  .loaded .sidenav > .sidenav-active { display: flex; }
+  .loaded .sidenav > .subnav-item { display: flex; }
+  .loaded .sidenav > .coming-soon { display: flex; }
+  .loaded .main-col > .button-group { display: block; }
+  .loaded .page-area > .pdf-stack { display: flex; }
+  .loaded .page-area { height: 840px; }
+
+  /* Recreating state: applies on top of .loaded so the sidenav and button-group
+     stay visible (real content, not skeleton), but the PDF area shows the
+     loading animation instead of the rendered PDF — and the create CTAs
+     in the page-area footer disappear too. The `html.recreating` qualifier
+     bumps specificity above the `.loaded ...` rules above so source order
+     can't flip the override. */
+  html.recreating .pdf-stack { display: none; }
+  html.recreating .loading-content { display: flex; }
+  html.recreating .page-area { height: 532px; }
+  /* Hide the entire RECREATE/download/print bar while generating — it
+     reappears in sync with the new PDF when loading finishes. */
+  html.recreating .main-col > .button-group { display: none; }
+
+  /* ===== End-of-PDF CTAs (Figma node 17753:1199) =====
+     Render below the PDF stack inside the page-area's scroll. The user reaches
+     them naturally by scrolling past the PDF content. */
+  .pdf-ctas {
+    display: none;        /* hidden until .loaded */
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 36px 24px;
+    background: #fff;
+    width: 792px;
+    box-sizing: border-box;
+  }
+  /* CTAs are revealed via `html.ctas-visible`, which JS adds 1.5s after each
+     render finishes — this prevents the footer from popping in before the
+     PDF is actually drawn. The :not(.recreating) part hides them again the
+     moment a new generation/recreate flow starts. */
+  html.ctas-visible:not(.recreating) .pdf-ctas { display: flex; }
+  /* Once a material has been generated, hide its CTA permanently (until
+     a page reload resets state). The matching subnav item is now the way
+     to navigate back to that material. */
+  .pdf-cta.is-generated { display: none; }
+  /* When *every* CTA is generated, the footer container itself becomes an
+     empty white box — hide the whole thing so the PDF ends cleanly. */
+  .pdf-ctas.is-empty { display: none !important; }
+  .pdf-cta {
+    background: #faf1ff;       /* purple/5 */
+    border: 1px solid #f1d9fe; /* purple/15 */
+    border-radius: 4px;
+    padding: 9px 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pdf-cta-frame {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    padding: 8px;
+    width: 100%;
+  }
+  .pdf-cta-content {
+    display: flex; align-items: center; gap: 8px;
+    flex: 1; min-width: 0;
+  }
+  .pdf-cta-icon {
+    background: #fff;
+    border: 1.167px solid #f1d9fe;
+    border-radius: 999px;
+    width: 56px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .pdf-cta-icon img { width: 30.5px; height: 29.4px; }
+  .pdf-cta-text {
+    display: flex; flex-direction: column;
+    color: #303b40;
+    min-width: 0;
+  }
+  .pdf-cta-title {
+    font-size: 18px; font-weight: 600; line-height: 1.5;
+  }
+  .pdf-cta-desc {
+    font-size: 16px; font-weight: 400; line-height: 1.5;
+  }
+  .pdf-cta-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1px solid #007694;
+    color: #007694;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex: none;
+  }
+  .pdf-cta-btn img { width: 16px; height: 16px; display: block; }
+
+</style>
+</head>
+<body>
+
+<!-- ===================== STICKY HEADER ===================== -->
+<div class="header-wrap">
+  <nav class="top-nav">
+   <div class="nav-inner">
+    <a class="logo" href="#" aria-label="Zearn home">
+      <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTEyLjAwNSIgaGVpZ2h0PSIzMS40MTQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiICAgdmlld0JveD0iMCAwIDExMi4wMDUgMzEuNDE0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iTGF5ZXJfMS0yIj4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTg1LjA4NTIgMjEuNzg0MkM4Ny4xNzc4IDIwLjQ5NzEgODguNDYyNSAxOC4yMjUzIDg4LjQ4NzEgMTUuNzY4N0M4OC40ODcxIDEwLjM0MzkgODQuMDg5NCA4LjI5NTc5IDgxLjMwOTUgOC4yOTU3OUg3MS40NTU1QzcwLjIyNzMgOC4yOTU3OSA2OC41ODc1IDguOTI0MDMgNjguNTg3NSAxMS41ODQ2VjI4LjExNjhDNjguNTU4MyAyOS4wMDA1IDY4Ljg5NjkgMjkuODU2NyA2OS41MjI3IDMwLjQ4MTNDNzAuMTQ4NSAzMS4xMDU5IDcxLjAwNTQgMzEuNDQyOSA3MS44ODkgMzEuNDEyQzczLjkzMDggMzEuNDEyIDc1LjIxMjQgMzAuMjIxNSA3NS4yMTI0IDI4LjExNjhWMjMuNDA1SDc4LjI4NDVMODIuMjcwNyAyOS44NzkxQzgyLjg4ODEgMzAuODM5OSA4My45NTU3IDMxLjQxNjQgODUuMDk3OCAzMS40MDU3Qzg2Ljg4MiAzMS40MDU3IDg4LjU3ODIgMzAuMDQ4NyA4OC41NzgyIDI4LjI2NDVDODguNTQ2NSAyNy41NDI3IDg4LjMwODkgMjYuODQ1MiA4Ny44OTM1IDI2LjI1NDFMODUuMDg1MiAyMS43ODQyTTc5Ljc0NTEgMTcuOTk1OUg3NS4yNDM4VjE3Ljk5NTlWMTMuNzExMlYxMy43MTEySDc5Ljc1MTRDODAuODI4OSAxMy43MTEyIDgxLjk1MDMgMTQuNTAyOCA4MS45NTAzIDE1Ljc3ODJDODEuOTUwMyAxNy4xODIzIDgxLjA0NTYgMTcuOTk1OSA3OS43NTE0IDE3Ljk5NTlINzkuNzQ1MSIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRkFEMjMzKSIvPgo8cGF0aCBpZD0iVmVjdG9yXzIiIGQ9Ik0xMDguNjg4IDguMDk0NzVDMTA2LjU1NSA4LjA5NDc1IDEwNS4zNTUgOS4zNzk1IDEwNS4zNTUgMTEuNjc4OVYyMC4yODI3TDk3LjYxMjQgMTAuMjMwOEM5Ni4yNTIyIDguNDk5OTYgOTUuMjUwMiA4LjA4MjE4IDkzLjYxMzYgOC4wODg0N0M5MS4wMjUyIDguMDg4NDcgOTAuMTI2OSA5LjYwODgxIDkwLjEyNjkgMTIuMjM0OUM5MC4xMjY5IDEyLjIzNDkgOTAuMTI2OSAyOC4xMTY4IDkwLjEyNjkgMjguMTEzN0M5MC4wOTY5IDI4Ljk5NjIgOTAuNDMzOCAyOS44NTE3IDkxLjA1NzYgMzAuNDc2N0M5MS42ODE0IDMxLjEwMTcgOTIuNTM2MyAzMS40NDAzIDkzLjQxODggMzEuNDEyQzk1LjQ2MzggMzEuNDEyIDk2Ljc1MTcgMzAuMjIxNSA5Ni43NTE3IDI4LjExNjhWMTkuMjMzNUM5Ni43MzYgMTkuMjU1NSAxMDQuOTk0IDI5Ljg2OTYgMTA1LjAxNiAyOS44ODU0QzEwNi4yMjkgMzEuMjM5MiAxMDcuMDY0IDMxLjM5OTQgMTA4LjQ3MiAzMS4zOTYzQzExMS4wNTcgMzEuMzk2MyAxMTIuMDA1IDI5Ljk0MTkgMTEyLjAwNSAyNy4zMTI3VjExLjY3ODlDMTEyLjAwMiA5LjM3OTUgMTEwLjgxNSA4LjA5NDc1IDEwOC42ODggOC4wOTQ3NVY4LjA5NDc1IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfMyIgZD0iTTQwLjg1MzggMjUuNzg5MkgzMS4zMTA4QzMxLjA0NzEgMjUuNzg5MiAzMC44MzMzIDI1LjU3NTQgMzAuODMzMyAyNS4zMTE3VjIyLjkzMDdDMzAuODM1IDIyLjY2ODIgMzEuMDQ4MyAyMi40NTY0IDMxLjMxMDggMjIuNDU2NEgzOC42MzkyQzQwLjEzMjIgMjIuNDU0NiA0MS4zNDIxIDIxLjI0NDggNDEuMzQzOCAxOS43NTE4VjE5Ljc1MThDNDEuMzQ0NiAxOS4wMzM3IDQxLjA2MDIgMTguMzQ0NiA0MC41NTI5IDE3LjgzNjJDNDAuMDQ1NyAxNy4zMjc4IDM5LjM1NzMgMTcuMDQxOCAzOC42MzkyIDE3LjA0MDlIMzEuMzEwOEMzMS4wNDcxIDE3LjA0MDkgMzAuODMzMyAxNi44MjcyIDMwLjgzMzMgMTYuNTYzNVYxNC4xNzkzQzMwLjgzMzMgMTMuOTE1NiAzMS4wNDcxIDEzLjcwMTggMzEuMzEwOCAxMy43MDE4SDQwLjgzODFDNDIuMzMwNSAxMy42OTgzIDQzLjUzODEgMTIuNDg2NiA0My41MzY0IDEwLjk5NDFWMTAuOTk0MUM0My41MzQ2IDkuNTAxNjEgNDIuMzI0MyA4LjI5MjY0IDQwLjgzMTggOC4yOTI2NEgyNy4wMTY3QzI1Ljc4ODUgOC4yOTI2NCAyNC4xNDI1IDguOTIwODkgMjQuMTQyNSAxMS41ODE1VjI3LjkxNThDMjQuMTQyNSAzMC41NzMzIDI1Ljc4ODUgMzEuMjA0NyAyNy4wMTY3IDMxLjIwNDdINDAuODM4MUM0MS44MjU3IDMxLjIzODMgNDIuNzUzMSAzMC43MzA2IDQzLjI1NjkgMjkuODgwNUM0My43NjA4IDI5LjAzMDMgNDMuNzYwOCAyNy45NzMgNDMuMjU2OSAyNy4xMjI4QzQyLjc1MzEgMjYuMjcyNyA0MS44MjU3IDI1Ljc2NSA0MC44MzgxIDI1Ljc5ODZMNDAuODUzOCAyNS43ODkyIiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNCIgZD0iTTYxLjU3MDEgMTIuNzg0NkM2MS4xNTIzIDExLjczODYgNjAuNjI3NyAxMC4yMTUxIDU5LjQ3MTcgOS4yNDQ0M0M1OC40OTkxIDguNDg3NDIgNTcuMjk5MiA4LjA4MTE5IDU2LjA2NjcgOC4wOTE2MUM1NC45NDg0IDguMDkxNjEgNTMuNDU5NSA4LjQwNTczIDUyLjYyNyA5LjI0NDQzQzUxLjU5OTkgMTAuMjY1MyA1MC45OTY3IDExLjY4MiA1MC41NjY0IDEyLjc4NDZMNDUuMzk2IDI2Ljg2MzVDNDQuNjgyOSAyNy4wNDg4IDQ0Ljk1MyAyOC40MTUzIDQ1LjEzODQgMjkuMTI4M0M0NS41NzgyIDMwLjg0MDMgNDcuNTAwNiAzMS43MzU1IDQ5LjE3MTcgMzEuMzA1MkM1MC4xNzM3IDMxLjA0NzYgNTAuOTE1MSAzMC4yMjQ2IDUxLjQzNjUgMjkuMTUzNEw1Mi4wOTkzIDI3LjM2M0g2MC4wMzA5TDYwLjY5MzcgMjkuMTUzNEM2MS4xNjQ5IDMwLjM1NjUgNjEuOTUwMiAzMS4wMzgyIDYyLjk1ODUgMzEuMzA1MkM2NC42Mjk2IDMxLjczNTUgNjYuNTUyIDMwLjg0MDMgNjYuOTkxOCAyOS4xMjgzQzY3LjE3NzEgMjguNDE1MyA2Ni43Mzc0IDI2Ljg2MzUgNjYuNzM3NCAyNi44NjM1TDYxLjU3MDEgMTIuNzg0Nk01My43OTI0IDIyLjAxMDNMNTYuMDYzNSAxNC45NTgzTDU4LjMzNDYgMjIuMDEwM0g1My43OTI0IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNSIgZD0iTTQuNDUwMjMgMTMuNzM5NUgxMi43Nzc2TDYuOTk0NjEgMTkuNDc1NEgxNi4yNjQzTDIwLjIxOTEgMTUuMTMxMUMyMS42OTI0IDEzLjQwOTcgMjIuNjA2NCAxMi41OTMgMjIuNjA2NCAxMS4wNDc1QzIyLjYwNjQgOS41MDIwMSAyMS42NjQxIDguNjY2NDUgMjAuMzIyOCA3LjE4Njk0TDE0LjQ3NyAxLjA4OTg0QzEyLjk4ODEgLTAuMzk5MDk3IDExLjI0MTUgLTAuMzMzMTMxIDkuNzk2NTggMS4xMDg2OUM4LjQyNzAxIDIuNDc4MjYgOC42OTcxNSA0LjIxMjIxIDEwLjAyNTkgNS41NDA5NEwxMi44MTIxIDguMzIwOTFWOC4zMjA5MUg0LjQ1MDIzQzIuOTU3MjUgOC4zMjI2NSAxLjc0NzM3IDkuNTMyNTIgMS43NDU2NCAxMS4wMjU1VjExLjAyNTVDMS43NDM5OCAxMS43NDQyIDIuMDI4MDkgMTIuNDM0IDIuNTM1MzggMTIuOTQzMUMzLjA0MjY4IDEzLjQ1MjIgMy43MzE1NSAxMy43Mzg3IDQuNDUwMjMgMTMuNzM5NVYxMy43Mzk1IiBmaWxsPSJ2YXIoLS1maWxsLTAsICMzMEMzRTIpIi8+CjxwYXRoIGlkPSJWZWN0b3JfNiIgZD0iTTE5Ljg3NjcgMjUuODI2OUgxMC4xMzlMMTUuNjU4MSAyMC4xMDM2SDYuMzY5NTFMMC45NzkxODcgMjUuNTMxNkMwLjAyMzI5MTcgMjYuNDg2NiAtMC4yNjI4MTQgMjcuOTIzNiAwLjI1NDM5NCAyOS4xNzE5QzAuNzcxNjAyIDMwLjQyMDMgMS45OTAxNiAzMS4yMzM4IDMuMzQxMzggMzEuMjMyOUgxOS44NzY3QzIxLjM2OTIgMzEuMjMyOSAyMi41Nzk2IDMwLjAyNCAyMi41ODEzIDI4LjUzMTVWMjguNTMxNUMyMi41ODEzIDI3LjAzNzggMjEuMzcwNCAyNS44MjY5IDE5Ljg3NjcgMjUuODI2OVYyNS44MjY5IiBmaWxsPSJ2YXIoLS1maWxsLTAsICNGQUQyMzMpIi8+CjwvZz4KPC9zdmc+Cg==" alt="Zearn" />
+    </a>
+    <div class="page-title">
+      <span class="sparkle-big"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9InNwYXJrbGUtYmlnIiBkPSJNMTAuNzYwOCAwLjQ4NDUwMUMxMC42MjUzIDAuMTg3NTQ5IDEwLjMyODMgMCAxMC4wMDUyIDBDOS42ODIxMyAwIDkuMzg1MSAwLjE4NzU0OSA5LjI0OTYxIDAuNDg0NTAxQzkuMjQ5NjEgMC40ODQ1MDEgOC4zMDI1NCA0LjY1MzggNi40ODI1NCA2LjQ3NTY0QzQuNjYyNTUgOC4yOTc0OSAwLjQ4OTgzOCA5LjI0MTk5IDAuNDg5ODM4IDkuMjQxOTlDMC4xODc1OTggOS4zODI2NSAwIDkuNjc5NiAwIDEwLjAwMjZDMCAxMC4zMjU2IDAuMTg3NTk4IDEwLjYyMjYgMC40ODQ2MjcgMTAuNzU4QzAuNDg0NjI3IDEwLjc1OCA0LjY1NzM0IDExLjcwMjUgNi40NzczMyAxMy41MjQ0QzguMjk3MzMgMTUuMzQ2MiA5LjI0NDQgMTkuNTE1NSA5LjI0NDQgMTkuNTE1NUM5LjM3OTg5IDE5LjgxMjUgOS42NzY5MiAyMCAxMCAyMEMxMC4zMjMxIDIwIDEwLjYyMDEgMTkuODEyNSAxMC43NTU2IDE5LjUxNTVDMTAuNzU1NiAxOS41MTU1IDExLjcwMjcgMTUuMzQ2MiAxMy41MjI3IDEzLjUyNDRDMTUuMzQyNyAxMS43MDI1IDE5LjUxNTQgMTAuNzU4IDE5LjUxNTQgMTAuNzU4QzE5LjgxMjQgMTAuNjIyNiAyMCAxMC4zMjU2IDIwIDEwLjAwMjZDMjAgOS42Nzk2IDE5LjgxMjQgOS4zODI2NSAxOS41MTU0IDkuMjQ3MkMxOS41MTU0IDkuMjQ3MiAxNS4zNDI3IDguMzAyNyAxMy41MjI3IDYuNDgwODVDMTEuNzAyNyA0LjY1OTAxIDEwLjc1NTYgMC40ODk3MTEgMTAuNzU1NiAwLjQ4OTcxMUwxMC43NjA4IDAuNDg0NTAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRUE3NEUzKSIvPgo8L3N2Zz4K" alt="" /></span>
+      <span class="title-text">Zearn AI Targeted Materials</span>
+      <span class="beta-pill">BETA</span>
+    </div>
+   </div>
+  </nav>
+
+  <div class="sub-nav">
+   <div class="nav-inner">
+    <a class="back-btn" href="tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html" aria-label="Back to Tower Alerts">
+      <span class="icon"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbXBvbmVudHMvQnV0dG9ucy9TZWNvbmRhcnkvMzJ0YWxsX1JvdW5kL0Fycm93TGVmdC9EZWZhdWx0IiBjbGlwLXBhdGg9InVybCgjY2xpcDBfMF80OSkiPgo8Y2lyY2xlIGlkPSJPdmFsIiBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9InZhcigtLWZpbGwtMCwgd2hpdGUpIi8+CjxwYXRoIGlkPSJPdXRsaW5lIiBkPSJNMTYgMEM3LjE2MzQ0IDAgMCA3LjE2MzQ0IDAgMTZDMCAyNC44MzY2IDcuMTYzNDQgMzIgMTYgMzJDMjQuODM2NiAzMiAzMiAyNC44MzY2IDMyIDE2QzMyIDcuMTYzNDQgMjQuODM2NiAwIDE2IDBaTTE2IDFDMjQuMjg0MyAxIDMxIDcuNzE1NzMgMzEgMTZDMzEgMjQuMjg0MyAyNC4yODQzIDMxIDE2IDMxQzcuNzE1NzMgMzEgMSAyNC4yODQzIDEgMTZDMSA3LjcxNTczIDcuNzE1NzMgMSAxNiAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8cGF0aCBpZD0iYXJyb3ctbGVmdCIgZD0iTTggMTYuMDAyQzggMTUuNzExMSA4LjEyNDkgMTUuNDQ5NCA4LjMyMzI0IDE1LjI2NjdMMTUuMzY4MiA4LjIyMTc3QzE1Ljc1ODYgNy44MzE0OSAxNi4zOTE3IDcuODMxNTUgMTYuNzgyMiA4LjIyMTc3QzE3LjE3MjggOC42MTIyOSAxNy4xNzI4IDkuMjQ2MjggMTYuNzgyMiA5LjYzNjhMMTEuNDE3IDE1LjAwMkwyMyAxNS4wMDJDMjMuNTUyMyAxNS4wMDIgMjQgMTUuNDQ5OCAyNCAxNi4wMDJDMjMuOTk5OCAxNi41NTQxIDIzLjU1MjEgMTcuMDAyIDIzIDE3LjAwMkwxMS40MTUgMTcuMDAyTDE2Ljc4MjIgMjIuMzY4MkMxNy4xNzI4IDIyLjc1ODggMTcuMTcyOCAyMy4zOTE4IDE2Ljc4MjIgMjMuNzgyM0MxNi4zOTE3IDI0LjE3MjggMTUuNzU4NyAyNC4xNzI4IDE1LjM2ODIgMjMuNzgyM0w4LjMxMjUgMTYuNzI3NkM4LjEyMDE5IDE2LjU0NTUgOC4wMDAxMiAxNi4yODc4IDggMTYuMDAyWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNDkiPgo8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" /></span>
+      <span class="label">Back to Tower Alerts</span>
+    </a>
+    <span class="center-title" id="centerTitle">Targeted Materials for Elijah Park</span>
+   </div>
+  </div>
+</div>
+
+<!-- ===================== CONTENT ===================== -->
+<main class="content-wrap">
+  <div class="disclaimer">
+    Reminder: AI can make mistakes! Review this content for accuracy. We do not use student data with generative AI.&nbsp;
+    <a href="#">View Zearn's AI data policy.</a>
+  </div>
+
+  <div class="side-by-side">
+
+    <!-- ===== Sidenav ===== -->
+    <aside class="sidenav">
+      <!-- Loading skeleton (shown while body.loading) -->
+      <div class="nav-skeleton" aria-hidden="true">
+        <div class="skel-bar"></div>
+        <div class="skel-bar"></div>
+        <div class="skel-bar"></div>
+        <div class="skel-bar"></div>
+      </div>
+
+      <div class="sidenav-active" id="navMiniLesson"><span class="label">Mini Lesson</span></div>
+      <div class="subnav-item" id="navStudentMaterials" data-material="worksheet">
+        <div class="content">
+          <span class="text">Student Materials</span>
+          <button class="sparkle-btn" type="button" aria-label="Recreate"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></button>
+        </div>
+      </div>
+      <div class="subnav-item" id="navSampleScript" data-material="sampleScript">
+        <div class="content">
+          <span class="text">Sample Script</span>
+          <button class="sparkle-btn" type="button" aria-label="Recreate"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></button>
+        </div>
+      </div>
+      <div class="coming-soon">
+        <span class="label">Problem Set</span>
+        <span class="tag">Coming Soon</span>
+      </div>
+    </aside>
+
+    <!-- ===== Main content ===== -->
+    <div class="main-col">
+      <div class="button-group">
+        <span class="generated" id="generatedTimestamp">Generated April 6, 2026 - 3:52pm</span>
+        <div class="btn-cluster">
+          <button class="btn-secondary" type="button">
+            <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImFycm93cy1yb3RhdGUtcmV2ZXJzZSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNDQpIj4KPHBhdGggaWQ9IlByaW1hcnkiIGQ9Ik0xMy45NDA2IDcuMTQwNjJDMTMuNTI1IDQuMjM0MzggMTEuMDIxOSAyIDggMkM2LjM0Mzc1IDIgNC44NDM3NSAyLjY3MTg3IDMuNzU2MjUgMy43NTYyNUMzLjc1IDMuNzYyNSAzLjc0Mzc1IDMuNzY4NzUgMy43Mzc1IDMuNzc1TDMuNSA0SDQuOTk2ODdDNS41NSA0IDUuOTk2ODcgNC40NDY4NyA1Ljk5Njg3IDVDNS45OTY4NyA1LjU1MzEzIDUuNTUgNiA0Ljk5Njg3IDZIMUMwLjQ0Njg3NSA2IDAgNS41NTMxMyAwIDVWMUMwIDAuNDQ2ODc1IDAuNDQ2ODc1IDAgMSAwQzEuNTUzMTMgMCAyIDAuNDQ2ODc1IDIgMVYyLjY2ODc1TDIuMzUzMTMgMi4zMzQzN0MzLjc5Njg4IDAuODkzNzUgNS43OTY4OCAwIDggMEMxMi4wMzEyIDAgMTUuMzY1NiAyLjk4MTI1IDE1LjkxODcgNi44NTkzOEMxNS45OTY5IDcuNDA2MjUgMTUuNjE4NyA3LjkxMjUgMTUuMDcxOSA3Ljk5MDYyQzE0LjUyNSA4LjA2ODc1IDE0LjAxODggNy42ODc1IDEzLjk0MDYgNy4xNDM3NVY3LjE0MDYyWk0wLjA4MTI1IDkuMTQwNjJDMC4wMDMxMjUgOC41OTM3NSAwLjM4MTI1IDguMDg3NSAwLjkyODEyNSA4LjAwOTM3QzEuNDc1IDcuOTMxMjUgMS45ODEyNSA4LjMxMjUgMi4wNTkzOCA4Ljg1NjI1QzIuNDc1IDExLjc2MjUgNC45NzgxMyAxMy45OTY5IDggMTMuOTk2OUM5LjY1NjI1IDEzLjk5NjkgMTEuMTU2MiAxMy4zMjUgMTIuMjQzNyAxMi4yNDA2QzEyLjI1IDEyLjIzNDQgMTIuMjU2MiAxMi4yMjgxIDEyLjI2MjUgMTIuMjIxOUwxMi41IDExLjk5NjlIMTEuMDAzMUMxMC40NSAxMS45OTY5IDEwLjAwMzEgMTEuNTUgMTAuMDAzMSAxMC45OTY5QzEwLjAwMzEgMTAuNDQzNyAxMC40NSA5Ljk5Njg3IDExLjAwMzEgOS45OTY4N0gxNS4wMDMxQzE1LjI2ODggOS45OTY4NyAxNS41MjUgMTAuMTAzMSAxNS43MTI1IDEwLjI5MzdDMTUuOSAxMC40ODQ0IDE2LjAwMzEgMTAuNzQwNiAxNi4wMDMxIDExLjAwNjNMMTUuOTcxOSAxNC45NzVDMTUuOTY4OCAxNS41MjgxIDE1LjUxNTYgMTUuOTcxOSAxNC45NjI1IDE1Ljk2NTZDMTQuNDA5NCAxNS45NTk0IDEzLjk2NTYgMTUuNTA5NCAxMy45NzE5IDE0Ljk1NjNMMTMuOTg0NCAxMy4zNDY5TDEzLjY1IDEzLjY2MjVDMTIuMjAzMSAxNS4xMDYzIDEwLjIwMzEgMTYgOCAxNkMzLjk2ODc1IDE2IDAuNjM0Mzc1IDEzLjAxODcgMC4wODEyNSA5LjE0MDYyWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNDQiPgo8cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" width="16" height="16" />
+            <span>RECREATE</span>
+          </button>
+          <button class="btn-icon" type="button" aria-label="Download">
+            <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxMiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9ImFycm93LWRvd24tdG8tbGluZSIgZD0iTTEgMTZDMC40NDY4NzUgMTYgMCAxNS41NTMxIDAgMTVDMCAxNC40NDY5IDAuNDQ2ODc1IDE0IDEgMTRIMTFDMTEuNTUzMSAxNCAxMiAxNC40NDY5IDEyIDE1QzEyIDE1LjU1MzEgMTEuNTUzMSAxNiAxMSAxNkgxWk02LjcwNjI1IDExLjcwNjNDNi4zMTU2MyAxMi4wOTY5IDUuNjgxMjUgMTIuMDk2OSA1LjI5MDYzIDExLjcwNjNMMS4yOTA2MiA3LjcwNjI1QzAuOSA3LjMxNTYzIDAuOSA2LjY4MTI1IDEuMjkwNjIgNi4yOTA2M0MxLjY4MTI1IDUuOSAyLjMxNTYyIDUuOSAyLjcwNjI1IDYuMjkwNjNMNSA4LjU4NDM4VjFDNSAwLjQ0Njg3NSA1LjQ0Njg3IDAgNiAwQzYuNTUzMTMgMCA3IDAuNDQ2ODc1IDcgMVY4LjU4NDM4TDkuMjkzNzUgNi4yOTA2M0M5LjY4NDM3IDUuOSAxMC4zMTg4IDUuOSAxMC43MDk0IDYuMjkwNjNDMTEuMSA2LjY4MTI1IDExLjEgNy4zMTU2MyAxMC43MDk0IDcuNzA2MjVMNi43MDkzNyAxMS43MDYzSDYuNzA2MjVaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMwMDc2OTQpIi8+Cjwvc3ZnPgo=" alt="" width="12" height="16" />
+          </button>
+          <button class="btn-icon" type="button" aria-label="Print">
+            <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYuNTE2MSIgaGVpZ2h0PSIxNi41MTYxIiB2aWV3Qm94PSIwIDAgMTYuNTE2MSAxNi41MTYxIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0icHJpbnQiIGQ9Ik0yLjA2NDUyIDIuMDY0NTJDMi4wNjQ1MiAwLjkyNTgwNiAyLjk5MDMyIDAgNC4xMjkwMyAwSDExLjAxNjFDMTEuNTY0NSAwIDEyLjA5MDMgMC4yMTYxMjkgMTIuNDc3NCAwLjYwMzIyNkwxMy44NDg0IDEuOTc0MTlDMTQuMjM1NSAyLjM2MTI5IDE0LjQ1MTYgMi44ODcxIDE0LjQ1MTYgMy40MzU0OFY0LjY0NTE2SDIuMDY0NTJWMi4wNjQ1MlpNMCA4LjI1ODA2QzAgNy4xMTkzNSAwLjkyNTgwNiA2LjE5MzU1IDIuMDY0NTIgNi4xOTM1NUgxNC40NTE2QzE1LjU5MDMgNi4xOTM1NSAxNi41MTYxIDcuMTE5MzUgMTYuNTE2MSA4LjI1ODA2VjExLjM1NDhDMTYuNTE2MSAxMS45MjU4IDE2LjA1NDggMTIuMzg3MSAxNS40ODM5IDEyLjM4NzFIMTQuNDUxNlYxNC40NTE2QzE0LjQ1MTYgMTUuNTkwMyAxMy41MjU4IDE2LjUxNjEgMTIuMzg3MSAxNi41MTYxSDQuMTI5MDNDMi45OTAzMiAxNi41MTYxIDIuMDY0NTIgMTUuNTkwMyAyLjA2NDUyIDE0LjQ1MTZWMTIuMzg3MUgxLjAzMjI2QzAuNDYxMjkgMTIuMzg3MSAwIDExLjkyNTggMCAxMS4zNTQ4VjguMjU4MDZaTTQuMTI5MDMgMTMuNDE5NFYxNC40NTE2SDEyLjM4NzFWMTEuMzU0OEg0LjEyOTAzVjEzLjQxOTRaTTE0LjcwOTcgOC43NzQxOUMxNC43MDk3IDguNTY4ODYgMTQuNjI4MSA4LjM3MTk1IDE0LjQ4MjkgOC4yMjY3NkMxNC4zMzc3IDguMDgxNTcgMTQuMTQwOCA4IDEzLjkzNTUgOEMxMy43MzAyIDggMTMuNTMzMiA4LjA4MTU3IDEzLjM4OCA4LjIyNjc2QzEzLjI0MjkgOC4zNzE5NSAxMy4xNjEzIDguNTY4ODYgMTMuMTYxMyA4Ljc3NDE5QzEzLjE2MTMgOC45Nzk1MiAxMy4yNDI5IDkuMTc2NDQgMTMuMzg4IDkuMzIxNjNDMTMuNTMzMiA5LjQ2NjgyIDEzLjczMDIgOS41NDgzOSAxMy45MzU1IDkuNTQ4MzlDMTQuMTQwOCA5LjU0ODM5IDE0LjMzNzcgOS40NjY4MiAxNC40ODI5IDkuMzIxNjNDMTQuNjI4MSA5LjE3NjQ0IDE0LjcwOTcgOC45Nzk1MiAxNC43MDk3IDguNzc0MTlaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMwMDc2OTQpIi8+Cjwvc3ZnPgo=" alt="" width="17" height="17" />
+          </button>
+        </div>
+      </div>
+
+      <section class="page-area">
+        <!-- Loading content (shown while body.loading) -->
+        <div class="loading-content" aria-live="polite">
+          <p class="loading-message">Zearn AI is creating materials for your student right now.</p>
+          <div class="sparkle-anim" aria-hidden="true">
+            <svg width="130.447" height="163.54" viewBox="0 0 130.447 163.54" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <path class="sparkle-1" d="M18.0586 77.7495C16.8577 78.9079 16.4591 80.659 17.0089 82.2164C17.5587 83.7739 18.9683 84.8866 20.6304 85.0344C20.6304 85.0344 42.3406 82.5046 54.2202 88.1777C66.0998 93.8508 77.7539 112.358 77.7539 112.358C78.9463 113.576 80.697 113.975 82.2541 113.425C83.8111 112.876 84.9234 111.466 85.0708 109.804C85.0708 109.804 82.5229 88.0814 88.2081 76.2075C93.8932 64.3337 112.38 52.6731 112.38 52.6731C113.581 51.5146 113.98 49.7636 113.43 48.2061C112.88 46.6486 111.47 45.5359 109.808 45.3882C109.808 45.3882 88.0981 47.9179 76.2185 42.2448C64.3389 36.5717 52.6849 18.064 52.6849 18.064C51.5264 16.8627 49.7757 16.4637 48.2186 17.0134C46.6616 17.5631 45.5493 18.9727 45.4018 20.6351C45.4018 20.6351 47.9498 42.3574 42.2646 54.2312C36.5795 66.105 18.0926 77.7657 18.0926 77.7657L18.0586 77.7495Z" />
+              <path class="sparkle-2" d="M55.8561 122.284C55.8139 121.66 55.408 121.123 54.8285 120.904C54.2489 120.686 53.5893 120.821 53.1454 121.262C53.1454 121.262 48.6262 128.1 44.1292 130.137C39.6322 132.174 31.5085 131.045 31.5085 131.045C30.8712 131.093 30.3338 131.499 30.1153 132.078C29.8968 132.657 30.0324 133.317 30.4736 133.761C30.4736 133.761 37.3194 138.278 39.3516 142.777C41.3838 147.276 40.2623 155.395 40.2623 155.395C40.3044 156.02 40.7103 156.557 41.2899 156.776C41.8694 156.994 42.5291 156.859 42.973 156.418C42.973 156.418 47.4922 149.58 51.9892 147.543C56.4862 145.506 64.6099 146.635 64.6099 146.635C65.2343 146.593 65.7717 146.187 65.9902 145.607C66.2087 145.028 66.0731 144.368 65.6319 143.925C65.6319 143.925 58.786 139.408 56.7538 134.909C54.7216 130.409 55.8432 122.29 55.8432 122.29L55.8561 122.284Z" />
+              <path class="sparkle-3" d="M113.195 115.97C113.181 115.658 112.984 115.385 112.696 115.269C112.409 115.154 112.078 115.215 111.851 115.43C111.851 115.43 109.519 118.8 107.249 119.77C104.979 120.74 100.93 120.089 100.93 120.089C100.611 120.106 100.338 120.303 100.223 120.59C100.107 120.878 100.168 121.209 100.384 121.435C100.384 121.435 103.758 123.767 104.725 126.037C105.693 128.308 105.046 132.355 105.046 132.355C105.06 132.668 105.257 132.94 105.544 133.056C105.832 133.171 106.163 133.111 106.39 132.895C106.39 132.895 108.722 129.525 110.992 128.555C113.262 127.585 117.31 128.236 117.31 128.236C117.623 128.222 117.896 128.025 118.011 127.738C118.127 127.45 118.066 127.119 117.85 126.893C117.85 126.893 114.477 124.561 113.509 122.291C112.541 120.02 113.189 115.973 113.189 115.973L113.195 115.97Z" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="pdf-stack" id="pdfStack" aria-label="Mini Lesson PDF"></div>
+
+        <!-- End-of-PDF CTAs: rendered below the PDF inside the same scroll
+             container so the user reaches them by scrolling past the PDF. -->
+        <div class="pdf-ctas" id="pdfCtas" aria-label="Generate additional materials">
+          <div class="pdf-cta" data-material="worksheet">
+            <div class="pdf-cta-frame">
+              <div class="pdf-cta-content">
+                <span class="pdf-cta-icon">
+                  <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMzAuNTQ1NCIgaGVpZ2h0PSIyOS40MzE4IiB2aWV3Qm94PSIwIDAgMzAuNTQ1NCAyOS40MzE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iR3JvdXAgMTciPgo8cGF0aCBpZD0iU3BhcmtsZXMiIGQ9Ik0xMy42OTU2IDAuNjE2NjM4QzEzLjUyMzEgMC4yMzg2OTkgMTMuMTQ1MSAwIDEyLjczMzkgMEMxMi4zMjI3IDAgMTEuOTQ0NyAwLjIzODY5OSAxMS43NzIyIDAuNjE2NjM4QzExLjc3MjIgMC42MTY2MzggMTAuNTQ3MSA1LjkyNTk5IDguMjUwNTEgOC4yNDE3M0M1Ljk1MzkyIDEwLjU1NzUgMC42MjM0MzEgMTEuNzYyNSAwLjYyMzQzMSAxMS43NjI1QzAuMjM4NzYxIDExLjk0MTYgMCAxMi4zMTk1IDAgMTIuNzMwNkMwIDEzLjE0MTcgMC4yMzg3NjEgMTMuNTE5NiAwLjYxNjc5OSAxMy42OTJDMC42MTY3OTkgMTMuNjkyIDUuOTQ3MjkgMTQuODk3MSA4LjI0Mzg4IDE3LjIxMjhDMTAuNTQwNSAxOS41Mjg2IDExLjc2NTYgMjQuODM3OSAxMS43NjU2IDI0LjgzNzlDMTEuOTM4IDI1LjIxNTggMTIuMzE2MSAyNS40NTQ1IDEyLjcyNzMgMjUuNDU0NUMxMy4xMzg1IDI1LjQ1NDUgMTMuNTE2NSAyNS4yMTU4IDEzLjY4ODkgMjQuODM3OUMxMy42ODg5IDI0LjgzNzkgMTQuOTE0MSAxOS41Mjg2IDE3LjIxMDcgMTcuMjEyOEMxOS41MDczIDE0Ljg5NzEgMjQuODM3NyAxMy42OTIgMjQuODM3NyAxMy42OTJDMjUuMjE1OCAxMy41MTk2IDI1LjQ1NDUgMTMuMTQxNyAyNS40NTQ1IDEyLjczMDZDMjUuNDU0NSAxMi4zMTk1IDI1LjIxNTggMTEuOTQxNiAyNC44Mzc3IDExLjc2OTJDMjQuODM3NyAxMS43NjkyIDE5LjUwNzMgMTAuNTY0MSAxNy4yMTA3IDguMjQ4MzZDMTQuOTE0MSA1LjkzMjYyIDEzLjY4ODkgMC42MjMyNjkgMTMuNjg4OSAwLjYyMzI2OUwxMy42OTU2IDAuNjE2NjM4WiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRUE3NEUzKSIvPgo8cGF0aCBpZD0iU3BhcmtsZXNfMiIgZD0iTTI1Ljg0MTggMTkuNDk2N0MyNS43NzI5IDE5LjM0NTUgMjUuNjIxNyAxOS4yNSAyNS40NTcyIDE5LjI1QzI1LjI5MjcgMTkuMjUgMjUuMTQxNSAxOS4zNDU1IDI1LjA3MjUgMTkuNDk2N0MyNS4wNzI1IDE5LjQ5NjcgMjQuNTgyNSAyMS42MjA0IDIzLjY2MzggMjIuNTQ2N0MyMi43NDUyIDIzLjQ3MyAyMC42MTMgMjMuOTU1IDIwLjYxMyAyMy45NTVDMjAuNDU5MSAyNC4wMjY2IDIwLjM2MzYgMjQuMTc3OCAyMC4zNjM2IDI0LjM0MjJDMjAuMzYzNiAyNC41MDY3IDIwLjQ1OTEgMjQuNjU3OCAyMC42MTAzIDI0LjcyNjhDMjAuNjEwMyAyNC43MjY4IDIyLjc0MjUgMjUuMjA4OCAyMy42NjEyIDI2LjEzNTFDMjQuNTc5OCAyNy4wNjE0IDI1LjA2OTkgMjkuMTg1MiAyNS4wNjk5IDI5LjE4NTJDMjUuMTM4OCAyOS4zMzYzIDI1LjI5IDI5LjQzMTggMjUuNDU0NSAyOS40MzE4QzI1LjYxOSAyOS40MzE4IDI1Ljc3MDIgMjkuMzM2MyAyNS44MzkyIDI5LjE4NTJDMjUuODM5MiAyOS4xODUyIDI2LjMyOTMgMjcuMDYxNCAyNy4yNDc5IDI2LjEzNTFDMjguMTY2NSAyNS4yMDg4IDMwLjI5ODcgMjQuNzI2OCAzMC4yOTg3IDI0LjcyNjhDMzAuNDQ5OSAyNC42NTc4IDMwLjU0NTQgMjQuNTA2NyAzMC41NDU0IDI0LjM0MjJDMzAuNTQ1NCAyNC4xNzc4IDMwLjQ0OTkgMjQuMDI2NiAzMC4yOTg3IDIzLjk1NzdDMzAuMjk4NyAyMy45NTc3IDI4LjE2NjUgMjMuNDc1NiAyNy4yNDc5IDIyLjU0OTNDMjYuMzI5MyAyMS42MjMgMjUuODM5MiAxOS40OTkzIDI1LjgzOTIgMTkuNDk5M0wyNS44NDE4IDE5LjQ5NjdaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICNFMUI4RjgpIi8+CjwvZz4KPC9zdmc+Cg==" alt="" />
+                </span>
+                <div class="pdf-cta-text">
+                  <div class="pdf-cta-title">Student Materials</div>
+                  <div class="pdf-cta-desc">Create a student handout with space for handwritten work.</div>
+                </div>
+              </div>
+              <button class="pdf-cta-btn" type="button" id="ctaStudentMaterials">
+                <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlByaW1hcnkiIGQ9Ik04LjYwODY1IDAuMzg3NjAxQzguNTAwMjYgMC4xNTAwMzkgOC4yNjI2NCAwIDguMDA0MTcgMEM3Ljc0NTcgMCA3LjUwODA4IDAuMTUwMDM5IDcuMzk5NjkgMC4zODc2MDFDNy4zOTk2OSAwLjM4NzYwMSA2LjY0MjAzIDMuNzIzMDQgNS4xODYwMyA1LjE4MDUyQzMuNzMwMDQgNi42Mzc5OSAwLjM5MTg3MSA3LjM5MzU5IDAuMzkxODcxIDcuMzkzNTlDMC4xNTAwNzggNy41MDYxMiAwIDcuNzQzNjggMCA4LjAwMjA4QzAgOC4yNjA0OCAwLjE1MDA3OCA4LjQ5ODA1IDAuMzg3NzAyIDguNjA2NDFDMC4zODc3MDIgOC42MDY0MSAzLjcyNTg3IDkuMzYyMDEgNS4xODE4NyAxMC44MTk1QzYuNjM3ODYgMTIuMjc3IDcuMzk1NTIgMTUuNjEyNCA3LjM5NTUyIDE1LjYxMjRDNy41MDM5MSAxNS44NSA3Ljc0MTUzIDE2IDggMTZDOC4yNTg0NyAxNiA4LjQ5NjA5IDE1Ljg1IDguNjA0NDggMTUuNjEyNEM4LjYwNDQ4IDE1LjYxMjQgOS4zNjIxNCAxMi4yNzcgMTAuODE4MSAxMC44MTk1QzEyLjI3NDEgOS4zNjIwMSAxNS42MTIzIDguNjA2NDEgMTUuNjEyMyA4LjYwNjQxQzE1Ljg0OTkgOC40OTgwNSAxNiA4LjI2MDQ4IDE2IDguMDAyMDhDMTYgNy43NDM2OCAxNS44NDk5IDcuNTA2MTIgMTUuNjEyMyA3LjM5Nzc2QzE1LjYxMjMgNy4zOTc3NiAxMi4yNzQxIDYuNjQyMTYgMTAuODE4MSA1LjE4NDY4QzkuMzYyMTQgMy43MjcyMSA4LjYwNDQ4IDAuMzkxNzY5IDguNjA0NDggMC4zOTE3NjlMOC42MDg2NSAwLjM4NzYwMVoiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwNzY5NCkiLz4KPC9zdmc+Cg==" alt="" />
+                <span>CREATE</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pdf-cta" data-material="sampleScript">
+            <div class="pdf-cta-frame">
+              <div class="pdf-cta-content">
+                <span class="pdf-cta-icon">
+                  <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMzAuNTQ1NCIgaGVpZ2h0PSIyOS40MzE4IiB2aWV3Qm94PSIwIDAgMzAuNTQ1NCAyOS40MzE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0iR3JvdXAgMTciPgo8cGF0aCBpZD0iU3BhcmtsZXMiIGQ9Ik0xMy42OTU2IDAuNjE2NjM4QzEzLjUyMzEgMC4yMzg2OTkgMTMuMTQ1MSAwIDEyLjczMzkgMEMxMi4zMjI3IDAgMTEuOTQ0NyAwLjIzODY5OSAxMS43NzIyIDAuNjE2NjM4QzExLjc3MjIgMC42MTY2MzggMTAuNTQ3MSA1LjkyNTk5IDguMjUwNTEgOC4yNDE3M0M1Ljk1MzkyIDEwLjU1NzUgMC42MjM0MzEgMTEuNzYyNSAwLjYyMzQzMSAxMS43NjI1QzAuMjM4NzYxIDExLjk0MTYgMCAxMi4zMTk1IDAgMTIuNzMwNkMwIDEzLjE0MTcgMC4yMzg3NjEgMTMuNTE5NiAwLjYxNjc5OSAxMy42OTJDMC42MTY3OTkgMTMuNjkyIDUuOTQ3MjkgMTQuODk3MSA4LjI0Mzg4IDE3LjIxMjhDMTAuNTQwNSAxOS41Mjg2IDExLjc2NTYgMjQuODM3OSAxMS43NjU2IDI0LjgzNzlDMTEuOTM4IDI1LjIxNTggMTIuMzE2MSAyNS40NTQ1IDEyLjcyNzMgMjUuNDU0NUMxMy4xMzg1IDI1LjQ1NDUgMTMuNTE2NSAyNS4yMTU4IDEzLjY4ODkgMjQuODM3OUMxMy42ODg5IDI0LjgzNzkgMTQuOTE0MSAxOS41Mjg2IDE3LjIxMDcgMTcuMjEyOEMxOS41MDczIDE0Ljg5NzEgMjQuODM3NyAxMy42OTIgMjQuODM3NyAxMy42OTJDMjUuMjE1OCAxMy41MTk2IDI1LjQ1NDUgMTMuMTQxNyAyNS40NTQ1IDEyLjczMDZDMjUuNDU0NSAxMi4zMTk1IDI1LjIxNTggMTEuOTQxNiAyNC44Mzc3IDExLjc2OTJDMjQuODM3NyAxMS43NjkyIDE5LjUwNzMgMTAuNTY0MSAxNy4yMTA3IDguMjQ4MzZDMTQuOTE0MSA1LjkzMjYyIDEzLjY4ODkgMC42MjMyNjkgMTMuNjg4OSAwLjYyMzI2OUwxMy42OTU2IDAuNjE2NjM4WiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRUE3NEUzKSIvPgo8cGF0aCBpZD0iU3BhcmtsZXNfMiIgZD0iTTI1Ljg0MTggMTkuNDk2N0MyNS43NzI5IDE5LjM0NTUgMjUuNjIxNyAxOS4yNSAyNS40NTcyIDE5LjI1QzI1LjI5MjcgMTkuMjUgMjUuMTQxNSAxOS4zNDU1IDI1LjA3MjUgMTkuNDk2N0MyNS4wNzI1IDE5LjQ5NjcgMjQuNTgyNSAyMS42MjA0IDIzLjY2MzggMjIuNTQ2N0MyMi43NDUyIDIzLjQ3MyAyMC42MTMgMjMuOTU1IDIwLjYxMyAyMy45NTVDMjAuNDU5MSAyNC4wMjY2IDIwLjM2MzYgMjQuMTc3OCAyMC4zNjM2IDI0LjM0MjJDMjAuMzYzNiAyNC41MDY3IDIwLjQ1OTEgMjQuNjU3OCAyMC42MTAzIDI0LjcyNjhDMjAuNjEwMyAyNC43MjY4IDIyLjc0MjUgMjUuMjA4OCAyMy42NjEyIDI2LjEzNTFDMjQuNTc5OCAyNy4wNjE0IDI1LjA2OTkgMjkuMTg1MiAyNS4wNjk5IDI5LjE4NTJDMjUuMTM4OCAyOS4zMzYzIDI1LjI5IDI5LjQzMTggMjUuNDU0NSAyOS40MzE4QzI1LjYxOSAyOS40MzE4IDI1Ljc3MDIgMjkuMzM2MyAyNS44MzkyIDI5LjE4NTJDMjUuODM5MiAyOS4xODUyIDI2LjMyOTMgMjcuMDYxNCAyNy4yNDc5IDI2LjEzNTFDMjguMTY2NSAyNS4yMDg4IDMwLjI5ODcgMjQuNzI2OCAzMC4yOTg3IDI0LjcyNjhDMzAuNDQ5OSAyNC42NTc4IDMwLjU0NTQgMjQuNTA2NyAzMC41NDU0IDI0LjM0MjJDMzAuNTQ1NCAyNC4xNzc4IDMwLjQ0OTkgMjQuMDI2NiAzMC4yOTg3IDIzLjk1NzdDMzAuMjk4NyAyMy45NTc3IDI4LjE2NjUgMjMuNDc1NiAyNy4yNDc5IDIyLjU0OTNDMjYuMzI5MyAyMS42MjMgMjUuODM5MiAxOS40OTkzIDI1LjgzOTIgMTkuNDk5M0wyNS44NDE4IDE5LjQ5NjdaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICNFMUI4RjgpIi8+CjwvZz4KPC9zdmc+Cg==" alt="" />
+                </span>
+                <div class="pdf-cta-text">
+                  <div class="pdf-cta-title">Sample Script</div>
+                  <div class="pdf-cta-desc">Create a ready to use teaching script to guide your lesson delivery.</div>
+                </div>
+              </div>
+              <button class="pdf-cta-btn" type="button" id="ctaSampleScript">
+                <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlByaW1hcnkiIGQ9Ik04LjYwODY1IDAuMzg3NjAxQzguNTAwMjYgMC4xNTAwMzkgOC4yNjI2NCAwIDguMDA0MTcgMEM3Ljc0NTcgMCA3LjUwODA4IDAuMTUwMDM5IDcuMzk5NjkgMC4zODc2MDFDNy4zOTk2OSAwLjM4NzYwMSA2LjY0MjAzIDMuNzIzMDQgNS4xODYwMyA1LjE4MDUyQzMuNzMwMDQgNi42Mzc5OSAwLjM5MTg3MSA3LjM5MzU5IDAuMzkxODcxIDcuMzkzNTlDMC4xNTAwNzggNy41MDYxMiAwIDcuNzQzNjggMCA4LjAwMjA4QzAgOC4yNjA0OCAwLjE1MDA3OCA4LjQ5ODA1IDAuMzg3NzAyIDguNjA2NDFDMC4zODc3MDIgOC42MDY0MSAzLjcyNTg3IDkuMzYyMDEgNS4xODE4NyAxMC44MTk1QzYuNjM3ODYgMTIuMjc3IDcuMzk1NTIgMTUuNjEyNCA3LjM5NTUyIDE1LjYxMjRDNy41MDM5MSAxNS44NSA3Ljc0MTUzIDE2IDggMTZDOC4yNTg0NyAxNiA4LjQ5NjA5IDE1Ljg1IDguNjA0NDggMTUuNjEyNEM4LjYwNDQ4IDE1LjYxMjQgOS4zNjIxNCAxMi4yNzcgMTAuODE4MSAxMC44MTk1QzEyLjI3NDEgOS4zNjIwMSAxNS42MTIzIDguNjA2NDEgMTUuNjEyMyA4LjYwNjQxQzE1Ljg0OTkgOC40OTgwNSAxNiA4LjI2MDQ4IDE2IDguMDAyMDhDMTYgNy43NDM2OCAxNS44NDk5IDcuNTA2MTIgMTUuNjEyMyA3LjM5Nzc2QzE1LjYxMjMgNy4zOTc3NiAxMi4yNzQxIDYuNjQyMTYgMTAuODE4MSA1LjE4NDY4QzkuMzYyMTQgMy43MjcyMSA4LjYwNDQ4IDAuMzkxNzY5IDguNjA0NDggMC4zOTE3NjlMOC42MDg2NSAwLjM4NzYwMVoiIGZpbGw9InZhcigtLWZpbGwtMCwgIzAwNzY5NCkiLz4KPC9zdmc+Cg==" alt="" />
+                <span>CREATE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // Loading state is the CSS default. After 3 seconds we add `loaded` to <html>
+  // to flip the UI to the real content. (We invert the logic this way so the
+  // loading state doesn't depend on a class addition during page load — some
+  // preview environments scrub class attributes added during load.)
+
+  // ---- Query-param wiring ----
+  const params = new URLSearchParams(window.location.search);
+  const student = params.get("student") || "Elijah Park";
+  const lesson  = params.get("lesson")  || "";
+
+  document.getElementById("centerTitle").textContent = `Targeted Materials for ${student}`;
+  document.title = lesson
+    ? `Create Resources – ${student} – ${lesson} – Zearn (Figma)`
+    : `Create Resources – ${student} – Zearn (Figma)`;
+
+  // The current PDF being rendered. Updated whenever a CTA generates a new
+  // material (Worksheet, Sample Script, etc.) so subsequent recreate clicks
+  // continue showing the most recently generated PDF.
+  let currentPdfUrl = "assets/pdf/Mini Lesson A.pdf";
+
+  // ---- Render PDF pages as stacked canvases (no gray chrome, no gaps) ----
+  async function renderPdf(pdfUrl) {
+    if (pdfUrl) currentPdfUrl = pdfUrl;
+    if (!window.pdfjsLib) return;
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const TARGET_WIDTH = 792;
+    const stack = document.getElementById("pdfStack");
+    // Always start from an empty stack — subsequent renders (swap, recreate)
+    // must not stack new canvases on top of old ones.
+    if (stack) stack.innerHTML = "";
+    try {
+      const pdf = await pdfjsLib.getDocument(currentPdfUrl).promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = TARGET_WIDTH / baseViewport.width;
+        // Render at up to 2× device pixel ratio for retina-crisp text.
+        // (Previously had to cap at DPR=1 when the PDF was one giant page
+        // because PDF.js silently dropped content from oversize canvases.
+        // The PDF is now multi-page, so each canvas is normal-sized and we
+        // can safely scale up.)
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const viewport = page.getViewport({ scale: scale * dpr });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.width = TARGET_WIDTH + "px";
+        canvas.style.height = (baseViewport.height * scale) + "px";
+        const ctx = canvas.getContext("2d");
+        // Paint white before rendering so any transparent regions in the PDF stay white.
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ctx, viewport, background: "#ffffff" }).promise;
+        stack.appendChild(canvas);
+      }
+    } catch (err) {
+      console.error("PDF render failed:", err);
+    }
+  }
+
+  // ---- Loading state: cycle through messages (3s each) ----
+  const loadingMessages = [
+    "Zearn AI is creating materials for your student right now.",
+    "Remember that AI can make mistakes.",
+    "Please check your materials carefully for relevance and accuracy."
+  ];
+  const msgEl = document.querySelector(".loading-message");
+  let msgIndex = 0;
+  let cycleInterval = null;
+  function showLoadingMessage() {
+    msgEl.classList.remove("fade-in");
+    // Force reflow so the animation restarts when we re-add the class.
+    void msgEl.offsetWidth;
+    msgEl.textContent = loadingMessages[msgIndex];
+    msgEl.classList.add("fade-in");
+    msgIndex = (msgIndex + 1) % loadingMessages.length;
+  }
+  function startLoadingCycle() {
+    msgIndex = 0;
+    showLoadingMessage();
+    clearInterval(cycleInterval);
+    cycleInterval = setInterval(showLoadingMessage, 3000);
+  }
+  function stopLoadingCycle() {
+    clearInterval(cycleInterval);
+    cycleInterval = null;
+  }
+
+  startLoadingCycle();
+  setTimeout(() => {
+    stopLoadingCycle();
+    document.documentElement.classList.add("loaded");
+    renderPdf();
+    // Mini Lesson is "generated" as soon as the initial PDF finishes loading.
+    state.generatedAt.miniLesson = formatNow();
+    setTimestamp(state.generatedAt.miniLesson);
+    scheduleCtas();
+  }, 9000);
+
+  // Build a "generated" timestamp anchored to "now" for variety, but keep the figma reference
+  // when no params provided. (Keep static to match Figma 1:1 by default.)
+
+  // ---- Download / Print of the currently loaded PDF ----
+  // Both actions operate on `currentPdfUrl` — whatever PDF the page area is
+  // showing right now (Mini Lesson, Worksheet, or Sample Script).
+  function downloadCurrentPdf() {
+    const a = document.createElement("a");
+    a.href = currentPdfUrl;
+    a.download = currentPdfUrl.split("/").pop();   // "Mini Lesson A.pdf"
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  // Print only the PDF itself (not the surrounding prototype UI). We load
+  // the PDF into a hidden same-origin iframe and call print() on its
+  // contentWindow — Chrome's built-in PDF viewer honors this. If the
+  // browser blocks it we fall back to opening the PDF in a new tab so the
+  // user can print from there.
+  let pdfPrintFrame = null;
+  function printCurrentPdf() {
+    if (!pdfPrintFrame) {
+      pdfPrintFrame = document.createElement("iframe");
+      Object.assign(pdfPrintFrame.style, {
+        position: "fixed", left: "-9999px", top: "-9999px",
+        width: "0", height: "0", border: "0", visibility: "hidden",
+      });
+      document.body.appendChild(pdfPrintFrame);
+    }
+    pdfPrintFrame.onload = () => {
+      // Built-in PDF viewer needs a moment after `load` before print() works.
+      setTimeout(() => {
+        try {
+          pdfPrintFrame.contentWindow.focus();
+          pdfPrintFrame.contentWindow.print();
+        } catch (e) {
+          window.open(currentPdfUrl, "_blank");
+        }
+      }, 200);
+    };
+    pdfPrintFrame.src = currentPdfUrl;
+  }
+
+  document.querySelectorAll(".btn-icon[aria-label='Print']").forEach(b =>
+    b.addEventListener("click", printCurrentPdf)
+  );
+  document.querySelectorAll(".btn-icon[aria-label='Download']").forEach(b =>
+    b.addEventListener("click", downloadCurrentPdf)
+  );
+
+  // ---- Shared modal helper ----
+  // Wires open/close/overlay-click/Escape on any element with:
+  //   <div class="...-overlay" hidden>
+  //     <button class="modal-close">...</button> [optional, any descendant]
+  //     ...
+  //   </div>
+  // Returns { open, close } so callers can trigger it programmatically.
+  // Wrap your call in a DOMContentLoaded handler since modal markup typically
+  // lives AFTER the inline script in the document body.
+  function wireModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+    if (!modal) return null;
+    function open()  { modal.hidden = false; modal.classList.add("open");    document.body.style.overflow = "hidden"; }
+    function close() { modal.classList.remove("open"); modal.hidden = true;  document.body.style.overflow = ""; }
+    modal.querySelector(".modal-close")?.addEventListener("click", close);
+    modal.addEventListener("click", e => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) close(); });
+    return { open, close };
+  }
+
+  // ---- State: which materials have been generated, what we're viewing ----
+  // In-memory only — a reload (e.g. clicking "Back to Tower Alerts") wipes
+  // it, which matches the spec: this MVP doesn't save generated materials.
+  const MATERIAL_PDF = {
+    miniLesson:   "assets/pdf/Mini Lesson A.pdf",
+    worksheet:    "assets/pdf/Worksheet A.pdf",
+    sampleScript: "assets/pdf/Sample Script A.pdf",
+  };
+  // When the user recreates a Mini Lesson, we randomly pick one of the
+  // OTHER variants in the folder so the result visibly differs from the
+  // current one. Worksheet / Sample Script have no variants yet.
+  const MINI_LESSON_VARIANTS = [
+    "assets/pdf/Mini Lesson A.pdf",
+    "assets/pdf/Mini Lesson B.pdf",
+    "assets/pdf/Mini Lesson C.pdf",
+  ];
+  function pickOtherMiniLesson() {
+    const others = MINI_LESSON_VARIANTS.filter(p => p !== currentPdfUrl);
+    return others[Math.floor(Math.random() * others.length)];
+  }
+  const state = {
+    generated: { worksheet: false, sampleScript: false },
+    currentView: "miniLesson",
+    // Per-material "Generated …" timestamp string. Captured at the moment
+    // each material finishes generating; shown verbatim while viewing it,
+    // so swapping back to Mini Lesson restores its original timestamp.
+    generatedAt: { miniLesson: null, worksheet: null, sampleScript: null },
+  };
+
+  // Format the current date/time as "Generated May 15, 2026 - 3:52pm".
+  function formatNow() {
+    const d = new Date();
+    const months = ["January","February","March","April","May","June",
+                    "July","August","September","October","November","December"];
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12 || 12;
+    const minutes = d.getMinutes().toString().padStart(2, "0");
+    return `Generated ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} - ${hours}:${minutes}${ampm}`;
+  }
+  function setTimestamp(text) {
+    const el = document.getElementById("generatedTimestamp");
+    if (el) el.textContent = text || "";
+  }
+
+  // CTA footer visibility: revealed 1.5s after each render via `.ctas-visible`
+  // on <html>. Reset whenever we enter a new loading state.
+  let ctasDelayTimer = null;
+  function scheduleCtas() {
+    clearTimeout(ctasDelayTimer);
+    ctasDelayTimer = setTimeout(() => {
+      document.documentElement.classList.add("ctas-visible");
+    }, 1500);
+  }
+  function hideCtasNow() {
+    clearTimeout(ctasDelayTimer);
+    document.documentElement.classList.remove("ctas-visible");
+  }
+
+  // Apply state → DOM: subnav "current" indicator, generated/clickable class,
+  // CTA visibility. Mini Lesson keeps its own active treatment regardless.
+  function syncSidenavAndCtas() {
+    const subItems = document.querySelectorAll(".subnav-item[data-material]");
+    subItems.forEach(el => {
+      const mat = el.dataset.material;
+      el.classList.toggle("generated", !!state.generated[mat]);
+      el.classList.toggle("current", state.currentView === mat);
+    });
+    document.querySelectorAll(".pdf-cta[data-material]").forEach(cta => {
+      const mat = cta.dataset.material;
+      cta.classList.toggle("is-generated", !!state.generated[mat]);
+    });
+    // Collapse the footer when every CTA has been hidden.
+    const allGenerated = Object.values(state.generated).every(v => v);
+    document.getElementById("pdfCtas")?.classList.toggle("is-empty", allGenerated);
+  }
+
+  // Instant view swap — no loading state. Used by sidenav navigation between
+  // already-generated materials and back to Mini Lesson.
+  function swapToView(view) {
+    state.currentView = view;
+    syncSidenavAndCtas();
+    renderPdf(MATERIAL_PDF[view]);
+    // Restore the timestamp that was captured when *this* material was
+    // generated, not whatever was last on screen.
+    setTimestamp(state.generatedAt[view]);
+    // Scroll page-area back to top so the user lands at the start of the PDF.
+    const pa = document.querySelector(".page-area");
+    if (pa) pa.scrollTop = 0;
+  }
+
+  // ---- Before You Go + Are You Sure (Recreate) modals ----
+  document.addEventListener("DOMContentLoaded", () => {
+    const byg = wireModal("#bygModal");
+    const ays = wireModal("#aysModal");
+    const backLink = document.querySelector("a.back-btn");
+
+    if (byg && backLink) {
+      backLink.addEventListener("click", e => { e.preventDefault(); byg.open(); });
+      document.getElementById("bygPrint")?.addEventListener("click", printCurrentPdf);
+      document.getElementById("bygDownload")?.addEventListener("click", downloadCurrentPdf);
+    }
+
+    // In-memory only — cleared on any page reload (sessionStorage would
+    // persist across reloads within the same tab, which the spec doesn't want).
+    let skipAysModal = false;
+
+    // Run the loading animation, then either re-render the current PDF
+    // (recreate) or render a newly-generated material and update state.
+    // material === null  → recreate current PDF (no state change)
+    // material === "worksheet" | "sampleScript" → generate that material
+    function triggerLoadingThenRender(material) {
+      // Drop the current PDF the moment the user commits to generating /
+      // recreating — we don't want any of the old canvases lingering behind
+      // the loading state. Also hide CTAs (they'll come back 1.5s after the
+      // new render finishes) and clear the "Generated …" timestamp.
+      const stack = document.getElementById("pdfStack");
+      if (stack) stack.innerHTML = "";
+      hideCtasNow();
+      setTimestamp("");
+      document.documentElement.classList.add("recreating");
+      startLoadingCycle();
+      setTimeout(() => {
+        stopLoadingCycle();
+        document.documentElement.classList.remove("recreating");
+        if (material) {
+          state.generated[material] = true;
+          state.currentView = material;
+          syncSidenavAndCtas();
+          renderPdf(MATERIAL_PDF[material]);
+        } else if (state.currentView === "miniLesson") {
+          // Mini Lesson recreate: cycle to a different variant.
+          renderPdf(pickOtherMiniLesson());
+        } else {
+          renderPdf();  // re-render whatever currentPdfUrl points at
+        }
+        // Stamp the current material with "now" — for a plain recreate this
+        // updates the existing view's timestamp; for a fresh create it
+        // captures the generation time for future swap-backs.
+        const view = state.currentView;
+        state.generatedAt[view] = formatNow();
+        setTimestamp(state.generatedAt[view]);
+        scheduleCtas();
+        const pa = document.querySelector(".page-area");
+        if (pa) pa.scrollTop = 0;
+      }, 9000);
+    }
+
+    // What the AYS modal will recreate when the user clicks Confirm.
+    //   null → the currently-displayed PDF (top RECREATE behavior)
+    //   "worksheet" / "sampleScript" → that specific material (sparkle btn)
+    let pendingMaterial = null;
+
+    if (ays) {
+      // Clicking the "RECREATE" button in the top button-group opens the AYS
+      // modal — unless the user previously checked "Don't show this again",
+      // in which case we go straight to the recreate flow.
+      const recreateBtn = document.querySelector(".btn-secondary");
+      recreateBtn?.addEventListener("click", () => {
+        pendingMaterial = null;          // recreate current view
+        if (skipAysModal) triggerLoadingThenRender(null);
+        else ays.open();
+      });
+
+      document.getElementById("aysCancel")?.addEventListener("click", () => ays.close());
+
+      // "RECREATE" in the modal: respect the "Don't show this again" checkbox,
+      // then close modal and run the recreate flow against pendingMaterial.
+      document.getElementById("aysRecreate")?.addEventListener("click", () => {
+        const dontShow = document.getElementById("aysDontShow");
+        if (dontShow?.checked) skipAysModal = true;
+        ays.close();
+        triggerLoadingThenRender(pendingMaterial);
+      });
+    }
+
+    // Sidenav sparkle buttons: act as per-material recreate triggers.
+    // - If the material already exists → behave like the top RECREATE
+    //   (AYS modal unless the "don't show again" pref is set).
+    // - If the material hasn't been generated yet → skip the modal and
+    //   go straight to generation (no "are you sure" makes sense for a
+    //   first-time create).
+    // stopPropagation prevents the subnav row's own navigation click from
+    // also firing.
+    function wireSparkle(subnavId, material) {
+      const sparkle = document.querySelector(`#${subnavId} .sparkle-btn`);
+      sparkle?.addEventListener("click", e => {
+        e.stopPropagation();
+        pendingMaterial = material;
+        if (state.generated[material]) {
+          if (skipAysModal || !ays) triggerLoadingThenRender(material);
+          else ays.open();
+        } else {
+          triggerLoadingThenRender(material);
+        }
+      });
+    }
+    wireSparkle("navStudentMaterials", "worksheet");
+    wireSparkle("navSampleScript",     "sampleScript");
+
+    // End-of-PDF CTAs: each one generates a new material via the loading flow.
+    document.getElementById("ctaStudentMaterials")?.addEventListener("click",
+      () => triggerLoadingThenRender("worksheet"));
+    document.getElementById("ctaSampleScript")?.addEventListener("click",
+      () => triggerLoadingThenRender("sampleScript"));
+
+    // Sidenav navigation: instant swap (no loading) between already-generated
+    // materials. Mini Lesson is always available. Subitems only navigate
+    // once their material has been generated — before that, click is a no-op.
+    document.getElementById("navMiniLesson")?.addEventListener("click", () => {
+      if (state.currentView !== "miniLesson") swapToView("miniLesson");
+    });
+    document.getElementById("navStudentMaterials")?.addEventListener("click", () => {
+      if (state.generated.worksheet && state.currentView !== "worksheet") {
+        swapToView("worksheet");
+      }
+    });
+    document.getElementById("navSampleScript")?.addEventListener("click", () => {
+      if (state.generated.sampleScript && state.currentView !== "sampleScript") {
+        swapToView("sampleScript");
+      }
+    });
+  });
+</script>
+
+
+<!-- ===================== BEFORE YOU GO MODAL ===================== -->
+<div class="byg-modal-overlay" id="bygModal" role="dialog" aria-modal="true" aria-labelledby="bygTitle" hidden>
+  <div class="byg-modal-card" role="document">
+    <button class="byg-close modal-close" type="button" aria-label="Close" id="bygClose">
+      <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbXBvbmVudHMvSWNvbnMvMjQvQ2xvc2VfRHVtbXkvRGVmYXVsdCIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfMjEpIj4KPGcgaWQ9IkFyZWEiPgo8L2c+CjxwYXRoIGlkPSJmYWwgZmEtdGltZXMiIGQ9Ik0xMy42OTczIDEyLjAwMDJMMTguODI1NSA2Ljg3MjA5TDE5Ljg4MyA1LjgxNDU2QzIwLjAzOSA1LjY1ODU1IDIwLjAzOSA1LjQwNTA0IDE5Ljg4MyA1LjI0OTA0TDE4Ljc1MTUgNC4xMTc1QzE4LjU5NTUgMy45NjE1IDE4LjM0MTkgMy45NjE1IDE4LjE4NTkgNC4xMTc1TDEyLjAwMDIgMTAuMzAzMkw1LjgxNDU2IDQuMTE3QzUuNjU4NTUgMy45NjEgNS40MDUwNCAzLjk2MSA1LjI0OTA0IDQuMTE3TDQuMTE3IDUuMjQ4NTRDMy45NjEgNS40MDQ1NCAzLjk2MSA1LjY1ODA1IDQuMTE3IDUuODE0MDZMMTAuMzAzMiAxMi4wMDAyTDQuMTE3IDE4LjE4NTlDMy45NjEgMTguMzQxOSAzLjk2MSAxOC41OTU1IDQuMTE3IDE4Ljc1MTVMNS4yNDg1NCAxOS44ODNDNS40MDQ1NCAyMC4wMzkgNS42NTgwNSAyMC4wMzkgNS44MTQwNiAxOS44ODNMMTIuMDAwMiAxMy42OTczTDE3LjEyODQgMTguODI1NUwxOC4xODU5IDE5Ljg4M0MxOC4zNDE5IDIwLjAzOSAxOC41OTU1IDIwLjAzOSAxOC43NTE1IDE5Ljg4M0wxOS44ODMgMTguNzUxNUMyMC4wMzkgMTguNTk1NSAyMC4wMzkgMTguMzQxOSAxOS44ODMgMTguMTg1OUwxMy42OTczIDEyLjAwMDJaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM0MTRDNTIpIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMF8yMSI+CjxyZWN0IHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="Close" />
+    </button>
+
+    <div class="body">
+      <h2 class="title" id="bygTitle">Before you go</h2>
+      <p class="msg">This BETA version does not save your documents.<br/>Use the buttons to print or download if you don't want to lose it!</p>
+    </div>
+
+    <div class="buttons">
+      <a class="byg-btn-primary" href="tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html" id="bygBackBtn">BACK TO TOWER ALERTS</a>
+      <button class="byg-btn-icon" type="button" aria-label="Download" id="bygDownload">
+        <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxMiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9ImFycm93LWRvd24tdG8tbGluZSIgZD0iTTEgMTZDMC40NDY4NzUgMTYgMCAxNS41NTMxIDAgMTVDMCAxNC40NDY5IDAuNDQ2ODc1IDE0IDEgMTRIMTFDMTEuNTUzMSAxNCAxMiAxNC40NDY5IDEyIDE1QzEyIDE1LjU1MzEgMTEuNTUzMSAxNiAxMSAxNkgxWk02LjcwNjI1IDExLjcwNjNDNi4zMTU2MyAxMi4wOTY5IDUuNjgxMjUgMTIuMDk2OSA1LjI5MDYzIDExLjcwNjNMMS4yOTA2MiA3LjcwNjI1QzAuOSA3LjMxNTYzIDAuOSA2LjY4MTI1IDEuMjkwNjIgNi4yOTA2M0MxLjY4MTI1IDUuOSAyLjMxNTYyIDUuOSAyLjcwNjI1IDYuMjkwNjNMNSA4LjU4NDM4VjFDNSAwLjQ0Njg3NSA1LjQ0Njg3IDAgNiAwQzYuNTUzMTMgMCA3IDAuNDQ2ODc1IDcgMVY4LjU4NDM4TDkuMjkzNzUgNi4yOTA2M0M5LjY4NDM3IDUuOSAxMC4zMTg4IDUuOSAxMC43MDk0IDYuMjkwNjNDMTEuMSA2LjY4MTI1IDExLjEgNy4zMTU2MyAxMC43MDk0IDcuNzA2MjVMNi43MDkzNyAxMS43MDYzSDYuNzA2MjVaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMwMDc2OTQpIi8+Cjwvc3ZnPgo=" alt="" width="12" height="16" />
+      </button>
+      <button class="byg-btn-icon" type="button" aria-label="Print" id="bygPrint">
+        <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYuNTE2MSIgaGVpZ2h0PSIxNi41MTYxIiB2aWV3Qm94PSIwIDAgMTYuNTE2MSAxNi41MTYxIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0icHJpbnQiIGQ9Ik0yLjA2NDUyIDIuMDY0NTJDMi4wNjQ1MiAwLjkyNTgwNiAyLjk5MDMyIDAgNC4xMjkwMyAwSDExLjAxNjFDMTEuNTY0NSAwIDEyLjA5MDMgMC4yMTYxMjkgMTIuNDc3NCAwLjYwMzIyNkwxMy44NDg0IDEuOTc0MTlDMTQuMjM1NSAyLjM2MTI5IDE0LjQ1MTYgMi44ODcxIDE0LjQ1MTYgMy40MzU0OFY0LjY0NTE2SDIuMDY0NTJWMi4wNjQ1MlpNMCA4LjI1ODA2QzAgNy4xMTkzNSAwLjkyNTgwNiA2LjE5MzU1IDIuMDY0NTIgNi4xOTM1NUgxNC40NTE2QzE1LjU5MDMgNi4xOTM1NSAxNi41MTYxIDcuMTE5MzUgMTYuNTE2MSA4LjI1ODA2VjExLjM1NDhDMTYuNTE2MSAxMS45MjU4IDE2LjA1NDggMTIuMzg3MSAxNS40ODM5IDEyLjM4NzFIMTQuNDUxNlYxNC40NTE2QzE0LjQ1MTYgMTUuNTkwMyAxMy41MjU4IDE2LjUxNjEgMTIuMzg3MSAxNi41MTYxSDQuMTI5MDNDMi45OTAzMiAxNi41MTYxIDIuMDY0NTIgMTUuNTkwMyAyLjA2NDUyIDE0LjQ1MTZWMTIuMzg3MUgxLjAzMjI2QzAuNDYxMjkgMTIuMzg3MSAwIDExLjkyNTggMCAxMS4zNTQ4VjguMjU4MDZaTTQuMTI5MDMgMTMuNDE5NFYxNC40NTE2SDEyLjM4NzFWMTEuMzU0OEg0LjEyOTAzVjEzLjQxOTRaTTE0LjcwOTcgOC43NzQxOUMxNC43MDk3IDguNTY4ODYgMTQuNjI4MSA4LjM3MTk1IDE0LjQ4MjkgOC4yMjY3NkMxNC4zMzc3IDguMDgxNTcgMTQuMTQwOCA4IDEzLjkzNTUgOEMxMy43MzAyIDggMTMuNTMzMiA4LjA4MTU3IDEzLjM4OCA4LjIyNjc2QzEzLjI0MjkgOC4zNzE5NSAxMy4xNjEzIDguNTY4ODYgMTMuMTYxMyA4Ljc3NDE5QzEzLjE2MTMgOC45Nzk1MiAxMy4yNDI5IDkuMTc2NDQgMTMuMzg4IDkuMzIxNjNDMTMuNTMzMiA5LjQ2NjgyIDEzLjczMDIgOS41NDgzOSAxMy45MzU1IDkuNTQ4MzlDMTQuMTQwOCA5LjU0ODM5IDE0LjMzNzcgOS40NjY4MiAxNC40ODI5IDkuMzIxNjNDMTQuNjI4MSA5LjE3NjQ0IDE0LjcwOTcgOC45Nzk1MiAxNC43MDk3IDguNzc0MTlaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICMwMDc2OTQpIi8+Cjwvc3ZnPgo=" alt="" width="17" height="17" />
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== ARE YOU SURE MODAL ===================== -->
+<div class="ays-modal-overlay" id="aysModal" role="dialog" aria-modal="true" aria-labelledby="aysTitle" hidden>
+  <div class="ays-modal-card" role="document">
+    <button class="ays-close modal-close" type="button" aria-label="Close" id="aysClose">
+      <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNvbXBvbmVudHMvSWNvbnMvMjQvQ2xvc2VfRHVtbXkvRGVmYXVsdCIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfMjEpIj4KPGcgaWQ9IkFyZWEiPgo8L2c+CjxwYXRoIGlkPSJmYWwgZmEtdGltZXMiIGQ9Ik0xMy42OTczIDEyLjAwMDJMMTguODI1NSA2Ljg3MjA5TDE5Ljg4MyA1LjgxNDU2QzIwLjAzOSA1LjY1ODU1IDIwLjAzOSA1LjQwNTA0IDE5Ljg4MyA1LjI0OTA0TDE4Ljc1MTUgNC4xMTc1QzE4LjU5NTUgMy45NjE1IDE4LjM0MTkgMy45NjE1IDE4LjE4NTkgNC4xMTc1TDEyLjAwMDIgMTAuMzAzMkw1LjgxNDU2IDQuMTE3QzUuNjU4NTUgMy45NjEgNS40MDUwNCAzLjk2MSA1LjI0OTA0IDQuMTE3TDQuMTE3IDUuMjQ4NTRDMy45NjEgNS40MDQ1NCAzLjk2MSA1LjY1ODA1IDQuMTE3IDUuODE0MDZMMTAuMzAzMiAxMi4wMDAyTDQuMTE3IDE4LjE4NTlDMy45NjEgMTguMzQxOSAzLjk2MSAxOC41OTU1IDQuMTE3IDE4Ljc1MTVMNS4yNDg1NCAxOS44ODNDNS40MDQ1NCAyMC4wMzkgNS42NTgwNSAyMC4wMzkgNS44MTQwNiAxOS44ODNMMTIuMDAwMiAxMy42OTczTDE3LjEyODQgMTguODI1NUwxOC4xODU5IDE5Ljg4M0MxOC4zNDE5IDIwLjAzOSAxOC41OTU1IDIwLjAzOSAxOC43NTE1IDE5Ljg4M0wxOS44ODMgMTguNzUxNUMyMC4wMzkgMTguNTk1NSAyMC4wMzkgMTguMzQxOSAxOS44ODMgMTguMTg1OUwxMy42OTczIDEyLjAwMDJaIiBmaWxsPSJ2YXIoLS1maWxsLTAsICM0MTRDNTIpIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMF8yMSI+CjxyZWN0IHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="Close" />
+    </button>
+
+    <div class="body">
+      <h2 class="title" id="aysTitle">Are you sure?</h2>
+      <div class="msg-stack">
+        <p class="msg">This BETA version does not save your documents.</p>
+        <label class="dontshow">
+          <input type="checkbox" id="aysDontShow" />
+          Don't show this again.
+        </label>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="ays-btn-secondary" type="button" id="aysCancel">CANCEL</button>
+      <button class="ays-btn-primary" type="button" id="aysRecreate">
+        <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlNwYXJrbGVzIiBkPSJNOC42MDg2NSAwLjM4NzYwMUM4LjUwMDI2IDAuMTUwMDM5IDguMjYyNjQgMCA4LjAwNDE3IDBDNy43NDU3IDAgNy41MDgwOCAwLjE1MDAzOSA3LjM5OTY5IDAuMzg3NjAxQzcuMzk5NjkgMC4zODc2MDEgNi42NDIwMyAzLjcyMzA0IDUuMTg2MDMgNS4xODA1MkMzLjczMDA0IDYuNjM3OTkgMC4zOTE4NzEgNy4zOTM1OSAwLjM5MTg3MSA3LjM5MzU5QzAuMTUwMDc4IDcuNTA2MTIgMCA3Ljc0MzY4IDAgOC4wMDIwOEMwIDguMjYwNDggMC4xNTAwNzggOC40OTgwNSAwLjM4NzcwMiA4LjYwNjQxQzAuMzg3NzAyIDguNjA2NDEgMy43MjU4NyA5LjM2MjAxIDUuMTgxODcgMTAuODE5NUM2LjYzNzg2IDEyLjI3NyA3LjM5NTUyIDE1LjYxMjQgNy4zOTU1MiAxNS42MTI0QzcuNTAzOTEgMTUuODUgNy43NDE1MyAxNiA4IDE2QzguMjU4NDcgMTYgOC40OTYwOSAxNS44NSA4LjYwNDQ4IDE1LjYxMjRDOC42MDQ0OCAxNS42MTI0IDkuMzYyMTQgMTIuMjc3IDEwLjgxODEgMTAuODE5NUMxMi4yNzQxIDkuMzYyMDEgMTUuNjEyMyA4LjYwNjQxIDE1LjYxMjMgOC42MDY0MUMxNS44NDk5IDguNDk4MDUgMTYgOC4yNjA0OCAxNiA4LjAwMjA4QzE2IDcuNzQzNjggMTUuODQ5OSA3LjUwNjEyIDE1LjYxMjMgNy4zOTc3NkMxNS42MTIzIDcuMzk3NzYgMTIuMjc0MSA2LjY0MjE2IDEwLjgxODEgNS4xODQ2OEM5LjM2MjE0IDMuNzI3MjEgOC42MDQ0OCAwLjM5MTc2OSA4LjYwNDQ4IDAuMzkxNzY5TDguNjA4NjUgMC4zODc2MDFaIiBmaWxsPSJ2YXIoLS1maWxsLTAsIHdoaXRlKSIvPgo8L3N2Zz4K" alt="" />
+        <span>RECREATE</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
