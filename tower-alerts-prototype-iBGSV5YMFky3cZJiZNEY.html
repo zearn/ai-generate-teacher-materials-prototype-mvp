@@ -50,14 +50,14 @@
   .top-nav {
     background: var(--white);
     height: 64px;
-    padding: 0 144px;
     display: flex;
+    justify-content: center;     /* center the 992px inner nav horizontally */
   }
   .yellow-bar { height: 4px; background: var(--yellow); }
   /* Breadcrumb shadow on scroll */
   .header-wrap.scrolled .breadcrumb { box-shadow: inset 0 -1px 0 0 var(--line), 0 4px 6px -2px rgba(0,0,0,0.15); }
   .top-nav .nav {
-    display: flex; justify-content: space-between; max-width: 992px; width: 100%;
+    display: flex; justify-content: space-between; width: 992px;
   }
   .top-nav .left { display: flex; align-items: center; }
   .logo-wrap { width: 112px; padding-right: 16px; display: flex; align-items: center; }
@@ -107,13 +107,13 @@
   .breadcrumb {
     background: var(--gray-bg);
     box-shadow: inset 0 -1px 0 0 var(--line);
-    padding: 0 144px;
     height: 56px;
     display: flex;
+    justify-content: center;     /* center the 992px inner row */
   }
   .breadcrumb ol {
     list-style: none; padding: 0; margin: 0;
-    display: flex; align-items: center; max-width: 928px; height: 100%;
+    display: flex; align-items: center; width: 992px; height: 100%;
   }
   .breadcrumb li { height: 56px; display: flex; align-items: center; }
   .breadcrumb .crumb-link {
