@@ -375,13 +375,7 @@
     border-radius: 4px;
   }
   .page-area::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.55); }
-  .pdf-stack {
-    /* Stacked PDF page canvases — no gaps, white throughout. */
-    display: flex; flex-direction: column;
-    background: var(--white);
-    width: 792px;
-  }
-  .pdf-stack canvas {
+  .lesson-preview {
     display: block;
     width: 792px;
     height: auto;
@@ -781,7 +775,7 @@
   .sidenav > .subnav-item,
   .sidenav > .coming-soon,
   .main-col > .button-group,
-  .page-area > .pdf-stack { display: none; }
+  .page-area > .lesson-preview { display: none; }
   .nav-skeleton { display: flex; }
   .loading-content { display: flex; }
   .page-area { height: 532px; }
@@ -793,8 +787,8 @@
   .loaded .sidenav > .subnav-item { display: flex; }
   .loaded .sidenav > .coming-soon { display: flex; }
   .loaded .main-col > .button-group { display: block; }
-  .loaded .page-area > .pdf-stack { display: flex; }
-  /* JS sets the height inline after each render based on PDF content,
+  .loaded .page-area > .lesson-preview { display: block; }
+  /* JS sets the height inline after each render based on image content,
      viewport, and the 920px cap above. We omit a CSS height here so the
      card matches its content until JS measures. */
 
@@ -804,7 +798,9 @@
      in the page-area footer disappear too. The `html.recreating` qualifier
      bumps specificity above the `.loaded ...` rules above so source order
      can't flip the override. */
-  html.recreating .pdf-stack { display: none; }
+  html.recreating .lesson-preview { display: none; }
+  html.no-worksheet .subnav-item[data-material="worksheet"],
+  html.no-worksheet .pdf-cta[data-material="worksheet"] { display: none !important; }
   html.recreating .loading-content { display: flex; }
   html.recreating .page-area { height: 532px; }
   /* Hide the entire RECREATE/download/print bar while generating — it
@@ -988,7 +984,7 @@
           </div>
         </div>
 
-        <div class="pdf-stack" id="pdfStack" aria-label="Mini Lesson PDF"></div>
+        <img class="lesson-preview" id="lessonPreview" alt="Mini Lesson preview" />
 
         <!-- End-of-PDF CTAs: rendered below the PDF inside the same scroll
              container so the user reaches them by scrolling past the PDF. -->
@@ -1035,7 +1031,6 @@
   </div>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
   // Loading state is the CSS default. After 3 seconds we add `loaded` to <html>
   // to flip the UI to the real content. (We invert the logic this way so the
@@ -1044,107 +1039,86 @@
 
   // ---- Query-param wiring ----
   const params = new URLSearchParams(window.location.search);
-  const student = params.get("student") || "Elijah Park";
-  const lesson  = params.get("lesson")  || "";
+  const student   = params.get("student") || "Elijah Park";
+  const lesson    = params.get("lesson")  || "";
+  const locParam  = params.get("loc")     || "";
 
   document.getElementById("centerTitle").textContent = `Targeted Materials for ${student}`;
   document.title = lesson
     ? `Create Resources – ${student} – ${lesson} – Zearn (Figma)`
     : `Create Resources – ${student} – Zearn (Figma)`;
 
-  // Available Mini Lesson variants. We pick one at random on initial load
-  // (so every visit can start on a different lesson) and also use this list
-  // to pick "one of the other two" when the user recreates the Mini Lesson.
+  // Available Mini Lesson variants — each pairs a WebP preview with its PDF for download.
+  // Key format matches the filename suffix: G{grade}M{mission}L{lesson}.
   const MINI_LESSON_VARIANTS = [
-    "assets/pdf/Mini Lesson A.pdf",
-    "assets/pdf/Mini Lesson B.pdf",
-    "assets/pdf/Mini Lesson C.pdf",
+    { key: "G3M3L7",  webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G3M3L7.webp",
+                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G3M3L7-compressed.pdf" },
+    { key: "G4M5L6",  webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G4M5L6.webp",
+                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G4M5L6-compressed.pdf" },
+    { key: "G5M6L19", webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G5M6L19.webp",
+                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G5M6L19-compressed.pdf" },
+    { key: "G8M2L10", webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G8M2L10.webp",
+                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G8M2L10-compressed.pdf" },
   ];
+
+  // Build "G{grade}M{mission}L{lesson}" from the URL's loc + lesson params.
+  function buildLessonKey(loc, lessonStr) {
+    const g = (loc       || "").match(/Grade\s+(\d+)/i);
+    const m = (loc       || "").match(/Mission\s+(\d+)/i);
+    const l = (lessonStr || "").match(/Lesson\s+(\d+)/i);
+    if (!g || !m || !l) return null;
+    return `G${g[1]}M${m[1]}L${l[1]}`;
+  }
+
   function pickRandomMiniLesson() {
     return MINI_LESSON_VARIANTS[Math.floor(Math.random() * MINI_LESSON_VARIANTS.length)];
   }
   function pickOtherMiniLesson() {
-    const others = MINI_LESSON_VARIANTS.filter(p => p !== currentPdfUrl);
+    const others = MINI_LESSON_VARIANTS.filter(v => v !== currentVariant);
     return others[Math.floor(Math.random() * others.length)];
   }
 
-  // The current PDF being rendered. Updated whenever a CTA generates a new
-  // material (Worksheet, Sample Script, etc.) so subsequent recreate clicks
-  // continue showing the most recently generated PDF.
-  let currentPdfUrl = pickRandomMiniLesson();
+  // Select the variant that matches this lesson; fall back to random.
+  const lessonKey = buildLessonKey(locParam, lesson);
+  const matchedVariant = lessonKey
+    ? MINI_LESSON_VARIANTS.find(v => v.key === lessonKey)
+    : null;
 
-  // ---- Render PDF pages as stacked canvases (no gray chrome, no gaps) ----
-  async function renderPdf(pdfUrl) {
+  // Currently displayed mini lesson variant. `currentPdfUrl` tracks the PDF
+  // for the Download button; it is updated whenever the view changes.
+  let currentVariant = matchedVariant || pickRandomMiniLesson();
+  let currentPdfUrl = currentVariant.pdf;
+
+  // ---- Render material: swap WebP preview image and update the download PDF target ----
+  function renderMaterial(webpUrl, pdfUrl) {
     if (pdfUrl) currentPdfUrl = pdfUrl;
-    if (!window.pdfjsLib) return;
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    const TARGET_WIDTH = 792;
-    const stack = document.getElementById("pdfStack");
-    // Always start from an empty stack — subsequent renders (swap, recreate)
-    // must not stack new canvases on top of old ones.
-    if (stack) stack.innerHTML = "";
-    // The Worksheet A.pdf source has ~24px more white space above its title
-    // than the other PDFs. Compensate by pulling the canvas stack up by 24px
-    // so all PDFs read with the same top inset.
-    if (stack) {
-      stack.style.marginTop = /Worksheet/.test(currentPdfUrl) ? "-24px" : "";
-    }
-    try {
-      const pdf = await pdfjsLib.getDocument(currentPdfUrl).promise;
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const baseViewport = page.getViewport({ scale: 1 });
-        const scale = TARGET_WIDTH / baseViewport.width;
-        // Render at up to 2× device pixel ratio for retina-crisp text.
-        // (Previously had to cap at DPR=1 when the PDF was one giant page
-        // because PDF.js silently dropped content from oversize canvases.
-        // The PDF is now multi-page, so each canvas is normal-sized and we
-        // can safely scale up.)
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const viewport = page.getViewport({ scale: scale * dpr });
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.width = TARGET_WIDTH + "px";
-        canvas.style.height = (baseViewport.height * scale) + "px";
-        const ctx = canvas.getContext("2d");
-        // Paint white before rendering so any transparent regions in the PDF stay white.
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        await page.render({ canvasContext: ctx, viewport, background: "#ffffff" }).promise;
-        stack.appendChild(canvas);
+    const img = document.getElementById("lessonPreview");
+    if (!img) return;
+    img.onload = () => {
+      adjustPageAreaHeight();
+      if (!document.documentElement.classList.contains("ctas-visible")) {
+        scheduleCtas();
       }
-    } catch (err) {
-      console.error("PDF render failed:", err);
-    }
-    // Resize the .page-area card to fit the freshly rendered PDF.
-    adjustPageAreaHeight();
-    // Schedule the CTA footer reveal — but only if the user isn't already
-    // looking at CTAs (i.e. we're coming out of a loading/recreate flow,
-    // not an instant swap-to-view). The 1.5s delay starts NOW, so the CTAs
-    // can never appear before the PDF has finished drawing.
-    if (!document.documentElement.classList.contains("ctas-visible")) {
-      scheduleCtas();
-    }
+    };
+    img.src = webpUrl || img.src;
   }
 
   // Size the page-area card to min(content, viewport-available, 920px).
-  // Called after every renderPdf, when CTAs come in, and on window resize.
+  // Called after every renderMaterial, when CTAs come in, and on window resize.
   function adjustPageAreaHeight() {
     const pageArea = document.querySelector(".page-area");
-    const stack    = document.getElementById("pdfStack");
+    const img      = document.getElementById("lessonPreview");
     const ctas     = document.getElementById("pdfCtas");
-    if (!pageArea || !stack) return;
+    if (!pageArea || !img) return;
     // Only resize once we're showing real content. During initial load /
     // recreating, the CSS-driven 532px height is correct.
     if (!document.documentElement.classList.contains("loaded") ||
         document.documentElement.classList.contains("recreating")) return;
     const ctasHeight = (ctas && getComputedStyle(ctas).display !== "none")
       ? ctas.scrollHeight : 0;
-    const contentHeight = stack.scrollHeight + ctasHeight;
+    const contentHeight = img.clientHeight + ctasHeight;
     const rect = pageArea.getBoundingClientRect();
-    const viewportAvailable = window.innerHeight - rect.top - 16;  // small bottom breathing room
+    const viewportAvailable = window.innerHeight - rect.top - 16;
     const target = Math.min(contentHeight, viewportAvailable, 920);
     pageArea.style.height = Math.max(target, 0) + "px";
   }
@@ -1194,7 +1168,7 @@
   setTimeout(() => {
     stopLoadingCycle();
     document.documentElement.classList.add("loaded");
-    renderPdf();   // renderPdf itself schedules the CTA reveal once it resolves
+    renderMaterial(currentVariant.webp, currentVariant.pdf);   // schedules CTA reveal once image loads
     // Mini Lesson is "generated" as soon as the initial PDF finishes loading.
     state.generatedAt.miniLesson = formatNow();
     setTimestamp(state.generatedAt.miniLesson);
@@ -1273,10 +1247,42 @@
   // miniLesson is initialised to the randomly chosen variant so that swapping
   // back to "Mini Lesson" from another view returns to the same one the user
   // started on (or the last one they recreated to).
+  // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
+  const WORKSHEET_VARIANTS = {
+    G3M3L7:  { webp: "assets/targeted_materials/worksheet/webp/worksheet_G3M3L7.webp",
+               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G3M3L7.pdf" },
+    G4M5L6:  { webp: "assets/targeted_materials/worksheet/webp/worksheet_G4M5L6.webp",
+               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G4M5L6.pdf" },
+    G8M2L10: { webp: "assets/targeted_materials/worksheet/webp/worksheet_G8M2L10.webp",
+               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G8M2L10.pdf" },
+  };
+  const matchedWorksheet = lessonKey ? WORKSHEET_VARIANTS[lessonKey] : null;
+  if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
+
+  // Sample Script variants keyed by lesson key.
+  const SAMPLE_SCRIPT_VARIANTS = {
+    G3M3L7:  { webp: "assets/targeted_materials/sample_script/webp/sample_script_G3M3L7.webp",
+               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G3M3L7.pdf" },
+    G4M5L6:  { webp: "assets/targeted_materials/sample_script/webp/sample_script_G4M5L6.webp",
+               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G4M5L6.pdf" },
+    G5M6L19: { webp: "assets/targeted_materials/sample_script/webp/sample_script_G5M6L19.webp",
+               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G5M6L19.pdf" },
+    G8M2L10: { webp: "assets/targeted_materials/sample_script/webp/sample_script_G8M2L10.webp",
+               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G8M2L10.pdf" },
+  };
+  const matchedSampleScript = lessonKey ? SAMPLE_SCRIPT_VARIANTS[lessonKey] : null;
+
+  // Placeholder WebP for materials that don't yet have their own image.
+  const PLACEHOLDER_WEBP = currentVariant.webp;
   const MATERIAL_PDF = {
-    miniLesson:   currentPdfUrl,
-    worksheet:    "assets/pdf/Worksheet A.pdf",
-    sampleScript: "assets/pdf/Sample Script A.pdf",
+    miniLesson:   currentVariant.pdf,
+    worksheet:    matchedWorksheet   ? matchedWorksheet.pdf   : "assets/pdf/Worksheet A.pdf",
+    sampleScript: matchedSampleScript ? matchedSampleScript.pdf : "assets/pdf/Sample Script A.pdf",
+  };
+  const MATERIAL_WEBP = {
+    miniLesson:   currentVariant.webp,
+    worksheet:    matchedWorksheet   ? matchedWorksheet.webp   : PLACEHOLDER_WEBP,
+    sampleScript: matchedSampleScript ? matchedSampleScript.webp : PLACEHOLDER_WEBP,
   };
   const state = {
     generated: { worksheet: false, sampleScript: false },
@@ -1332,8 +1338,11 @@
       const mat = cta.dataset.material;
       cta.classList.toggle("is-generated", !!state.generated[mat]);
     });
-    // Collapse the footer when every CTA has been hidden.
-    const allGenerated = Object.values(state.generated).every(v => v);
+    // Collapse the footer when every *available* CTA has been generated.
+    const availableMaterials = Object.keys(state.generated)
+      .filter(mat => !(mat === "worksheet"   && !matchedWorksheet))
+      .filter(mat => !(mat === "sampleScript" && !matchedSampleScript));
+    const allGenerated = availableMaterials.every(mat => state.generated[mat]);
     document.getElementById("pdfCtas")?.classList.toggle("is-empty", allGenerated);
   }
 
@@ -1342,7 +1351,7 @@
   function swapToView(view) {
     state.currentView = view;
     syncSidenavAndCtas();
-    renderPdf(MATERIAL_PDF[view]);
+    renderMaterial(MATERIAL_WEBP[view], MATERIAL_PDF[view]);
     // Restore the timestamp that was captured when *this* material was
     // generated, not whatever was last on screen.
     setTimestamp(state.generatedAt[view]);
@@ -1372,12 +1381,12 @@
     // material === null  → recreate current PDF (no state change)
     // material === "worksheet" | "sampleScript" → generate that material
     function triggerLoadingThenRender(material) {
-      // Drop the current PDF the moment the user commits to generating /
-      // recreating — we don't want any of the old canvases lingering behind
+      // Clear the current image the moment the user commits to generating /
+      // recreating — we don't want the old preview lingering behind
       // the loading state. Also hide CTAs (they'll come back 1.5s after the
       // new render finishes) and clear the "Generated …" timestamp.
-      const stack = document.getElementById("pdfStack");
-      if (stack) stack.innerHTML = "";
+      const img = document.getElementById("lessonPreview");
+      if (img) img.src = "";
       hideCtasNow();
       setTimestamp("");
       document.documentElement.classList.add("recreating");
@@ -1389,15 +1398,17 @@
           state.generated[material] = true;
           state.currentView = material;
           syncSidenavAndCtas();
-          renderPdf(MATERIAL_PDF[material]);
+          renderMaterial(MATERIAL_WEBP[material], MATERIAL_PDF[material]);
         } else if (state.currentView === "miniLesson") {
           // Mini Lesson recreate: cycle to a different variant, and remember
           // it so subsequent swap-backs from another view land on this one.
           const next = pickOtherMiniLesson();
-          MATERIAL_PDF.miniLesson = next;
-          renderPdf(next);
+          currentVariant = next;
+          MATERIAL_PDF.miniLesson = next.pdf;
+          MATERIAL_WEBP.miniLesson = next.webp;
+          renderMaterial(next.webp, next.pdf);
         } else {
-          renderPdf();  // re-render whatever currentPdfUrl points at
+          renderMaterial(MATERIAL_WEBP[state.currentView], MATERIAL_PDF[state.currentView]);
         }
         // Stamp the current material with "now" — for a plain recreate this
         // updates the existing view's timestamp; for a fresh create it
@@ -1405,9 +1416,9 @@
         const view = state.currentView;
         state.generatedAt[view] = formatNow();
         setTimestamp(state.generatedAt[view]);
-        // renderPdf above will schedule the CTA reveal once it resolves;
+        // renderMaterial above will schedule the CTA reveal once the image loads;
         // we already called hideCtasNow() at the start of this flow, so
-        // .ctas-visible is absent and scheduleCtas will run inside renderPdf.
+        // .ctas-visible is absent and scheduleCtas will run inside renderMaterial.
         const pa = document.querySelector(".page-area");
         if (pa) pa.scrollTop = 0;
       }, 9000);

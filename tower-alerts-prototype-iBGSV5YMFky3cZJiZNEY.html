@@ -439,6 +439,7 @@
   .breadcrumb-meta { font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal); margin: 8px 0; }
   .lesson-link {
     font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua);
+    max-width: 568px;
   }
   .lesson-link:hover { text-decoration: underline; }
 
@@ -612,11 +613,12 @@
   .modal-card {
     position: relative;
     background: #fff;
-    border-top: 16px solid #1cc7e6;     /* aqua/40 */
-    border-radius: 4px;
+    border-top: 32px solid #F182EA;
+    border-radius: 20px 20px 4px 4px;
     box-shadow: 1px 1px 1.5px rgba(128,128,128,0.5);
-    width: 774px; max-width: 100%;
-    padding: 32px 32px 48px;
+    width: 604px; max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 34px 32px;
     font-family: "Source Sans Pro", -apple-system, "Helvetica Neue", Arial, sans-serif;
     color: #303b40;
   }
@@ -634,38 +636,51 @@
   .modal-heading .sparkles { width: 21.1654px; height: 20.7946px; flex: none; }
   .modal-heading h1 {
     margin: 0;
-    font-size: 32px; font-weight: 400; line-height: 48px;
+    font-size: 20px; font-weight: 400; line-height: 48px;
     color: #303b40; white-space: nowrap;
   }
+  .modal-beta {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 11px; font-weight: 700; line-height: 15px;
+    color: #7029A5;
+    background: #FAF1FF;
+    border: 1px solid #7029A5;
+    border-radius: 3.5px;
+    vertical-align: middle;
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+  }
   .modal-intro {
-    font-size: 20px; line-height: 1.5; color: #303b40;
-    text-align: center; margin: 0 0 8px;
+    font-size: 16px; line-height: 1.5; color: #303b40;
+    text-align: center; margin: 0 0 24px;
   }
   .modal-intro strong { font-weight: 600; }
   .objective-card {
-    background: #f0f5f8;       /* charcoal/5 */
-    border-radius: 4px;
-    padding: 24px 32px 32px;
-    margin-bottom: 24px;
+    background: #FAF1FF;
+    border: 1px solid #F1D9FE;
+    border-radius: 10px;
+    padding: 24px 18px 8px;
+    margin-bottom: 32px;
     text-align: center;
   }
   .objective-card p {
-    margin: 0; font-size: 20px; font-weight: 600; line-height: 1.5; color: #303b40;
+    margin: 0; font-size: 16px; font-weight: 600; line-height: 1.5; color: #303b40;
   }
   .modal-select-label {
-    font-size: 20px; font-weight: 400; line-height: 1.5;
+    font-size: 16px; font-weight: 400; line-height: 1.5;
     color: #000; text-align: center;
-    margin: 0 0 16px;
+    margin: 0 0 8px;
   }
   .modal-options {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    margin-bottom: 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    margin-bottom: 16px;
   }
   .modal-option {
-    width: 364px; height: 64px;
-    border-radius: 40px;
+    width: 302px; height: 60px;
+    border-radius: 30px;
     display: flex; align-items: center;
-    padding: 0 19px;
+    padding: 0 22px;
     background: #fff;
     box-sizing: border-box;
   }
@@ -674,7 +689,7 @@
     border: 3px solid #09b;              /* aqua/radio selected */
   }
   .modal-option.disabled {
-    border: 1px solid var(--gray-40);           /* disabled-light */
+    border: 1px solid #DDE0E3;
     color: var(--gray-40);
   }
   .modal-option .checkbox {
@@ -688,13 +703,13 @@
      whole row reads as one disabled unit. */
   .modal-option .checkbox-empty {
     width: 15px; height: 15px;
-    border: 1px solid var(--gray-40);
+    border: 1px solid #ABABAB;
     background: var(--white);
     border-radius: 2.5px;
     box-sizing: border-box;
   }
   .modal-option .label {
-    font-size: 20px; font-weight: 600; line-height: 1.5; color: #303b40;
+    font-size: 16px; font-weight: 600; line-height: 1.5; color: #303b40;
   }
   .modal-option.disabled .label { color: var(--gray-40); }
   .modal-option.disabled {
@@ -729,6 +744,7 @@
     background: var(--help-bg);
     border-radius: 4px;
     padding: 8px 32px;
+    margin: 0 28px;
     text-align: center;
     font-size: 16px; line-height: 1.5; color: #000;
   }
@@ -1066,7 +1082,7 @@
           
           <div class="alert-side">
             <a class="create-resources"
-               href="create-resources-95a534VKBScVGb3WUOvN.html?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}"
+               href="create-resources-95a534VKBScVGb3WUOvN.html?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}&loc=${encodeURIComponent(a.loc)}"
                data-student="${a.student.replace(/"/g, "&quot;")}"
                data-lesson="${a.lesson.replace(/"/g, "&quot;")}"
                data-loc="${a.loc.replace(/"/g, "&quot;")}"
@@ -1189,7 +1205,7 @@
 
     <div class="modal-heading">
       <span class="sparkles" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjEuMTY1NCIgaGVpZ2h0PSIyMC43OTQ2IiB2aWV3Qm94PSIwIDAgMjEuMTY1NCAyMC43OTQ2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBpZD0ic3BhcmtsZXMiPgo8cGF0aCBpZD0iU3BhcmtsZXMiIGQ9Ik0xMS4zODc5IDAuNTAzNzVDMTEuMjQ0NSAwLjE5NSAxMC45MzAxIDAgMTAuNTg4MiAwQzEwLjI0NjMgMCA5LjkzMTk5IDAuMTk1IDkuNzg4NiAwLjUwMzc1QzkuNzg4NiAwLjUwMzc1IDguNzY5OSA0Ljg0MTEyIDYuODYwMjkgNi43MzI5MkM0Ljk1MDY4IDguNjI0NzEgMC41MTgzODIgOS42MDkxNyAwLjUxODM4MiA5LjYwOTE3QzAuMTk4NTI5IDkuNzU1NDIgMCAxMC4wNjQyIDAgMTAuNEMwIDEwLjczNTggMC4xOTg1MjkgMTEuMDQ0NiAwLjUxMjg2OCAxMS4xODU0QzAuNTEyODY4IDExLjE4NTQgNC45NDUxNyAxMi4xNjk5IDYuODU0NzggMTQuMDYxN0M4Ljc2NDM5IDE1Ljk1MzUgOS43ODMwOSAyMC4yOTA4IDkuNzgzMDkgMjAuMjkwOEM5LjkyNjQ3IDIwLjU5OTYgMTAuMjQwOCAyMC43OTQ2IDEwLjU4MjcgMjAuNzk0NkMxMC45MjQ2IDIwLjc5NDYgMTEuMjM5IDIwLjU5OTYgMTEuMzgyNCAyMC4yOTA4QzExLjM4MjQgMjAuMjkwOCAxMi40MDExIDE1Ljk1MzUgMTQuMzEwNyAxNC4wNjE3QzE2LjIyMDMgMTIuMTY5OSAyMC42NTI2IDExLjE4NTQgMjAuNjUyNiAxMS4xODU0QzIwLjk2NjkgMTEuMDQ0NiAyMS4xNjU0IDEwLjczNTggMjEuMTY1NCAxMC40QzIxLjE2NTQgMTAuMDY0MiAyMC45NjY5IDkuNzU1NDIgMjAuNjUyNiA5LjYxNDU4QzIwLjY1MjYgOS42MTQ1OCAxNi4yMjAzIDguNjMwMTMgMTQuMzEwNyA2LjczODMzQzEyLjQwMTEgNC44NDY1NCAxMS4zODI0IDAuNTA5MTY3IDExLjM4MjQgMC41MDkxNjdMMTEuMzg3OSAwLjUwMzc1WiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjRUE3NEUzKSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></span>
-      <h1 id="ctmModalTitle">Create Targeted Materials</h1>
+      <h1 id="ctmModalTitle">CREATE TARGETED MATERIALS<span class="modal-beta">BETA</span></h1>
     </div>
 
     <p class="modal-intro"><strong id="ctmStudent">Elijah Park</strong> struggled on <span id="ctmMissionLesson">Mission 3, Lesson 4</span>, and may need support on the following objective:</p>
