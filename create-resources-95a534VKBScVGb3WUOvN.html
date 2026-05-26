@@ -83,7 +83,7 @@
   .page-title .sparkle-big { width: 20px; height: 20px; flex: none; }
   .page-title .sparkle-big img { width: 20px; height: 20px; }
   .page-title .title-text {
-    font-size: 22px; line-height: 1.5; color: var(--charcoal);
+    font-size: 18px; line-height: 1.5; color: var(--charcoal);
     text-transform: uppercase; font-weight: 400;
   }
   .beta-pill {
@@ -107,7 +107,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .sub-nav .center-title {
-    font-weight: 600; font-size: 20px; line-height: 1.5;
+    font-weight: 600; font-size: 18px; line-height: 1.5;
     color: var(--charcoal);
   }
   .back-btn {
@@ -144,13 +144,10 @@
     display: flex; flex-direction: column; gap: 8px;
   }
   .disclaimer {
-    height: 40px;
-    background: var(--help-bg);
-    border: 1px solid var(--gray-30);
+    height: 24px;
     border-radius: 4px;
     display: flex; align-items: center; justify-content: center;
-    padding: 9px 33px;
-    font-size: 16px; line-height: 1.5; color: #000;
+    font-size: 14px; line-height: 1.5; color: #000;
     text-align: center;
   }
   .disclaimer a { color: var(--aqua); font-weight: 600; }
@@ -210,9 +207,13 @@
     display: inline-flex; align-items: center; justify-content: center;
     flex: none;
     cursor: pointer;
+    margin-right: 8px;
     padding: 0;        /* reset user-agent <button> padding */
   }
   .subnav-item .sparkle-btn img { width: 12px; height: 12px; }
+  .subnav-item .sparkle-btn .icon-refresh { display: none; }
+  .subnav-item.generated .sparkle-btn .icon-sparkle { display: none; }
+  .subnav-item.generated .sparkle-btn .icon-refresh { display: block; }
   /* Sparkle buttons share the same hover/press recolor as other secondary
      buttons. Defined inline here (rather than in the shared block far below)
      so the per-button rules stay grouped. */
@@ -248,9 +249,24 @@
   /* When a subnav item is the currently-viewed material, its label goes
      SemiBold to match the section-level Mini Lesson active treatment. */
   .subnav-item.current .text { font-weight: 600; }
-  /* Generated subitems become clickable navigation; ungenerated ones aren't. */
-  .subnav-item.generated { cursor: pointer; }
-  .subnav-item.generated:hover { background: var(--purple-bg); }
+  /* nav-pending: same fuchsia bar + bold treatment for an ungenerated item
+     that the user clicked to scroll to CTAs. Managed via direct classList
+     manipulation rather than syncSidenavAndCtas so it tracks each click
+     independently of state.currentView. */
+  .subnav-item.nav-pending::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 24px;
+    background: var(--fuchsia);
+  }
+  .subnav-item.nav-pending .text { font-weight: 600; }
+  /* All subnav items are clickable (generated → scroll to section; ungenerated → scroll to CTAs). */
+  .subnav-item { cursor: pointer; }
+  .subnav-item:hover { background: var(--purple-bg); }
   /* Mini Lesson is always clickable (loads Mini Lesson A.pdf back). */
   .sidenav-active { cursor: pointer; }
 
@@ -273,7 +289,7 @@
   /* ===== Main content column ===== */
   .main-col {
     width: 792px;
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; 
     flex: none;
   }
   .button-group {
@@ -352,17 +368,34 @@
      the height with an inline style so the card never grows past the PDF
      content OR the viewport, but always caps at 920px. */
   .page-area {
-    background: var(--white);
+    background: var(--gray-bg);
     border-radius: 0 0 4px 4px;
+    /* Shadow on the container itself — used for the loading and recreating
+       canvas states. Stripped in loaded state where individual sections carry
+       their own shadows instead. */
     box-shadow: var(--card-dropshadow);
-    padding: 0;
+    /* 4px horizontal padding gives child section box-shadows room to bleed
+       without being clipped by overflow-x (clips at padding edge = 800px,
+       not content edge = 792px). Negative margins keep content flush with
+       the button-group. Body background is --gray-bg so the bleed is invisible. */
+    padding: 0 4px;
+    margin: 0 -4px;
     position: relative;
-    width: 792px;
+    width: 800px;
     max-height: 920px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;       /* Firefox */
     scrollbar-color: rgba(0,0,0,0.35) transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .material-section {
+    background: var(--white);
+    box-shadow: var(--card-dropshadow);
+    width: 792px;
+    flex-shrink: 0;
   }
   /* Chrome/Safari: thin floating-style scrollbar that visually sits over the PDF's right edge */
   .page-area::-webkit-scrollbar {
@@ -715,36 +748,41 @@
     from { background-position: 200% 0; }
     to   { background-position: -200% 0; }
   }
-  /* Loading content inside the page-area card */
+  /* Loading content inside the page-area card — abs-positioned so it overlays
+     sections without pushing them down. width:100% resolves to the full 800px
+     padding-box of the positioned .page-area ancestor, covering edge-to-edge. */
   .loading-content {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 5;
     display: flex; flex-direction: column; align-items: center;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     padding: 64px 36px 0;
     box-sizing: border-box;
+    background: var(--white);
+    transition: opacity 0.5s ease;
   }
-  .loading-content .loading-message {
-    font-size: 24px; font-weight: 600; line-height: 1.5;
+  .loading-content .loading-message,
+  .new-material-loading .loading-message {
+    font-size: 24px; font-weight: 400; line-height: 1.5;
     color: var(--charcoal); text-align: center;
     margin: 0;
-    /* width:fit-content so the clip-path wipe lines up with the text edges,
-       not the full container width. */
-    width: fit-content;
-    max-width: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
-  /* Reveal each new message left → right over 2s (no movement). */
-  .loading-content .loading-message.fade-in {
-    animation: msg-reveal 2s ease-out;
+  .loading-content .loading-message.fade-in,
+  .new-material-loading .loading-message.fade-in {
+    opacity: 1;
   }
-  @keyframes msg-reveal {
-    from { clip-path: inset(0 100% 0 0); }
-    to   { clip-path: inset(0 0 0 0); }
-  }
-  .loading-content .sparkle-anim {
+  .loading-content .sparkle-anim,
+  .new-material-loading .sparkle-anim {
     margin-top: 48px;
     width: 147.333px; height: 176.661px;
     display: flex; align-items: center; justify-content: center;
   }
-  .loading-content .sparkle-anim svg {
+  .loading-content .sparkle-anim svg,
+  .new-material-loading .sparkle-anim svg {
     width: 130.447px; height: 163.54px;
     transform: rotate(6.19deg);
   }
@@ -754,14 +792,17 @@
     0%, 100% { fill: #FFEFFE; }
     50%      { fill: #D65CD0; }
   }
-  .loading-content .sparkle-anim .sparkle-1 {
+  .loading-content .sparkle-anim .sparkle-1,
+  .new-material-loading .sparkle-anim .sparkle-1 {
     animation: sparkle-fade 2.4s ease-in-out infinite;
   }
-  .loading-content .sparkle-anim .sparkle-2 {
+  .loading-content .sparkle-anim .sparkle-2,
+  .new-material-loading .sparkle-anim .sparkle-2 {
     animation: sparkle-fade 2.4s ease-in-out infinite;
     animation-delay: -0.8s;
   }
-  .loading-content .sparkle-anim .sparkle-3 {
+  .loading-content .sparkle-anim .sparkle-3,
+  .new-material-loading .sparkle-anim .sparkle-3 {
     animation: sparkle-fade 2.4s ease-in-out infinite;
     animation-delay: -1.6s;
   }
@@ -775,22 +816,27 @@
   .sidenav > .subnav-item,
   .sidenav > .coming-soon,
   .main-col > .button-group,
-  .page-area > .lesson-preview { display: none; }
+  .material-section { display: none; }
   .nav-skeleton { display: flex; }
-  .loading-content { display: flex; }
   .page-area { height: 532px; }
 
   /* Loaded state: hide loading, show real */
-  .loaded .nav-skeleton,
-  .loaded .loading-content { display: none; }
+  .loaded .nav-skeleton { display: none; }
+  html.loaded .loading-content { opacity: 0; pointer-events: none; }
   .loaded .sidenav > .sidenav-active { display: flex; }
   .loaded .sidenav > .subnav-item { display: flex; }
   .loaded .sidenav > .coming-soon { display: flex; }
-  .loaded .main-col > .button-group { display: block; }
-  .loaded .page-area > .lesson-preview { display: block; }
-  /* JS sets the height inline after each render based on image content,
-     viewport, and the 920px cap above. We omit a CSS height here so the
-     card matches its content until JS measures. */
+  .loaded .main-col > .button-group { display: block; z-index: 1000;}
+  .loaded #section-miniLesson { display: block; }
+  /* Generated sections are revealed by JS adding .visible */
+  .material-section.visible { display: block; }
+  /* In loaded state individual sections carry their own shadows; remove the
+     container shadow. Add 6px bottom padding so the last section's bottom
+     shadow bleeds into the padding rather than being clipped by overflow-y. */
+  html.loaded .page-area {
+    box-shadow: none;
+    padding-bottom: 6px;
+  }
 
   /* Recreating state: applies on top of .loaded so the sidenav and button-group
      stay visible (real content, not skeleton), but the PDF area shows the
@@ -798,14 +844,47 @@
      in the page-area footer disappear too. The `html.recreating` qualifier
      bumps specificity above the `.loaded ...` rules above so source order
      can't flip the override. */
-  html.recreating .lesson-preview { display: none; }
+  html.recreating .material-section { display: none !important; }
   html.no-worksheet .subnav-item[data-material="worksheet"],
   html.no-worksheet .pdf-cta[data-material="worksheet"] { display: none !important; }
-  html.recreating .loading-content { display: flex; }
-  html.recreating .page-area { height: 532px; }
-  /* Hide the entire RECREATE/download/print bar while generating — it
+  html.recreating .loading-content { opacity: 1; pointer-events: auto; }
+  html.recreating .page-area { height: 532px; box-shadow: var(--card-dropshadow); padding-bottom: 0; }
+  /* Hide the entire RECREATE/download/print bar while recreating — it
      reappears in sync with the new PDF when loading finishes. */
   html.recreating .main-col > .button-group { display: none; }
+
+  /* SM / SS generation (first-time or recreate): same full-screen overlay as
+     recreating, but the Recreate/download bar stays visible.
+     The loading card is 792px (matching material sections) with its own shadow;
+     page-area carries no shadow so the gray strips on each side look like
+     the normal loaded-state gaps. */
+  html.generating-material .material-section { display: none !important; }
+  html.generating-material .loading-content {
+    opacity: 1; pointer-events: auto;
+    left: 4px; width: 792px;
+    box-shadow: var(--card-dropshadow);
+  }
+  html.generating-material .page-area { height: 532px; box-shadow: none; padding-bottom: 0; }
+  html.generating-material .pdf-ctas { display: none !important; }
+
+  /* First-time generation: loading card is a normal flex item at the same
+     position the new section will occupy — no overlay, no repositioning needed. */
+  html.generating-new .new-material-loading { display: flex; }
+  html.generating-new .pdf-ctas { display: none !important; }
+
+  /* The inline loading card (first-time generation of a new material).
+     Matches .loading-content layout exactly: column flex, top-padded, centered horizontally. */
+  .new-material-loading {
+    display: none;
+    background: #fff;
+    box-shadow: var(--card-dropshadow);
+    width: 792px;
+    min-height: 532px;
+    flex-direction: column;
+    align-items: center;
+    padding: 64px 36px 0;
+    box-sizing: border-box;
+  }
 
   /* ===== End-of-PDF CTAs (Figma node 17753:1199) =====
      Render below the PDF stack inside the page-area's scroll. The user reaches
@@ -885,6 +964,17 @@
   }
   .pdf-cta-btn img { width: 16px; height: 16px; display: block; }
 
+  /* Pulse: ease-in to 4px peak, 0.6s hold, ease-out back to 0 (1.3s total). */
+  @keyframes cta-highlight-pulse {
+    0%  { box-shadow: 0 0 0 0px #F299EC; animation-timing-function: ease-in; }
+    27% { box-shadow: 0 0 0 4px #F299EC; animation-timing-function: linear; }
+    73% { box-shadow: 0 0 0 4px #F299EC; animation-timing-function: ease-out; }
+    100%{ box-shadow: 0 0 0 0px #F299EC; }
+  }
+  .pdf-cta.cta-highlight {
+    animation: cta-highlight-pulse 1.3s linear;
+  }
+
 </style>
 </head>
 <body>
@@ -938,13 +1028,13 @@
       <div class="subnav-item" id="navStudentMaterials" data-material="worksheet">
         <div class="content">
           <span class="text">Student Materials</span>
-          <button class="sparkle-btn" type="button" aria-label="Recreate"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></button>
+          <button class="sparkle-btn" type="button" aria-label="Recreate"><img class="icon-sparkle" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /><img class="icon-refresh" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImFycm93cy1yb3RhdGUtcmV2ZXJzZSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNDQpIj4KPHBhdGggaWQ9IlByaW1hcnkiIGQ9Ik0xMy45NDA2IDcuMTQwNjJDMTMuNTI1IDQuMjM0MzggMTEuMDIxOSAyIDggMkM2LjM0Mzc1IDIgNC44NDM3NSAyLjY3MTg3IDMuNzU2MjUgMy43NTYyNUMzLjc1IDMuNzYyNSAzLjc0Mzc1IDMuNzY4NzUgMy43Mzc1IDMuNzc1TDMuNSA0SDQuOTk2ODdDNS41NSA0IDUuOTk2ODcgNC40NDY4NyA1Ljk5Njg3IDVDNS45OTY4NyA1LjU1MzEzIDUuNTUgNiA0Ljk5Njg3IDZIMUMwLjQ0Njg3NSA2IDAgNS41NTMxMyAwIDVWMUMwIDAuNDQ2ODc1IDAuNDQ2ODc1IDAgMSAwQzEuNTUzMTMgMCAyIDAuNDQ2ODc1IDIgMVYyLjY2ODc1TDIuMzUzMTMgMi4zMzQzN0MzLjc5Njg4IDAuODkzNzUgNS43OTY4OCAwIDggMEMxMi4wMzEyIDAgMTUuMzY1NiAyLjk4MTI1IDE1LjkxODcgNi44NTkzOEMxNS45OTY5IDcuNDA2MjUgMTUuNjE4NyA3LjkxMjUgMTUuMDcxOSA3Ljk5MDYyQzE0LjUyNSA4LjA2ODc1IDE0LjAxODggNy42ODc1IDEzLjk0MDYgNy4xNDM3NVY3LjE0MDYyWk0wLjA4MTI1IDkuMTQwNjJDMC4wMDMxMjUgOC41OTM3NSAwLjM4MTI1IDguMDg3NSAwLjkyODEyNSA4LjAwOTM3QzEuNDc1IDcuOTMxMjUgMS45ODEyNSA4LjMxMjUgMi4wNTkzOCA4Ljg1NjI1QzIuNDc1IDExLjc2MjUgNC45NzgxMyAxMy45OTY5IDggMTMuOTk2OUM5LjY1NjI1IDEzLjk5NjkgMTEuMTU2MiAxMy4zMjUgMTIuMjQzNyAxMi4yNDA2QzEyLjI1IDEyLjIzNDQgMTIuMjU2MiAxMi4yMjgxIDEyLjI2MjUgMTIuMjIxOUwxMi41IDExLjk5NjlIMTEuMDAzMUMxMC40NSAxMS45OTY5IDEwLjAwMzEgMTEuNTUgMTAuMDAzMSAxMC45OTY5QzEwLjAwMzEgMTAuNDQzNyAxMC40NSA5Ljk5Njg3IDExLjAwMzEgOS45OTY4N0gxNS4wMDMxQzE1LjI2ODggOS45OTY4NyAxNS41MjUgMTAuMTAzMSAxNS43MTI1IDEwLjI5MzdDMTUuOSAxMC40ODQ0IDE2LjAwMzEgMTAuNzQwNiAxNi4wMDMxIDExLjAwNjNMMTUuOTcxOSAxNC45NzVDMTUuOTY4OCAxNS41MjgxIDE1LjUxNTYgMTUuOTcxOSAxNC45NjI1IDE1Ljk2NTZDMTQuNDA5NCAxNS45NTk0IDEzLjk2NTYgMTUuNTA5NCAxMy45NzE5IDE0Ljk1NjNMMTMuOTg0NCAxMy4zNDY5TDEzLjY1IDEzLjY2MjVDMTIuMjAzMSAxNS4xMDYzIDEwLjIwMzEgMTYgOCAxNkMzLjk2ODc1IDE2IDAuNjM0Mzc1IDEzLjAxODcgMC4wODEyNSA5LjE0MDYyWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNDQiPgo8cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" /></button>
         </div>
       </div>
       <div class="subnav-item" id="navSampleScript" data-material="sampleScript">
         <div class="content">
           <span class="text">Sample Script</span>
-          <button class="sparkle-btn" type="button" aria-label="Recreate"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /></button>
+          <button class="sparkle-btn" type="button" aria-label="Recreate"><img class="icon-sparkle" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkxpbmsiPgo8cGF0aCBpZD0ic3BhcmtsZS1zbWFsbCIgZD0iTTYuNDU2NDkgMC4yOTA3MDFDNi4zNzUyIDAuMTEyNTI5IDYuMTk2OTggMCA2LjAwMzEzIDBDNS44MDkyOCAwIDUuNjMxMDYgMC4xMTI1MjkgNS41NDk3NyAwLjI5MDcwMUM1LjU0OTc3IDAuMjkwNzAxIDQuOTgxNTIgMi43OTIyOCAzLjg4OTUzIDMuODg1MzlDMi43OTc1MyA0Ljk3ODQ5IDAuMjkzOTAzIDUuNTQ1MTkgMC4yOTM5MDMgNS41NDUxOUMwLjExMjU1OSA1LjYyOTU5IDAgNS44MDc3NiAwIDYuMDAxNTZDMCA2LjE5NTM2IDAuMTEyNTU5IDYuMzczNTMgMC4yOTA3NzYgNi40NTQ4MUMwLjI5MDc3NiA2LjQ1NDgxIDIuNzk0NCA3LjAyMTUxIDMuODg2NCA4LjExNDYxQzQuOTc4NCA5LjIwNzcyIDUuNTQ2NjQgMTEuNzA5MyA1LjU0NjY0IDExLjcwOTNDNS42Mjc5MyAxMS44ODc1IDUuODA2MTUgMTIgNiAxMkM2LjE5Mzg1IDEyIDYuMzcyMDcgMTEuODg3NSA2LjQ1MzM2IDExLjcwOTNDNi40NTMzNiAxMS43MDkzIDcuMDIxNiA5LjIwNzcyIDguMTEzNiA4LjExNDYxQzkuMjA1NiA3LjAyMTUxIDExLjcwOTIgNi40NTQ4MSAxMS43MDkyIDYuNDU0ODFDMTEuODg3NCA2LjM3MzUzIDEyIDYuMTk1MzYgMTIgNi4wMDE1NkMxMiA1LjgwNzc2IDExLjg4NzQgNS42Mjk1OSAxMS43MDkyIDUuNTQ4MzJDMTEuNzA5MiA1LjU0ODMyIDkuMjA1NiA0Ljk4MTYyIDguMTEzNiAzLjg4ODUxQzcuMDIxNiAyLjc5NTQxIDYuNDUzMzYgMC4yOTM4MjcgNi40NTMzNiAwLjI5MzgyN0w2LjQ1NjQ5IDAuMjkwNzAxWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+Cjwvc3ZnPgo=" alt="" /><img class="icon-refresh" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9ImFycm93cy1yb3RhdGUtcmV2ZXJzZSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNDQpIj4KPHBhdGggaWQ9IlByaW1hcnkiIGQ9Ik0xMy45NDA2IDcuMTQwNjJDMTMuNTI1IDQuMjM0MzggMTEuMDIxOSAyIDggMkM2LjM0Mzc1IDIgNC44NDM3NSAyLjY3MTg3IDMuNzU2MjUgMy43NTYyNUMzLjc1IDMuNzYyNSAzLjc0Mzc1IDMuNzY4NzUgMy43Mzc1IDMuNzc1TDMuNSA0SDQuOTk2ODdDNS41NSA0IDUuOTk2ODcgNC40NDY4NyA1Ljk5Njg3IDVDNS45OTY4NyA1LjU1MzEzIDUuNTUgNiA0Ljk5Njg3IDZIMUMwLjQ0Njg3NSA2IDAgNS41NTMxMyAwIDVWMUMwIDAuNDQ2ODc1IDAuNDQ2ODc1IDAgMSAwQzEuNTUzMTMgMCAyIDAuNDQ2ODc1IDIgMVYyLjY2ODc1TDIuMzUzMTMgMi4zMzQzN0MzLjc5Njg4IDAuODkzNzUgNS43OTY4OCAwIDggMEMxMi4wMzEyIDAgMTUuMzY1NiAyLjk4MTI1IDE1LjkxODcgNi44NTkzOEMxNS45OTY5IDcuNDA2MjUgMTUuNjE4NyA3LjkxMjUgMTUuMDcxOSA3Ljk5MDYyQzE0LjUyNSA4LjA2ODc1IDE0LjAxODggNy42ODc1IDEzLjk0MDYgNy4xNDM3NVY3LjE0MDYyWk0wLjA4MTI1IDkuMTQwNjJDMC4wMDMxMjUgOC41OTM3NSAwLjM4MTI1IDguMDg3NSAwLjkyODEyNSA4LjAwOTM3QzEuNDc1IDcuOTMxMjUgMS45ODEyNSA4LjMxMjUgMi4wNTkzOCA4Ljg1NjI1QzIuNDc1IDExLjc2MjUgNC45NzgxMyAxMy45OTY5IDggMTMuOTk2OUM5LjY1NjI1IDEzLjk5NjkgMTEuMTU2MiAxMy4zMjUgMTIuMjQzNyAxMi4yNDA2QzEyLjI1IDEyLjIzNDQgMTIuMjU2MiAxMi4yMjgxIDEyLjI2MjUgMTIuMjIxOUwxMi41IDExLjk5NjlIMTEuMDAzMUMxMC40NSAxMS45OTY5IDEwLjAwMzEgMTEuNTUgMTAuMDAzMSAxMC45OTY5QzEwLjAwMzEgMTAuNDQzNyAxMC40NSA5Ljk5Njg3IDExLjAwMzEgOS45OTY4N0gxNS4wMDMxQzE1LjI2ODggOS45OTY4NyAxNS41MjUgMTAuMTAzMSAxNS43MTI1IDEwLjI5MzdDMTUuOSAxMC40ODQ0IDE2LjAwMzEgMTAuNzQwNiAxNi4wMDMxIDExLjAwNjNMMTUuOTcxOSAxNC45NzVDMTUuOTY4OCAxNS41MjgxIDE1LjUxNTYgMTUuOTcxOSAxNC45NjI1IDE1Ljk2NTZDMTQuNDA5NCAxNS45NTk0IDEzLjk2NTYgMTUuNTA5NCAxMy45NzE5IDE0Ljk1NjNMMTMuOTg0NCAxMy4zNDY5TDEzLjY1IDEzLjY2MjVDMTIuMjAzMSAxNS4xMDYzIDEwLjIwMzEgMTYgOCAxNkMzLjk2ODc1IDE2IDAuNjM0Mzc1IDEzLjAxODcgMC4wODEyNSA5LjE0MDYyWiIgZmlsbD0idmFyKC0tZmlsbC0wLCAjMDA3Njk0KSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNDQiPgo8cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" /></button>
         </div>
       </div>
       <div class="coming-soon">
@@ -984,7 +1074,28 @@
           </div>
         </div>
 
-        <img class="lesson-preview" id="lessonPreview" alt="Mini Lesson preview" />
+        <div class="material-section" id="section-miniLesson">
+          <img class="lesson-preview" id="lessonPreviewMiniLesson" alt="Mini Lesson preview" />
+        </div>
+        <div class="material-section" id="section-worksheet">
+          <img class="lesson-preview" id="lessonPreviewWorksheet" alt="Worksheet preview" />
+        </div>
+        <div class="material-section" id="section-sampleScript">
+          <img class="lesson-preview" id="lessonPreviewSampleScript" alt="Sample Script preview" />
+        </div>
+
+        <!-- Inline loading card for first-time generation of a new material.
+             Sits below all material sections; hidden until html.generating-new. -->
+        <div class="new-material-loading" id="newMaterialLoading" aria-live="polite">
+          <p class="loading-message"></p>
+          <div class="sparkle-anim" aria-hidden="true">
+            <svg width="130.447" height="163.54" viewBox="0 0 130.447 163.54" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <path class="sparkle-1" d="M18.0586 77.7495C16.8577 78.9079 16.4591 80.659 17.0089 82.2164C17.5587 83.7739 18.9683 84.8866 20.6304 85.0344C20.6304 85.0344 42.3406 82.5046 54.2202 88.1777C66.0998 93.8508 77.7539 112.358 77.7539 112.358C78.9463 113.576 80.697 113.975 82.2541 113.425C83.8111 112.876 84.9234 111.466 85.0708 109.804C85.0708 109.804 82.5229 88.0814 88.2081 76.2075C93.8932 64.3337 112.38 52.6731 112.38 52.6731C113.581 51.5146 113.98 49.7636 113.43 48.2061C112.88 46.6486 111.47 45.5359 109.808 45.3882C109.808 45.3882 88.0981 47.9179 76.2185 42.2448C64.3389 36.5717 52.6849 18.064 52.6849 18.064C51.5264 16.8627 49.7757 16.4637 48.2186 17.0134C46.6616 17.5631 45.5493 18.9727 45.4018 20.6351C45.4018 20.6351 47.9498 42.3574 42.2646 54.2312C36.5795 66.105 18.0926 77.7657 18.0926 77.7657L18.0586 77.7495Z" />
+              <path class="sparkle-2" d="M55.8561 122.284C55.8139 121.66 55.408 121.123 54.8285 120.904C54.2489 120.686 53.5893 120.821 53.1454 121.262C53.1454 121.262 48.6262 128.1 44.1292 130.137C39.6322 132.174 31.5085 131.045 31.5085 131.045C30.8712 131.093 30.3338 131.499 30.1153 132.078C29.8968 132.657 30.0324 133.317 30.4736 133.761C30.4736 133.761 37.3194 138.278 39.3516 142.777C41.3838 147.276 40.2623 155.395 40.2623 155.395C40.3044 156.02 40.7103 156.557 41.2899 156.776C41.8694 156.994 42.5291 156.859 42.973 156.418C42.973 156.418 47.4922 149.58 51.9892 147.543C56.4862 145.506 64.6099 146.635 64.6099 146.635C65.2343 146.593 65.7717 146.187 65.9902 145.607C66.2087 145.028 66.0731 144.368 65.6319 143.925C65.6319 143.925 58.786 139.408 56.7538 134.909C54.7216 130.409 55.8432 122.29 55.8432 122.29L55.8561 122.284Z" />
+              <path class="sparkle-3" d="M113.195 115.97C113.181 115.658 112.984 115.385 112.696 115.269C112.409 115.154 112.078 115.215 111.851 115.43C111.851 115.43 109.519 118.8 107.249 119.77C104.979 120.74 100.93 120.089 100.93 120.089C100.611 120.106 100.338 120.303 100.223 120.59C100.107 120.878 100.168 121.209 100.384 121.435C100.384 121.435 103.758 123.767 104.725 126.037C105.693 128.308 105.046 132.355 105.046 132.355C105.06 132.668 105.257 132.94 105.544 133.056C105.832 133.171 106.163 133.111 106.39 132.895C106.39 132.895 108.722 129.525 110.992 128.555C113.262 127.585 117.31 128.236 117.31 128.236C117.623 128.222 117.896 128.025 118.011 127.738C118.127 127.45 118.066 127.119 117.85 126.893C117.85 126.893 114.477 124.561 113.509 122.291C112.541 120.02 113.189 115.973 113.189 115.973L113.195 115.97Z" />
+            </svg>
+          </div>
+        </div>
 
         <!-- End-of-PDF CTAs: rendered below the PDF inside the same scroll
              container so the user reaches them by scrolling past the PDF. -->
@@ -1048,17 +1159,13 @@
     ? `Create Resources – ${student} – ${lesson} – Zearn (Figma)`
     : `Create Resources – ${student} – Zearn (Figma)`;
 
-  // Available Mini Lesson variants — each pairs a WebP preview with its PDF for download.
+  // Available Mini Lesson variants — each pairs a WebP preview image with its lesson key.
   // Key format matches the filename suffix: G{grade}M{mission}L{lesson}.
   const MINI_LESSON_VARIANTS = [
-    { key: "G3M3L7",  webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G3M3L7.webp",
-                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G3M3L7-compressed.pdf" },
-    { key: "G4M5L6",  webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G4M5L6.webp",
-                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G4M5L6-compressed.pdf" },
-    { key: "G5M6L19", webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G5M6L19.webp",
-                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G5M6L19-compressed.pdf" },
-    { key: "G8M2L10", webp: "assets/targeted_materials/mini_lesson/webp/mini_lesson_G8M2L10.webp",
-                      pdf:  "assets/pdf/mini_lessons/mini_lesson_G8M2L10-compressed.pdf" },
+    { key: "G3M3L7",  webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G3M3L7.webp" },
+    { key: "G4M5L6",  webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G4M5L6.webp" },
+    { key: "G5M6L19", webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G5M6L19.webp" },
+    { key: "G8M2L10", webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G8M2L10.webp" },
   ];
 
   // Build "G{grade}M{mission}L{lesson}" from the URL's loc + lesson params.
@@ -1084,15 +1191,12 @@
     ? MINI_LESSON_VARIANTS.find(v => v.key === lessonKey)
     : null;
 
-  // Currently displayed mini lesson variant. `currentPdfUrl` tracks the PDF
-  // for the Download button; it is updated whenever the view changes.
+  // Currently displayed mini lesson variant.
   let currentVariant = matchedVariant || pickRandomMiniLesson();
-  let currentPdfUrl = currentVariant.pdf;
 
-  // ---- Render material: swap WebP preview image and update the download PDF target ----
-  function renderMaterial(webpUrl, pdfUrl) {
-    if (pdfUrl) currentPdfUrl = pdfUrl;
-    const img = document.getElementById("lessonPreview");
+  // ---- Render the mini lesson image (also schedules CTA reveal once loaded) ----
+  function renderMiniLesson(webpUrl) {
+    const img = document.getElementById("lessonPreviewMiniLesson");
     if (!img) return;
     img.onload = () => {
       adjustPageAreaHeight();
@@ -1100,27 +1204,102 @@
         scheduleCtas();
       }
     };
-    img.src = webpUrl || img.src;
+    if (webpUrl) img.src = webpUrl;
   }
 
-  // Size the page-area card to min(content, viewport-available, 920px).
-  // Called after every renderMaterial, when CTAs come in, and on window resize.
+  // ---- Move pdf-ctas to the bottom of the last visible section ----
+  function movePdfCtas() {
+    const ctas = document.getElementById("pdfCtas");
+    if (!ctas) return;
+    const order = ["section-sampleScript", "section-worksheet", "section-miniLesson"];
+    for (const id of order) {
+      const el = document.getElementById(id);
+      if (el && (id === "section-miniLesson" || el.classList.contains("visible"))) {
+        if (ctas.parentElement !== el) el.appendChild(ctas);
+        break;
+      }
+    }
+  }
+
+  // ---- Scroll the page-area to show the pdf-ctas ----
+  function scrollToPdfCtas() {
+    const pageArea = document.querySelector(".page-area");
+    const ctas     = document.getElementById("pdfCtas");
+    if (!pageArea || !ctas) return;
+    pageArea.scrollTo({ top: ctas.offsetTop, behavior: "smooth" });
+  }
+
+  // ---- Flash a fuchsia highlight border on the CTA card for the given material ----
+  // Waits for the smooth scroll to finish (scrollend event) before starting the
+  // pulse so the animation doesn't play while the page is still moving.
+  // A 700ms fallback fires in case scrollend never comes (already in view, etc.).
+  function flashCtaHighlight(material) {
+    const pageArea = document.querySelector(".page-area");
+    const ctaEl   = document.querySelector(`.pdf-cta[data-material="${material}"]`);
+    if (!ctaEl) return;
+    let fired = false;
+    function triggerPulse() {
+      if (fired) return;
+      fired = true;
+      ctaEl.classList.remove("cta-highlight");
+      void ctaEl.offsetWidth;
+      ctaEl.classList.add("cta-highlight");
+      ctaEl.addEventListener("animationend", () => ctaEl.classList.remove("cta-highlight"), { once: true });
+    }
+    if (pageArea) pageArea.addEventListener("scrollend", triggerPulse, { once: true });
+    setTimeout(triggerPulse, 700);
+  }
+
+  // ---- Reveal a generated section and load its image ----
+  function revealSection(material, webpUrl) {
+    const sectionId = material === "worksheet" ? "section-worksheet" : "section-sampleScript";
+    const imgId     = material === "worksheet" ? "lessonPreviewWorksheet" : "lessonPreviewSampleScript";
+    const section   = document.getElementById(sectionId);
+    const img       = document.getElementById(imgId);
+    if (!section || !img) return;
+    section.classList.add("visible");
+    movePdfCtas();  // re-attach pdf-ctas to the new last section
+    img.onload = () => {
+      adjustPageAreaHeight();
+      if (!document.documentElement.classList.contains("ctas-visible")) {
+        scheduleCtas();
+      }
+    };
+    if (webpUrl) img.src = webpUrl;
+  }
+
+  // ---- Update a section's image in-place (for recreate of already-visible section) ----
+  function reRenderSection(material, webpUrl) {
+    const imgId = { miniLesson: "lessonPreviewMiniLesson", worksheet: "lessonPreviewWorksheet", sampleScript: "lessonPreviewSampleScript" }[material];
+    const img = document.getElementById(imgId);
+    if (!img) return;
+    img.onload = () => {
+      adjustPageAreaHeight();
+      if (!document.documentElement.classList.contains("ctas-visible")) {
+        scheduleCtas();
+      }
+    };
+    if (webpUrl) img.src = webpUrl;
+  }
+
+  // ---- Smooth-scroll the page-area to a material section ----
+  function scrollToSection(sectionId) {
+    const pageArea = document.querySelector(".page-area");
+    const section  = document.getElementById(sectionId);
+    if (!pageArea || !section) return;
+    pageArea.scrollTo({ top: section.offsetTop, behavior: "smooth" });
+  }
+
+  // ---- Size the page-area to fill the available viewport (capped at 920px) ----
   function adjustPageAreaHeight() {
     const pageArea = document.querySelector(".page-area");
-    const img      = document.getElementById("lessonPreview");
-    const ctas     = document.getElementById("pdfCtas");
-    if (!pageArea || !img) return;
-    // Only resize once we're showing real content. During initial load /
-    // recreating, the CSS-driven 532px height is correct.
+    if (!pageArea) return;
     if (!document.documentElement.classList.contains("loaded") ||
-        document.documentElement.classList.contains("recreating")) return;
-    const ctasHeight = (ctas && getComputedStyle(ctas).display !== "none")
-      ? ctas.scrollHeight : 0;
-    const contentHeight = img.clientHeight + ctasHeight;
+        document.documentElement.classList.contains("recreating") ||
+        document.documentElement.classList.contains("generating-material")) return;
     const rect = pageArea.getBoundingClientRect();
     const viewportAvailable = window.innerHeight - rect.top - 16;
-    const target = Math.min(contentHeight, viewportAvailable, 920);
-    pageArea.style.height = Math.max(target, 0) + "px";
+    pageArea.style.height = Math.min(viewportAvailable, 920) + "px";
   }
   window.addEventListener("resize", () => adjustPageAreaHeight());
 
@@ -1130,7 +1309,6 @@
     "Remember that AI can make mistakes.",
     "Please check your materials carefully for relevance and accuracy."
   ];
-  const msgEl = document.querySelector(".loading-message");
   let msgIndex = 0;
   let cycleInterval = null;
   // Shuffled copy of LOADING_MESSAGES; freshly re-shuffled each cycle so
@@ -1145,17 +1323,25 @@
     }
   }
   function showLoadingMessage() {
-    msgEl.classList.remove("fade-in");
-    // Force reflow so the animation restarts when we re-add the class.
-    void msgEl.offsetWidth;
-    msgEl.textContent = shuffledMessages[msgIndex];
-    msgEl.classList.add("fade-in");
+    const text = shuffledMessages[msgIndex];
     msgIndex = (msgIndex + 1) % shuffledMessages.length;
+    document.querySelectorAll(".loading-message").forEach(el => {
+      el.classList.remove("fade-in");
+      setTimeout(() => {
+        el.textContent = text;
+        el.classList.add("fade-in");
+      }, 500);
+    });
   }
   function startLoadingCycle() {
     shuffleMessages();
     msgIndex = 0;
-    showLoadingMessage();
+    const firstText = shuffledMessages[msgIndex];
+    msgIndex = 1;
+    document.querySelectorAll(".loading-message").forEach(el => {
+      el.textContent = firstText;
+      el.classList.add("fade-in");
+    });
     clearInterval(cycleInterval);
     cycleInterval = setInterval(showLoadingMessage, 3000);
   }
@@ -1168,19 +1354,37 @@
   setTimeout(() => {
     stopLoadingCycle();
     document.documentElement.classList.add("loaded");
-    renderMaterial(currentVariant.webp, currentVariant.pdf);   // schedules CTA reveal once image loads
+    renderMiniLesson(currentVariant.webp);   // schedules CTA reveal once image loads
     // Mini Lesson is "generated" as soon as the initial PDF finishes loading.
     state.generatedAt.miniLesson = formatNow();
     setTimestamp(state.generatedAt.miniLesson);
   }, 9000);
 
-  // ---- Download / Print of the currently loaded PDF ----
-  // Both actions operate on `currentPdfUrl` — whatever PDF the page area is
-  // showing right now (Mini Lesson, Worksheet, or Sample Script).
+  // ---- Compute the download PDF path based on which materials have been generated ----
+  // Always downloads a combined PDF that includes everything generated so far.
+  function getDownloadPdfUrl() {
+    const key = currentVariant.key;
+    const hasWorksheet    = state.generated.worksheet;
+    const hasSampleScript = state.generated.sampleScript;
+    let folder;
+    if (hasWorksheet && hasSampleScript) {
+      folder = "pdf_mini_lesson_worksheet_sample_script";
+    } else if (hasWorksheet) {
+      folder = "pdf_mini_lesson_worksheet";
+    } else if (hasSampleScript) {
+      folder = "pdf_mini_lesson_sample_script";
+    } else {
+      folder = "pdf_mini_lesson";
+    }
+    return `assets/targeted_materials/download/pdf/${folder}/pdf_${key}_mini_lesson.pdf`;
+  }
+
+  // ---- Download / Print the combined PDF for all generated materials ----
   function downloadCurrentPdf() {
+    const url = getDownloadPdfUrl();
     const a = document.createElement("a");
-    a.href = currentPdfUrl;
-    a.download = currentPdfUrl.split("/").pop();   // "Mini Lesson A.pdf"
+    a.href = url;
+    a.download = url.split("/").pop();
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1192,6 +1396,7 @@
   // user can print from there.
   let pdfPrintFrame = null;
   function printCurrentPdf() {
+    const url = getDownloadPdfUrl();
     if (!pdfPrintFrame) {
       pdfPrintFrame = document.createElement("iframe");
       Object.assign(pdfPrintFrame.style, {
@@ -1207,11 +1412,11 @@
           pdfPrintFrame.contentWindow.focus();
           pdfPrintFrame.contentWindow.print();
         } catch (e) {
-          window.open(currentPdfUrl, "_blank");
+          window.open(url, "_blank");
         }
       }, 200);
     };
-    pdfPrintFrame.src = currentPdfUrl;
+    pdfPrintFrame.src = url;
   }
 
   document.querySelectorAll(".btn-icon[aria-label='Print']").forEach(b =>
@@ -1249,36 +1454,24 @@
   // started on (or the last one they recreated to).
   // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
   const WORKSHEET_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/worksheet/webp/worksheet_G3M3L7.webp",
-               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G3M3L7.pdf" },
-    G4M5L6:  { webp: "assets/targeted_materials/worksheet/webp/worksheet_G4M5L6.webp",
-               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G4M5L6.pdf" },
-    G8M2L10: { webp: "assets/targeted_materials/worksheet/webp/worksheet_G8M2L10.webp",
-               pdf:  "assets/targeted_materials/worksheet/pdf/worksheet_G8M2L10.pdf" },
+    G3M3L7:  { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G3M3L7.webp" },
+    G4M5L6:  { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G4M5L6.webp" },
+    G8M2L10: { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G8M2L10.webp" },
   };
   const matchedWorksheet = lessonKey ? WORKSHEET_VARIANTS[lessonKey] : null;
   if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
 
   // Sample Script variants keyed by lesson key.
   const SAMPLE_SCRIPT_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/sample_script/webp/sample_script_G3M3L7.webp",
-               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G3M3L7.pdf" },
-    G4M5L6:  { webp: "assets/targeted_materials/sample_script/webp/sample_script_G4M5L6.webp",
-               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G4M5L6.pdf" },
-    G5M6L19: { webp: "assets/targeted_materials/sample_script/webp/sample_script_G5M6L19.webp",
-               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G5M6L19.pdf" },
-    G8M2L10: { webp: "assets/targeted_materials/sample_script/webp/sample_script_G8M2L10.webp",
-               pdf:  "assets/targeted_materials/sample_script/pdf/sample_script_G8M2L10.pdf" },
+    G3M3L7:  { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G3M3L7.webp" },
+    G4M5L6:  { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G4M5L6.webp" },
+    G5M6L19: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G5M6L19.webp" },
+    G8M2L10: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G8M2L10.webp" },
   };
   const matchedSampleScript = lessonKey ? SAMPLE_SCRIPT_VARIANTS[lessonKey] : null;
 
   // Placeholder WebP for materials that don't yet have their own image.
   const PLACEHOLDER_WEBP = currentVariant.webp;
-  const MATERIAL_PDF = {
-    miniLesson:   currentVariant.pdf,
-    worksheet:    matchedWorksheet   ? matchedWorksheet.pdf   : "assets/pdf/Worksheet A.pdf",
-    sampleScript: matchedSampleScript ? matchedSampleScript.pdf : "assets/pdf/Sample Script A.pdf",
-  };
   const MATERIAL_WEBP = {
     miniLesson:   currentVariant.webp,
     worksheet:    matchedWorksheet   ? matchedWorksheet.webp   : PLACEHOLDER_WEBP,
@@ -1346,22 +1539,25 @@
     document.getElementById("pdfCtas")?.classList.toggle("is-empty", allGenerated);
   }
 
-  // Instant view swap — no loading state. Used by sidenav navigation between
-  // already-generated materials and back to Mini Lesson.
-  function swapToView(view) {
-    state.currentView = view;
-    syncSidenavAndCtas();
-    renderMaterial(MATERIAL_WEBP[view], MATERIAL_PDF[view]);
-    // Restore the timestamp that was captured when *this* material was
-    // generated, not whatever was last on screen.
-    setTimestamp(state.generatedAt[view]);
-    // Scroll page-area back to top so the user lands at the start of the PDF.
-    const pa = document.querySelector(".page-area");
-    if (pa) pa.scrollTop = 0;
-  }
+  // Section id lookup used for scrolling and scroll-tracking.
+  const SECTION_IDS = {
+    miniLesson:   "section-miniLesson",
+    worksheet:    "section-worksheet",
+    sampleScript: "section-sampleScript",
+  };
+
+  // Preview image id lookup (needed for post-generation scroll timing).
+  const SECTION_IMG_IDS = {
+    miniLesson:   "lessonPreviewMiniLesson",
+    worksheet:    "lessonPreviewWorksheet",
+    sampleScript: "lessonPreviewSampleScript",
+  };
 
   // ---- Before You Go + Are You Sure (Recreate) modals ----
   document.addEventListener("DOMContentLoaded", () => {
+    // Attach pdf-ctas to the mini lesson section immediately (it starts outside sections in HTML).
+    movePdfCtas();
+
     const byg = wireModal("#bygModal");
     const ays = wireModal("#aysModal");
     const backLink = document.querySelector("a.back-btn");
@@ -1376,51 +1572,85 @@
     // persist across reloads within the same tab, which the spec doesn't want).
     let skipAysModal = false;
 
-    // Run the loading animation, then either re-render the current PDF
-    // (recreate) or render a newly-generated material and update state.
-    // material === null  → recreate current PDF (no state change)
-    // material === "worksheet" | "sampleScript" → generate that material
+    // Run the loading animation, then reveal / re-render the target material.
+    // material === null         → recreate whichever section is currentView
+    // material === "worksheet"  → generate worksheet for the first time
+    // material === "sampleScript" → generate sample script for the first time
     function triggerLoadingThenRender(material) {
-      // Clear the current image the moment the user commits to generating /
-      // recreating — we don't want the old preview lingering behind
-      // the loading state. Also hide CTAs (they'll come back 1.5s after the
-      // new render finishes) and clear the "Generated …" timestamp.
-      const img = document.getElementById("lessonPreview");
-      if (img) img.src = "";
       hideCtasNow();
       setTimestamp("");
-      document.documentElement.classList.add("recreating");
+      clearNavPending();
+      // Restore nav highlight for the material being generated so the user
+      // sees which item is active during loading.
+      const loadingMaterial = material || state.currentView;
+      if (loadingMaterial === "worksheet") {
+        document.getElementById("navStudentMaterials")?.classList.add("nav-pending");
+      } else if (loadingMaterial === "sampleScript") {
+        document.getElementById("navSampleScript")?.classList.add("nav-pending");
+      }
+      // Mini Lesson recreate uses the full-screen overlay with the Recreate bar
+      // hidden. SM/SS (first-time or recreate) uses generating-material which
+      // shows the same overlay but keeps the Recreate bar visible.
+      const isMiniLessonRecreate = material === null && state.currentView === "miniLesson";
+      document.querySelector(".page-area")?.scrollTo({ top: 0 });
+      document.documentElement.classList.add(isMiniLessonRecreate ? "recreating" : "generating-material");
       startLoadingCycle();
       setTimeout(() => {
         stopLoadingCycle();
         document.documentElement.classList.remove("recreating");
-        if (material) {
-          state.generated[material] = true;
-          state.currentView = material;
+        document.documentElement.classList.remove("generating-material");
+        if (material === "worksheet") {
+          state.generated.worksheet = true;
+          state.currentView = "worksheet";
           syncSidenavAndCtas();
-          renderMaterial(MATERIAL_WEBP[material], MATERIAL_PDF[material]);
+          revealSection("worksheet", MATERIAL_WEBP.worksheet);
+        } else if (material === "sampleScript") {
+          state.generated.sampleScript = true;
+          state.currentView = "sampleScript";
+          syncSidenavAndCtas();
+          revealSection("sampleScript", MATERIAL_WEBP.sampleScript);
         } else if (state.currentView === "miniLesson") {
-          // Mini Lesson recreate: cycle to a different variant, and remember
-          // it so subsequent swap-backs from another view land on this one.
+          // Mini Lesson recreate: dependent materials are invalidated — reset them.
+          state.generated.worksheet = false;
+          state.generated.sampleScript = false;
+          state.generatedAt.worksheet = null;
+          state.generatedAt.sampleScript = null;
+          document.getElementById("section-worksheet")?.classList.remove("visible");
+          document.getElementById("section-sampleScript")?.classList.remove("visible");
+          movePdfCtas();
+          syncSidenavAndCtas();
+          // Cycle to a different Mini Lesson variant.
           const next = pickOtherMiniLesson();
           currentVariant = next;
-          MATERIAL_PDF.miniLesson = next.pdf;
           MATERIAL_WEBP.miniLesson = next.webp;
-          renderMaterial(next.webp, next.pdf);
+          renderMiniLesson(next.webp);
         } else {
-          renderMaterial(MATERIAL_WEBP[state.currentView], MATERIAL_PDF[state.currentView]);
+          // Recreate worksheet or sample script.
+          reRenderSection(state.currentView, MATERIAL_WEBP[state.currentView]);
         }
-        // Stamp the current material with "now" — for a plain recreate this
-        // updates the existing view's timestamp; for a fresh create it
-        // captures the generation time for future swap-backs.
         const view = state.currentView;
         state.generatedAt[view] = formatNow();
         setTimestamp(state.generatedAt[view]);
-        // renderMaterial above will schedule the CTA reveal once the image loads;
-        // we already called hideCtasNow() at the start of this flow, so
-        // .ctas-visible is absent and scheduleCtas will run inside renderMaterial.
+        // Snap the section to the top of the page-area.
+        // For SM/SS the section image hasn't loaded yet so sec.offsetHeight = 0,
+        // making scrollHeight too small to reach sec.offsetTop. Setting a temporary
+        // minHeight equal to pa.clientHeight guarantees the scroll range is
+        // sufficient; it is cleared when the image loads.
         const pa = document.querySelector(".page-area");
-        if (pa) pa.scrollTop = 0;
+        const sec = document.getElementById(SECTION_IDS[view]);
+        if (pa && sec) {
+          if (view !== "miniLesson") {
+            sec.style.minHeight = pa.clientHeight + "px";
+            pa.scrollTo({ top: sec.offsetTop });
+            const imgEl = document.getElementById(SECTION_IMG_IDS[view]);
+            if (imgEl) imgEl.addEventListener("load", () => {
+              sec.style.minHeight = "";
+              adjustPageAreaHeight();
+            }, { once: true });
+          } else {
+            pa.scrollTo({ top: 0 });
+          }
+        }
       }, 9000);
     }
 
@@ -1482,22 +1712,74 @@
     document.getElementById("ctaSampleScript")?.addEventListener("click",
       () => triggerLoadingThenRender("sampleScript"));
 
-    // Sidenav navigation: instant swap (no loading) between already-generated
-    // materials. Mini Lesson is always available. Subitems only navigate
-    // once their material has been generated — before that, click is a no-op.
-    document.getElementById("navMiniLesson")?.addEventListener("click", () => {
-      if (state.currentView !== "miniLesson") swapToView("miniLesson");
-    });
+    // Clear all subnav active indicators (nav-pending and current).
+    // navScrollTo re-adds the correct .current via syncSidenavAndCtas immediately after.
+    function clearNavPending() {
+      document.querySelectorAll(".subnav-item.nav-pending").forEach(el => el.classList.remove("nav-pending"));
+      document.querySelectorAll(".subnav-item.current").forEach(el => el.classList.remove("current"));
+    }
+
+    // Sidenav navigation: smooth-scroll to the section. Mini Lesson is always
+    // available. Other sections only navigate once generated.
+    function navScrollTo(material) {
+      clearNavPending();
+      state.currentView = material;
+      syncSidenavAndCtas();
+      setTimestamp(state.generatedAt[material]);
+      scrollToSection(SECTION_IDS[material]);
+    }
+    document.getElementById("navMiniLesson")?.addEventListener("click",
+      () => navScrollTo("miniLesson"));
     document.getElementById("navStudentMaterials")?.addEventListener("click", () => {
-      if (state.generated.worksheet && state.currentView !== "worksheet") {
-        swapToView("worksheet");
+      if (state.generated.worksheet) navScrollTo("worksheet");
+      else {
+        clearNavPending();
+        document.getElementById("navStudentMaterials")?.classList.add("nav-pending");
+        scrollToPdfCtas();
+        flashCtaHighlight("worksheet");
       }
     });
     document.getElementById("navSampleScript")?.addEventListener("click", () => {
-      if (state.generated.sampleScript && state.currentView !== "sampleScript") {
-        swapToView("sampleScript");
+      if (state.generated.sampleScript) navScrollTo("sampleScript");
+      else {
+        clearNavPending();
+        document.getElementById("navSampleScript")?.classList.add("nav-pending");
+        scrollToPdfCtas();
+        flashCtaHighlight("sampleScript");
       }
     });
+
+    // Keep nav highlight in sync as the user scrolls within the page-area.
+    const pageAreaEl = document.querySelector(".page-area");
+    if (pageAreaEl) {
+      const sectionOrder = [
+        { id: "section-miniLesson",   material: "miniLesson" },
+        { id: "section-worksheet",    material: "worksheet" },
+        { id: "section-sampleScript", material: "sampleScript" },
+      ];
+      pageAreaEl.addEventListener("scroll", () => {
+        // During loading states sections are display:none so offsetTop collapses
+        // to 0 for all — skip scroll tracking to avoid corrupting the nav.
+        if (document.documentElement.classList.contains("generating-material") ||
+            document.documentElement.classList.contains("recreating")) return;
+        const scrollTop = pageAreaEl.scrollTop;
+        let active = sectionOrder[0];
+        for (const s of sectionOrder) {
+          const el = document.getElementById(s.id);
+          if (!el) continue;
+          // Skip sections that haven't been revealed yet — display:none gives
+          // offsetTop===0, which would falsely win the active-section check.
+          const isVisible = s.id === "section-miniLesson" || el.classList.contains("visible");
+          if (isVisible && el.offsetTop <= scrollTop + 80) active = s;
+        }
+        if (active.material !== state.currentView) {
+          clearNavPending();
+          state.currentView = active.material;
+          syncSidenavAndCtas();
+          setTimestamp(state.generatedAt[active.material]);
+        }
+      });
+    }
   });
 </script>
 
