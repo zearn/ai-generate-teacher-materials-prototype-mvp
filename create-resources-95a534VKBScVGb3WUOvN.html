@@ -427,6 +427,13 @@
     height: auto;
     background: var(--white);
   }
+  .lesson-preview.fade-in-img {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .lesson-preview.fade-in-img.img-loaded {
+    opacity: 1;
+  }
   .lesson-header {
     display: flex; flex-direction: column; gap: 16px;
     margin-bottom: 16px;
@@ -778,7 +785,7 @@
   }
   .loading-content .loading-message,
   .new-material-loading .loading-message {
-    font-size: 24px; font-weight: 400; line-height: 1.5;
+    font-size: 22px; font-weight: 400; line-height: 1.5;
     color: var(--charcoal); text-align: center;
     margin: 0;
     opacity: 0;
@@ -866,18 +873,12 @@
      reappears in sync with the new PDF when loading finishes. */
   html.recreating .main-col > .button-group { display: none; }
 
-  /* SM / SS generation (first-time or recreate): same full-screen overlay as
-     recreating, but the Recreate/download bar stays visible.
-     The loading card is 792px (matching material sections) with its own shadow;
-     page-area carries no shadow so the gray strips on each side look like
-     the normal loaded-state gaps. */
-  html.generating-material .material-section { display: none !important; }
-  html.generating-material .loading-content {
-    opacity: 1; pointer-events: auto;
-    left: 4px; width: 792px;
-    box-shadow: var(--card-dropshadow);
-  }
-  html.generating-material .page-area { height: 532px; box-shadow: none; padding-bottom: 0; }
+  /* SM / SS generation: only hide the specific section being generated so
+     other sections (Mini Lesson, already-generated SS/SM) stay scrollable.
+     An inline loading card replaces the hidden section at the bottom. */
+  html.loading-worksheet #section-worksheet { display: none !important; }
+  html.loading-samplescript #section-sampleScript { display: none !important; }
+  html.generating-material .new-material-loading { display: flex; }
   html.generating-material .pdf-ctas { display: none !important; }
 
   /* First-time generation: loading card is a normal flex item at the same
@@ -1272,8 +1273,11 @@
     const img       = document.getElementById(imgId);
     if (!section || !img) return;
     section.classList.add("visible");
-    movePdfCtas();  // re-attach pdf-ctas to the new last section
+    movePdfCtas();
+    img.classList.add("fade-in-img");
+    img.classList.remove("img-loaded");
     img.onload = () => {
+      requestAnimationFrame(() => img.classList.add("img-loaded"));
       adjustPageAreaHeight();
       if (!document.documentElement.classList.contains("ctas-visible")) {
         scheduleCtas();
@@ -1287,7 +1291,10 @@
     const imgId = { miniLesson: "lessonPreviewMiniLesson", worksheet: "lessonPreviewWorksheet", sampleScript: "lessonPreviewSampleScript" }[material];
     const img = document.getElementById(imgId);
     if (!img) return;
+    img.classList.add("fade-in-img");
+    img.classList.remove("img-loaded");
     img.onload = () => {
+      requestAnimationFrame(() => img.classList.add("img-loaded"));
       adjustPageAreaHeight();
       if (!document.documentElement.classList.contains("ctas-visible")) {
         scheduleCtas();
@@ -1309,8 +1316,7 @@
     const pageArea = document.querySelector(".page-area");
     if (!pageArea) return;
     if (!document.documentElement.classList.contains("loaded") ||
-        document.documentElement.classList.contains("recreating") ||
-        document.documentElement.classList.contains("generating-material")) return;
+        document.documentElement.classList.contains("recreating")) return;
     const rect = pageArea.getBoundingClientRect();
     const viewportAvailable = window.innerHeight - rect.top - 16;
     pageArea.style.height = Math.min(viewportAvailable, 920) + "px";
@@ -1634,21 +1640,48 @@
       // hidden. SM/SS (first-time or recreate) uses generating-material which
       // shows the same overlay but keeps the Recreate bar visible.
       const isMiniLessonRecreate = material === null && state.currentView === "miniLesson";
-      document.querySelector(".page-area")?.scrollTo({ top: 0 });
-      document.documentElement.classList.add(isMiniLessonRecreate ? "recreating" : "generating-material");
+      const html = document.documentElement;
+      if (isMiniLessonRecreate) {
+        document.querySelector(".page-area")?.scrollTo({ top: 0 });
+        html.classList.add("recreating");
+      } else {
+        if (loadingMaterial === "worksheet") html.classList.add("loading-worksheet");
+        else if (loadingMaterial === "sampleScript") html.classList.add("loading-samplescript");
+        html.classList.add("generating-material");
+        userNavigatedDuringLoad = false;
+        loadingMaterialInProgress = loadingMaterial;
+        // Scroll to the inline loading card so the user sees the animation start.
+        suppressScrollNav = true;
+        requestAnimationFrame(() => {
+          const loadingCard = document.getElementById("newMaterialLoading");
+          const pa = document.querySelector(".page-area");
+          if (loadingCard && pa) {
+            pa.scrollTo({ top: loadingCard.offsetTop, behavior: "smooth" });
+            pa.addEventListener("scrollend", () => { suppressScrollNav = false; }, { once: true });
+            setTimeout(() => { suppressScrollNav = false; }, 1200);
+          } else {
+            suppressScrollNav = false;
+          }
+        });
+      }
       startLoadingCycle();
       setTimeout(() => {
         stopLoadingCycle();
         document.documentElement.classList.remove("recreating");
         document.documentElement.classList.remove("generating-material");
+        document.documentElement.classList.remove("loading-worksheet");
+        document.documentElement.classList.remove("loading-samplescript");
+        loadingMaterialInProgress = null;
+        const navigatedAway = userNavigatedDuringLoad;
+        userNavigatedDuringLoad = false;
         if (material === "worksheet") {
           state.generated.worksheet = true;
-          state.currentView = "worksheet";
+          if (!navigatedAway) state.currentView = "worksheet";
           syncSidenavAndCtas();
           revealSection("worksheet", MATERIAL_WEBP.worksheet);
         } else if (material === "sampleScript") {
           state.generated.sampleScript = true;
-          state.currentView = "sampleScript";
+          if (!navigatedAway) state.currentView = "sampleScript";
           syncSidenavAndCtas();
           revealSection("sampleScript", MATERIAL_WEBP.sampleScript);
         } else if (state.currentView === "miniLesson") {
@@ -1667,31 +1700,30 @@
           MATERIAL_WEBP.miniLesson = next.webp;
           renderMiniLesson(next.webp);
         } else {
-          // Recreate worksheet or sample script.
-          reRenderSection(state.currentView, MATERIAL_WEBP[state.currentView]);
+          // Top Recreate button on an SM/SS section (material=null, not ML recreate).
+          // Use loadingMaterial (captured at start) — state.currentView may have changed.
+          if (!navigatedAway) state.currentView = loadingMaterial;
+          syncSidenavAndCtas();
+          reRenderSection(loadingMaterial, MATERIAL_WEBP[loadingMaterial]);
         }
-        const view = state.currentView;
-        state.generatedAt[view] = formatNow();
-        setTimestamp(state.generatedAt[view]);
-        // Snap the section to the top of the page-area.
-        // For SM/SS the section image hasn't loaded yet so sec.offsetHeight = 0,
-        // making scrollHeight too small to reach sec.offsetTop. Setting a temporary
-        // minHeight equal to pa.clientHeight guarantees the scroll range is
-        // sufficient; it is cleared when the image loads.
+        // loadingMaterial is always the correct "what was generated" key.
+        state.generatedAt[loadingMaterial] = formatNow();
+        setTimestamp(state.generatedAt[state.currentView]);
         const pa = document.querySelector(".page-area");
-        const sec = document.getElementById(SECTION_IDS[view]);
-        if (pa && sec) {
-          if (view !== "miniLesson") {
+        if (loadingMaterial !== "miniLesson") {
+          // SM/SS: set minHeight on the generated section only, never touch scroll position.
+          const sec = document.getElementById(SECTION_IDS[loadingMaterial]);
+          if (pa && sec) {
             sec.style.minHeight = pa.clientHeight + "px";
-            pa.scrollTo({ top: sec.offsetTop });
-            const imgEl = document.getElementById(SECTION_IMG_IDS[view]);
+            const imgEl = document.getElementById(SECTION_IMG_IDS[loadingMaterial]);
             if (imgEl) imgEl.addEventListener("load", () => {
               sec.style.minHeight = "";
               adjustPageAreaHeight();
             }, { once: true });
-          } else {
-            pa.scrollTo({ top: 0 });
           }
+        } else {
+          // Mini Lesson recreate: scroll to top (user is always viewing ML here).
+          if (pa) pa.scrollTo({ top: 0 });
         }
       }, 9000);
     }
@@ -1770,6 +1802,9 @@
       if (pa) pa.scrollTo({ top: pa.scrollTop, behavior: "instant" });
     }
     function navScrollTo(material) {
+      if (loadingMaterialInProgress && material !== loadingMaterialInProgress) {
+        userNavigatedDuringLoad = true;
+      }
       cancelScroll();
       clearNavPending();
       state.currentView = material;
@@ -1782,6 +1817,7 @@
     document.getElementById("navStudentMaterials")?.addEventListener("click", () => {
       if (state.generated.worksheet) navScrollTo("worksheet");
       else {
+        if (loadingMaterialInProgress && "worksheet" !== loadingMaterialInProgress) userNavigatedDuringLoad = true;
         cancelScroll();
         clearNavPending();
         document.getElementById("navStudentMaterials")?.classList.add("nav-pending");
@@ -1795,6 +1831,7 @@
     document.getElementById("navSampleScript")?.addEventListener("click", () => {
       if (state.generated.sampleScript) navScrollTo("sampleScript");
       else {
+        if (loadingMaterialInProgress && "sampleScript" !== loadingMaterialInProgress) userNavigatedDuringLoad = true;
         cancelScroll();
         clearNavPending();
         document.getElementById("navSampleScript")?.classList.add("nav-pending");
@@ -1810,6 +1847,8 @@
     // suppressScrollNav is set while a programmatic CTA scroll runs so it
     // doesn't overwrite the nav state set by the triggering click.
     let suppressScrollNav = false;
+    let userNavigatedDuringLoad = false;
+    let loadingMaterialInProgress = null;
     function scrollToCtas_suppressed() {
       suppressScrollNav = true;
       const pa = document.querySelector(".page-area");
@@ -1825,24 +1864,25 @@
         { id: "section-worksheet",    material: "worksheet" },
         { id: "section-sampleScript", material: "sampleScript" },
       ];
-      pageAreaEl.addEventListener("scroll", () => {
+      pageAreaEl.addEventListener("scrollend", () => {
         if (suppressScrollNav) return;
-        // During loading states sections are display:none so offsetTop collapses
-        // to 0 for all — skip scroll tracking to avoid corrupting the nav.
-        if (document.documentElement.classList.contains("generating-material") ||
-            document.documentElement.classList.contains("recreating")) return;
+        if (document.documentElement.classList.contains("recreating")) return;
+        const isGenerating = document.documentElement.classList.contains("generating-material");
         const scrollTop = pageAreaEl.scrollTop;
+        // During generation, ignore scrollend if the user is near the loading card
+        // (that position corresponds to the loading material, not a real nav section).
+        if (isGenerating) {
+          const loadingCard = document.getElementById("newMaterialLoading");
+          if (loadingCard && scrollTop >= loadingCard.offsetTop - 120) return;
+          userNavigatedDuringLoad = true;
+        }
         let active = sectionOrder[0];
         for (const s of sectionOrder) {
           const el = document.getElementById(s.id);
           if (!el) continue;
-          // Skip sections that haven't been revealed yet — display:none gives
-          // offsetTop===0, which would falsely win the active-section check.
-          const isVisible = s.id === "section-miniLesson" || el.classList.contains("visible");
+          const isVisible = (s.id === "section-miniLesson" || el.classList.contains("visible")) && el.offsetHeight > 0;
           if (isVisible && el.offsetTop <= scrollTop + 80) active = s;
         }
-        // Always sync ml-active from scroll position so scrolling back to Mini
-        // Lesson restores its highlight even if state.currentView didn't change.
         const mlEl = document.getElementById("navMiniLesson");
         if (active.material === "miniLesson") {
           mlEl?.classList.add("ml-active");
