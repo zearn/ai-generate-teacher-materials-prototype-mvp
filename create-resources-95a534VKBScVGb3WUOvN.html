@@ -164,34 +164,55 @@
     background: var(--white);
     border-radius: 4px;
     box-shadow: var(--card-dropshadow);
-    padding: 16px 12px 8px;
+    padding: 16px 7px 8px;
     flex: none;
     display: flex; flex-direction: column; align-items: flex-start;
     overflow: hidden;
+    position: relative;
+  }
+  .nav-slider {
+    position: absolute;
+    left: 7px; right: 7px;
+    background: var(--purple-bg);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.15s ease;
   }
   .sidenav-active {
     width: 100%;
-    background: var(--purple-bg);
-    border-left: 4px solid var(--fuchsia);
-    padding: 12px 16px;
+    border-left: 4px solid transparent;
+    padding: 12px 12px;
     display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    position: relative; z-index: 1;
+    transition: border-left-color 0.2s ease;
+  }
+  .sidenav-active.ml-active {
+    border-left-color: var(--fuchsia);
   }
   .sidenav-active .label {
-    font-size: 18px; font-weight: 600; line-height: 24px; color: #000;
+    font-size: 18px; font-weight: 400; line-height: 24px; color: #000;
     white-space: nowrap;
+    transition: font-weight 0s;
   }
+  .sidenav-active.ml-active .label { font-weight: 600; }
   .subnav-item {
-    padding-left: 16px;
     width: 100%;
     display: flex; flex-direction: column; justify-content: center;
     box-sizing: border-box;
+    position: relative; z-index: 1;
+  }
+  .subnav-item {
+    background-image: linear-gradient(to right, transparent 8px, var(--gray-15) 8px);
+    background-size: 100% 1px;
+    background-position: 0 bottom;
+    background-repeat: no-repeat;
   }
   .subnav-item .content {
-    border-bottom: 1px solid var(--gray-15);
     display: flex; align-items: center; justify-content: space-between;
-    /* No right padding — the sparkle button is flush-right with the gray stroke
-       below it (the stroke runs the full width of .content). */
-    padding: 12px 0 12px 16px;
+    padding: 12px 0 12px 28px;
     width: 100%;
     box-sizing: border-box;
   }
@@ -235,8 +256,9 @@
      section-level active state). Doesn't span the full row height.
      Mini Lesson keeps its own full-height active treatment; the subnav
      fuchsia bar only marks which generated material is currently being shown. */
-  .subnav-item { position: relative; }
-  .subnav-item.current::before {
+  .subnav-item { position: relative; transition: background 0.2s ease; }
+  /* Always-present indicator bar; fades in when current or pending. */
+  .subnav-item::before {
     content: "";
     position: absolute;
     left: 16px;
@@ -245,30 +267,25 @@
     width: 4px;
     height: 24px;
     background: var(--fuchsia);
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
-  /* When a subnav item is the currently-viewed material, its label goes
-     SemiBold to match the section-level Mini Lesson active treatment. */
-  .subnav-item.current .text { font-weight: 600; }
-  /* nav-pending: same fuchsia bar + bold treatment for an ungenerated item
-     that the user clicked to scroll to CTAs. Managed via direct classList
-     manipulation rather than syncSidenavAndCtas so it tracks each click
-     independently of state.currentView. */
-  .subnav-item.nav-pending::before {
-    content: "";
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 24px;
-    background: var(--fuchsia);
-  }
+  .subnav-item.current::before,
+  .subnav-item.nav-pending::before { opacity: 1; }
+  /* backgrounds handled by .nav-slider */
+  .subnav-item.current .text,
   .subnav-item.nav-pending .text { font-weight: 600; }
   /* All subnav items are clickable (generated → scroll to section; ungenerated → scroll to CTAs). */
   .subnav-item { cursor: pointer; }
-  .subnav-item:hover { background: var(--purple-bg); }
+  .subnav-item::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 8px; right: 0;
+    background: var(--purple-bg); opacity: 0; pointer-events: none; z-index: -1;
+    transition: opacity 0.15s ease;
+  }
+  .subnav-item:hover::after { opacity: 1; }
   /* Mini Lesson is always clickable (loads Mini Lesson A.pdf back). */
   .sidenav-active { cursor: pointer; }
+  .sidenav-active:hover { background: var(--purple-bg); }
 
   .coming-soon {
     width: 100%;
@@ -1024,7 +1041,8 @@
         <div class="skel-bar"></div>
       </div>
 
-      <div class="sidenav-active" id="navMiniLesson"><span class="label">Mini Lesson</span></div>
+      <div class="nav-slider" id="navSlider" aria-hidden="true"></div>
+      <div class="sidenav-active ml-active" id="navMiniLesson"><span class="label">Mini Lesson</span></div>
       <div class="subnav-item" id="navStudentMaterials" data-material="worksheet">
         <div class="content">
           <span class="text">Student Materials</span>
@@ -1358,6 +1376,7 @@
     // Mini Lesson is "generated" as soon as the initial PDF finishes loading.
     state.generatedAt.miniLesson = formatNow();
     setTimestamp(state.generatedAt.miniLesson);
+    updateNavSlider();
   }, 9000);
 
   // ---- Compute the download PDF path based on which materials have been generated ----
@@ -1368,9 +1387,9 @@
     const hasSampleScript = state.generated.sampleScript;
     let folder;
     if (hasWorksheet && hasSampleScript) {
-      folder = "pdf_mini_lesson_worksheet_sample_script";
+      folder = "pdf_mini_lesson_student_materials_sample_script";
     } else if (hasWorksheet) {
-      folder = "pdf_mini_lesson_worksheet";
+      folder = "pdf_mini_lesson_student_materials";
     } else if (hasSampleScript) {
       folder = "pdf_mini_lesson_sample_script";
     } else {
@@ -1454,9 +1473,9 @@
   // started on (or the last one they recreated to).
   // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
   const WORKSHEET_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G3M3L7.webp" },
-    G4M5L6:  { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G4M5L6.webp" },
-    G8M2L10: { webp: "assets/targeted_materials/preview/worksheet/webp/worksheet_G8M2L10.webp" },
+    G3M3L7:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G3M3L7@2x.webp" },
+    G4M5L6:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G4M5L6@2x.webp" },
+    G8M2L10: { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G8M2L10@2x.webp" },
   };
   const matchedWorksheet = lessonKey ? WORKSHEET_VARIANTS[lessonKey] : null;
   if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
@@ -1517,10 +1536,33 @@
     clearTimeout(ctasDelayTimer);
     document.documentElement.classList.remove("ctas-visible");
   }
+  function showCtasNow() {
+    clearTimeout(ctasDelayTimer);
+    document.documentElement.classList.add("ctas-visible");
+    adjustPageAreaHeight();
+  }
 
   // Apply state → DOM: subnav "current" indicator, generated/clickable class,
   // CTA visibility. Mini Lesson keeps its own active treatment regardless.
+  function updateNavSlider() {
+    const slider = document.getElementById("navSlider");
+    const sidenav = document.querySelector(".sidenav");
+    if (!slider || !sidenav) return;
+    const mlEl = document.getElementById("navMiniLesson");
+    const activeEl = mlEl?.classList.contains("ml-active")
+      ? mlEl
+      : sidenav.querySelector(".subnav-item.current, .subnav-item.nav-pending");
+    if (!activeEl) { slider.style.opacity = "0"; return; }
+    const isSubnav = activeEl.classList.contains("subnav-item");
+    slider.style.left   = isSubnav ? "15px" : "7px";
+    slider.style.opacity = "1";
+    slider.style.top    = activeEl.offsetTop + "px";
+    slider.style.height = activeEl.offsetHeight + "px";
+  }
+
   function syncSidenavAndCtas() {
+    document.getElementById("navMiniLesson")
+      ?.classList.toggle("ml-active", state.currentView === "miniLesson");
     const subItems = document.querySelectorAll(".subnav-item[data-material]");
     subItems.forEach(el => {
       const mat = el.dataset.material;
@@ -1537,6 +1579,7 @@
       .filter(mat => !(mat === "sampleScript" && !matchedSampleScript));
     const allGenerated = availableMaterials.every(mat => state.generated[mat]);
     document.getElementById("pdfCtas")?.classList.toggle("is-empty", allGenerated);
+    updateNavSlider();
   }
 
   // Section id lookup used for scrolling and scroll-tracking.
@@ -1585,8 +1628,12 @@
       const loadingMaterial = material || state.currentView;
       if (loadingMaterial === "worksheet") {
         document.getElementById("navStudentMaterials")?.classList.add("nav-pending");
+        document.getElementById("navMiniLesson")?.classList.remove("ml-active");
+        updateNavSlider();
       } else if (loadingMaterial === "sampleScript") {
         document.getElementById("navSampleScript")?.classList.add("nav-pending");
+        document.getElementById("navMiniLesson")?.classList.remove("ml-active");
+        updateNavSlider();
       }
       // Mini Lesson recreate uses the full-screen overlay with the Recreate bar
       // hidden. SM/SS (first-time or recreate) uses generating-material which
@@ -1721,7 +1768,14 @@
 
     // Sidenav navigation: smooth-scroll to the section. Mini Lesson is always
     // available. Other sections only navigate once generated.
+    // Cancel any in-progress smooth scroll so its events don't override
+    // the nav state set by the click that follows.
+    function cancelScroll() {
+      const pa = document.querySelector(".page-area");
+      if (pa) pa.scrollTo({ top: pa.scrollTop, behavior: "instant" });
+    }
     function navScrollTo(material) {
+      cancelScroll();
       clearNavPending();
       state.currentView = material;
       syncSidenavAndCtas();
@@ -1733,23 +1787,42 @@
     document.getElementById("navStudentMaterials")?.addEventListener("click", () => {
       if (state.generated.worksheet) navScrollTo("worksheet");
       else {
+        cancelScroll();
         clearNavPending();
         document.getElementById("navStudentMaterials")?.classList.add("nav-pending");
-        scrollToPdfCtas();
+        document.getElementById("navMiniLesson")?.classList.remove("ml-active");
+        updateNavSlider();
+        showCtasNow();
+        scrollToCtas_suppressed();
         flashCtaHighlight("worksheet");
       }
     });
     document.getElementById("navSampleScript")?.addEventListener("click", () => {
       if (state.generated.sampleScript) navScrollTo("sampleScript");
       else {
+        cancelScroll();
         clearNavPending();
         document.getElementById("navSampleScript")?.classList.add("nav-pending");
-        scrollToPdfCtas();
+        document.getElementById("navMiniLesson")?.classList.remove("ml-active");
+        updateNavSlider();
+        showCtasNow();
+        scrollToCtas_suppressed();
         flashCtaHighlight("sampleScript");
       }
     });
 
     // Keep nav highlight in sync as the user scrolls within the page-area.
+    // suppressScrollNav is set while a programmatic CTA scroll runs so it
+    // doesn't overwrite the nav state set by the triggering click.
+    let suppressScrollNav = false;
+    function scrollToCtas_suppressed() {
+      suppressScrollNav = true;
+      const pa = document.querySelector(".page-area");
+      const onEnd = () => { suppressScrollNav = false; };
+      pa?.addEventListener("scrollend", onEnd, { once: true });
+      setTimeout(onEnd, 1200); // fallback if scrollend never fires
+      scrollToPdfCtas();
+    }
     const pageAreaEl = document.querySelector(".page-area");
     if (pageAreaEl) {
       const sectionOrder = [
@@ -1758,6 +1831,7 @@
         { id: "section-sampleScript", material: "sampleScript" },
       ];
       pageAreaEl.addEventListener("scroll", () => {
+        if (suppressScrollNav) return;
         // During loading states sections are display:none so offsetTop collapses
         // to 0 for all — skip scroll tracking to avoid corrupting the nav.
         if (document.documentElement.classList.contains("generating-material") ||
@@ -1772,8 +1846,17 @@
           const isVisible = s.id === "section-miniLesson" || el.classList.contains("visible");
           if (isVisible && el.offsetTop <= scrollTop + 80) active = s;
         }
-        if (active.material !== state.currentView) {
+        // Always sync ml-active from scroll position so scrolling back to Mini
+        // Lesson restores its highlight even if state.currentView didn't change.
+        const mlEl = document.getElementById("navMiniLesson");
+        if (active.material === "miniLesson") {
+          mlEl?.classList.add("ml-active");
           clearNavPending();
+        } else {
+          mlEl?.classList.remove("ml-active");
+        }
+        updateNavSlider();
+        if (active.material !== state.currentView) {
           state.currentView = active.material;
           syncSidenavAndCtas();
           setTimestamp(state.generatedAt[active.material]);
