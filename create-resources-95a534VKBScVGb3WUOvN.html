@@ -184,6 +184,7 @@
   .sidenav-active {
     width: 100%;
     border-left: 4px solid transparent;
+    border-bottom: 1px solid var(--gray-15);
     padding: 12px 12px;
     display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
     position: relative; z-index: 1;
@@ -204,13 +205,8 @@
     box-sizing: border-box;
     position: relative; z-index: 1;
   }
-  .subnav-item {
-    background-image: linear-gradient(to right, transparent 8px, var(--gray-15) 8px);
-    background-size: 100% 1px;
-    background-position: 0 bottom;
-    background-repeat: no-repeat;
-  }
   .subnav-item .content {
+    border-bottom: 1px solid var(--gray-15);
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 0 12px 28px;
     width: 100%;
@@ -278,7 +274,7 @@
   /* All subnav items are clickable (generated → scroll to section; ungenerated → scroll to CTAs). */
   .subnav-item { cursor: pointer; }
   .subnav-item::after {
-    content: ""; position: absolute; top: 0; bottom: 0; left: 8px; right: 0;
+    content: ""; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
     background: var(--purple-bg); opacity: 0; pointer-events: none; z-index: -1;
     transition: opacity 0.15s ease;
   }
@@ -1553,8 +1549,7 @@
       ? mlEl
       : sidenav.querySelector(".subnav-item.current, .subnav-item.nav-pending");
     if (!activeEl) { slider.style.opacity = "0"; return; }
-    const isSubnav = activeEl.classList.contains("subnav-item");
-    slider.style.left   = isSubnav ? "15px" : "7px";
+    slider.style.left   = "7px";
     slider.style.opacity = "1";
     slider.style.top    = activeEl.offsetTop + "px";
     slider.style.height = activeEl.offsetHeight + "px";
