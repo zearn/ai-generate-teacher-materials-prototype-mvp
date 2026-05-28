@@ -588,7 +588,7 @@
   .byg-modal-card .buttons {
     border-top: 1px solid #c7c7c7;     /* gray/30 */
     padding: 32px 0;
-    display: flex; gap: 24px; align-items: center; justify-content: center;
+    display: flex; gap: 16px; align-items: center; justify-content: center;
     width: 100%;
   }
   .byg-btn-primary {
@@ -701,7 +701,7 @@
   .ays-modal-card .buttons {
     border-top: 1px solid #c7c7c7;
     padding: 32px 0;
-    display: flex; gap: 24px; align-items: center; justify-content: center;
+    display: flex; gap: 16px; align-items: center; justify-content: center;
     width: 100%;
   }
   .ays-btn-secondary {
@@ -1475,11 +1475,11 @@
   // started on (or the last one they recreated to).
   // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
   const WORKSHEET_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G3M3L7@2x.webp" },
     G4M5L6:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G4M5L6@2x.webp" },
+    G5M6L19: { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G5M6L19@2x.webp" },
     G8M2L10: { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G8M2L10@2x.webp" },
   };
-  const matchedWorksheet = lessonKey ? WORKSHEET_VARIANTS[lessonKey] : null;
+  const matchedWorksheet = WORKSHEET_VARIANTS[lessonKey || currentVariant.key] ?? null;
   if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
 
   // Sample Script variants keyed by lesson key.
@@ -1489,7 +1489,7 @@
     G5M6L19: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G5M6L19.webp" },
     G8M2L10: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G8M2L10.webp" },
   };
-  const matchedSampleScript = lessonKey ? SAMPLE_SCRIPT_VARIANTS[lessonKey] : null;
+  const matchedSampleScript = SAMPLE_SCRIPT_VARIANTS[lessonKey || currentVariant.key] ?? null;
 
   // Placeholder WebP for materials that don't yet have their own image.
   const PLACEHOLDER_WEBP = currentVariant.webp;
