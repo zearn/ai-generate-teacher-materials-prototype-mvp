@@ -848,7 +848,25 @@
   .loaded .sidenav > .coming-soon { display: flex; }
   .loaded .main-col > .button-group { display: block; z-index: 1000;}
   .loaded #section-miniLesson { display: block; }
-  /* Generated sections are revealed by JS adding .visible */
+  /* Worksheet / Sample Script sections are ALWAYS visible in the loaded
+     state — each acts as a "slot" that holds either the CTA card (before
+     generation) or the generated preview (after). This is what keeps a
+     yet-to-be-created material's CTA in its proper position in the stack
+     rather than at the bottom of the page. */
+  .loaded #section-worksheet,
+  .loaded #section-sampleScript { display: block; }
+  /* Inside worksheet / sample-script sections: by default show the CTA
+     card, hide the preview img. After generation (.visible added to the
+     section) we flip — preview shown, CTA hidden. */
+  #section-worksheet > .lesson-preview,
+  #section-sampleScript > .lesson-preview { display: none; }
+  #section-worksheet.visible > .lesson-preview,
+  #section-sampleScript.visible > .lesson-preview { display: block; }
+  /* Give the CTA card 36px breathing room inside its section. */
+  .material-section > .pdf-cta { margin: 36px; }
+  .material-section.visible > .pdf-cta { display: none; }
+  /* Legacy: keep .visible as a "show entire section" toggle for code paths
+     that still reference it as a generic flag. */
   .material-section.visible { display: block; }
   /* In loaded state individual sections carry their own shadows; remove the
      container shadow. Add 6px bottom padding so the last section's bottom
@@ -873,18 +891,30 @@
      reappears in sync with the new PDF when loading finishes. */
   html.recreating .main-col > .button-group { display: none; }
 
-  /* SM / SS generation: only hide the specific section being generated so
-     other sections (Mini Lesson, already-generated SS/SM) stay scrollable.
-     An inline loading card replaces the hidden section at the bottom. */
-  html.loading-worksheet #section-worksheet { display: none !important; }
-  html.loading-samplescript #section-sampleScript { display: none !important; }
-  html.generating-material .new-material-loading { display: flex; }
-  html.generating-material .pdf-ctas { display: none !important; }
+  /* SM / SS generation: keep the section being generated VISIBLE so its
+     position in the stack stays put. Hide just the section's own children
+     (CTA + preview) — the loading card is moved INTO the section by JS so
+     it visually replaces them in place. */
+  html.loading-worksheet #section-worksheet > .lesson-preview,
+  html.loading-worksheet #section-worksheet > .pdf-cta { display: none !important; }
+  html.loading-samplescript #section-sampleScript > .lesson-preview,
+  html.loading-samplescript #section-sampleScript > .pdf-cta { display: none !important; }
+  /* The .new-material-loading card always shows when it's a child of a
+     material-section. (Outside a section it stays display:none.) */
+  .material-section > .new-material-loading { display: flex; }
+  /* When nested inside a section the loader sheds its own white-card chrome —
+     the section already provides the background + drop-shadow. */
+  .material-section > .new-material-loading {
+    background: transparent;
+    box-shadow: none;
+    width: 100%;
+  }
 
-  /* First-time generation: loading card is a normal flex item at the same
-     position the new section will occupy — no overlay, no repositioning needed. */
-  html.generating-new .new-material-loading { display: flex; }
-  html.generating-new .pdf-ctas { display: none !important; }
+  /* NOTE: we don't hide all .pdf-cta during generation any more. The section
+     being generated is already hidden by the `html.loading-worksheet` /
+     `html.loading-samplescript` rules above (which hide its containing
+     section), and the OTHER material's CTA must stay visible so the user
+     can still kick off that one. */
 
   /* The inline loading card (first-time generation of a new material).
      Matches .loading-content layout exactly: column flex, top-padded, centered horizontally. */
@@ -900,30 +930,15 @@
     box-sizing: border-box;
   }
 
-  /* ===== End-of-PDF CTAs (Figma node 17753:1199) =====
-     Render below the PDF stack inside the page-area's scroll. The user reaches
-     them naturally by scrolling past the PDF content. */
-  .pdf-ctas {
-    display: none;        /* hidden until .loaded */
-    flex-direction: column;
-    gap: 8px;
-    padding: 36px;        /* even 36px gutter on all four sides */
-    background: var(--white);
-    width: 792px;
-    box-sizing: border-box;
-  }
-  /* CTAs are revealed via `html.ctas-visible`, which JS adds 1.5s after each
-     render finishes — this prevents the footer from popping in before the
-     PDF is actually drawn. The :not(.recreating) part hides them again the
-     moment a new generation/recreate flow starts. */
-  html.ctas-visible:not(.recreating) .pdf-ctas { display: flex; }
-  /* Once a material has been generated, hide its CTA permanently (until
-     a page reload resets state). The matching subnav item is now the way
-     to navigate back to that material. */
+  /* ===== Material CTAs =====
+     Each CTA card lives inside the material-section it represents (worksheet
+     CTA inside #section-worksheet, sample-script CTA inside #section-sampleScript).
+     The section's slot logic above swaps between CTA and preview based on
+     `.visible`. Section-level display rules (`.loaded #section-...`,
+     `html.loading-... #section-...`, `html.recreating .material-section`)
+     already control when the CTA is on screen, so the CTA itself only needs
+     the .is-generated hide rule below. */
   .pdf-cta.is-generated { display: none; }
-  /* When *every* CTA is generated, the footer container itself becomes an
-     empty white box — hide the whole thing so the PDF ends cleanly. */
-  .pdf-ctas.is-empty { display: none !important; }
   .pdf-cta {
     background: #faf1ff;       /* purple/5 */
     border: 1px solid #f1d9fe; /* purple/15 */
@@ -1094,27 +1109,6 @@
         </div>
         <div class="material-section" id="section-worksheet">
           <img class="lesson-preview" id="lessonPreviewWorksheet" alt="Worksheet preview" />
-        </div>
-        <div class="material-section" id="section-sampleScript">
-          <img class="lesson-preview" id="lessonPreviewSampleScript" alt="Sample Script preview" />
-        </div>
-
-        <!-- Inline loading card for first-time generation of a new material.
-             Sits below all material sections; hidden until html.generating-new. -->
-        <div class="new-material-loading" id="newMaterialLoading" aria-live="polite">
-          <p class="loading-message"></p>
-          <div class="sparkle-anim" aria-hidden="true">
-            <svg width="130.447" height="163.54" viewBox="0 0 130.447 163.54" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-              <path class="sparkle-1" d="M18.0586 77.7495C16.8577 78.9079 16.4591 80.659 17.0089 82.2164C17.5587 83.7739 18.9683 84.8866 20.6304 85.0344C20.6304 85.0344 42.3406 82.5046 54.2202 88.1777C66.0998 93.8508 77.7539 112.358 77.7539 112.358C78.9463 113.576 80.697 113.975 82.2541 113.425C83.8111 112.876 84.9234 111.466 85.0708 109.804C85.0708 109.804 82.5229 88.0814 88.2081 76.2075C93.8932 64.3337 112.38 52.6731 112.38 52.6731C113.581 51.5146 113.98 49.7636 113.43 48.2061C112.88 46.6486 111.47 45.5359 109.808 45.3882C109.808 45.3882 88.0981 47.9179 76.2185 42.2448C64.3389 36.5717 52.6849 18.064 52.6849 18.064C51.5264 16.8627 49.7757 16.4637 48.2186 17.0134C46.6616 17.5631 45.5493 18.9727 45.4018 20.6351C45.4018 20.6351 47.9498 42.3574 42.2646 54.2312C36.5795 66.105 18.0926 77.7657 18.0926 77.7657L18.0586 77.7495Z" />
-              <path class="sparkle-2" d="M55.8561 122.284C55.8139 121.66 55.408 121.123 54.8285 120.904C54.2489 120.686 53.5893 120.821 53.1454 121.262C53.1454 121.262 48.6262 128.1 44.1292 130.137C39.6322 132.174 31.5085 131.045 31.5085 131.045C30.8712 131.093 30.3338 131.499 30.1153 132.078C29.8968 132.657 30.0324 133.317 30.4736 133.761C30.4736 133.761 37.3194 138.278 39.3516 142.777C41.3838 147.276 40.2623 155.395 40.2623 155.395C40.3044 156.02 40.7103 156.557 41.2899 156.776C41.8694 156.994 42.5291 156.859 42.973 156.418C42.973 156.418 47.4922 149.58 51.9892 147.543C56.4862 145.506 64.6099 146.635 64.6099 146.635C65.2343 146.593 65.7717 146.187 65.9902 145.607C66.2087 145.028 66.0731 144.368 65.6319 143.925C65.6319 143.925 58.786 139.408 56.7538 134.909C54.7216 130.409 55.8432 122.29 55.8432 122.29L55.8561 122.284Z" />
-              <path class="sparkle-3" d="M113.195 115.97C113.181 115.658 112.984 115.385 112.696 115.269C112.409 115.154 112.078 115.215 111.851 115.43C111.851 115.43 109.519 118.8 107.249 119.77C104.979 120.74 100.93 120.089 100.93 120.089C100.611 120.106 100.338 120.303 100.223 120.59C100.107 120.878 100.168 121.209 100.384 121.435C100.384 121.435 103.758 123.767 104.725 126.037C105.693 128.308 105.046 132.355 105.046 132.355C105.06 132.668 105.257 132.94 105.544 133.056C105.832 133.171 106.163 133.111 106.39 132.895C106.39 132.895 108.722 129.525 110.992 128.555C113.262 127.585 117.31 128.236 117.31 128.236C117.623 128.222 117.896 128.025 118.011 127.738C118.127 127.45 118.066 127.119 117.85 126.893C117.85 126.893 114.477 124.561 113.509 122.291C112.541 120.02 113.189 115.973 113.189 115.973L113.195 115.97Z" />
-            </svg>
-          </div>
-        </div>
-
-        <!-- End-of-PDF CTAs: rendered below the PDF inside the same scroll
-             container so the user reaches them by scrolling past the PDF. -->
-        <div class="pdf-ctas" id="pdfCtas" aria-label="Generate additional materials">
           <div class="pdf-cta" data-material="worksheet">
             <div class="pdf-cta-frame">
               <div class="pdf-cta-content">
@@ -1132,7 +1126,9 @@
               </button>
             </div>
           </div>
-
+        </div>
+        <div class="material-section" id="section-sampleScript">
+          <img class="lesson-preview" id="lessonPreviewSampleScript" alt="Sample Script preview" />
           <div class="pdf-cta" data-material="sampleScript">
             <div class="pdf-cta-frame">
               <div class="pdf-cta-content">
@@ -1151,6 +1147,20 @@
             </div>
           </div>
         </div>
+
+        <!-- Inline loading card for first-time generation of a new material.
+             Sits below all material sections; hidden until html.generating-new. -->
+        <div class="new-material-loading" id="newMaterialLoading" aria-live="polite">
+          <p class="loading-message"></p>
+          <div class="sparkle-anim" aria-hidden="true">
+            <svg width="130.447" height="163.54" viewBox="0 0 130.447 163.54" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <path class="sparkle-1" d="M18.0586 77.7495C16.8577 78.9079 16.4591 80.659 17.0089 82.2164C17.5587 83.7739 18.9683 84.8866 20.6304 85.0344C20.6304 85.0344 42.3406 82.5046 54.2202 88.1777C66.0998 93.8508 77.7539 112.358 77.7539 112.358C78.9463 113.576 80.697 113.975 82.2541 113.425C83.8111 112.876 84.9234 111.466 85.0708 109.804C85.0708 109.804 82.5229 88.0814 88.2081 76.2075C93.8932 64.3337 112.38 52.6731 112.38 52.6731C113.581 51.5146 113.98 49.7636 113.43 48.2061C112.88 46.6486 111.47 45.5359 109.808 45.3882C109.808 45.3882 88.0981 47.9179 76.2185 42.2448C64.3389 36.5717 52.6849 18.064 52.6849 18.064C51.5264 16.8627 49.7757 16.4637 48.2186 17.0134C46.6616 17.5631 45.5493 18.9727 45.4018 20.6351C45.4018 20.6351 47.9498 42.3574 42.2646 54.2312C36.5795 66.105 18.0926 77.7657 18.0926 77.7657L18.0586 77.7495Z" />
+              <path class="sparkle-2" d="M55.8561 122.284C55.8139 121.66 55.408 121.123 54.8285 120.904C54.2489 120.686 53.5893 120.821 53.1454 121.262C53.1454 121.262 48.6262 128.1 44.1292 130.137C39.6322 132.174 31.5085 131.045 31.5085 131.045C30.8712 131.093 30.3338 131.499 30.1153 132.078C29.8968 132.657 30.0324 133.317 30.4736 133.761C30.4736 133.761 37.3194 138.278 39.3516 142.777C41.3838 147.276 40.2623 155.395 40.2623 155.395C40.3044 156.02 40.7103 156.557 41.2899 156.776C41.8694 156.994 42.5291 156.859 42.973 156.418C42.973 156.418 47.4922 149.58 51.9892 147.543C56.4862 145.506 64.6099 146.635 64.6099 146.635C65.2343 146.593 65.7717 146.187 65.9902 145.607C66.2087 145.028 66.0731 144.368 65.6319 143.925C65.6319 143.925 58.786 139.408 56.7538 134.909C54.7216 130.409 55.8432 122.29 55.8432 122.29L55.8561 122.284Z" />
+              <path class="sparkle-3" d="M113.195 115.97C113.181 115.658 112.984 115.385 112.696 115.269C112.409 115.154 112.078 115.215 111.851 115.43C111.851 115.43 109.519 118.8 107.249 119.77C104.979 120.74 100.93 120.089 100.93 120.089C100.611 120.106 100.338 120.303 100.223 120.59C100.107 120.878 100.168 121.209 100.384 121.435C100.384 121.435 103.758 123.767 104.725 126.037C105.693 128.308 105.046 132.355 105.046 132.355C105.06 132.668 105.257 132.94 105.544 133.056C105.832 133.171 106.163 133.111 106.39 132.895C106.39 132.895 108.722 129.525 110.992 128.555C113.262 127.585 117.31 128.236 117.31 128.236C117.623 128.222 117.896 128.025 118.011 127.738C118.127 127.45 118.066 127.119 117.85 126.893C117.85 126.893 114.477 124.561 113.509 122.291C112.541 120.02 113.189 115.973 113.189 115.973L113.195 115.97Z" />
+            </svg>
+          </div>
+        </div>
+
       </section>
     </div>
 
@@ -1222,26 +1232,18 @@
     if (webpUrl) img.src = webpUrl;
   }
 
-  // ---- Move pdf-ctas to the bottom of the last visible section ----
-  function movePdfCtas() {
-    const ctas = document.getElementById("pdfCtas");
-    if (!ctas) return;
-    const order = ["section-sampleScript", "section-worksheet", "section-miniLesson"];
-    for (const id of order) {
-      const el = document.getElementById(id);
-      if (el && (id === "section-miniLesson" || el.classList.contains("visible"))) {
-        if (ctas.parentElement !== el) el.appendChild(ctas);
-        break;
-      }
-    }
-  }
-
-  // ---- Scroll the page-area to show the pdf-ctas ----
-  function scrollToPdfCtas() {
+  // Legacy no-ops kept so existing call sites don't error. Each CTA now
+  // lives inside its own material-section, so there is nothing to move.
+  function movePdfCtas() { /* obsolete: CTAs are now per-section */ }
+  // Scroll the page-area to a specific material's CTA (in its section).
+  function scrollToPdfCtas(material) {
     const pageArea = document.querySelector(".page-area");
-    const ctas     = document.getElementById("pdfCtas");
-    if (!pageArea || !ctas) return;
-    pageArea.scrollTo({ top: ctas.offsetTop, behavior: "smooth" });
+    const sel = material
+      ? `.pdf-cta[data-material="${material}"]`
+      : ".pdf-cta:not(.is-generated)";
+    const ctaEl = document.querySelector(sel);
+    if (!pageArea || !ctaEl) return;
+    pageArea.scrollTo({ top: ctaEl.offsetTop, behavior: "smooth" });
   }
 
   // ---- Flash a fuchsia highlight border on the CTA card for the given material ----
@@ -1575,12 +1577,9 @@
       const mat = cta.dataset.material;
       cta.classList.toggle("is-generated", !!state.generated[mat]);
     });
-    // Collapse the footer when every *available* CTA has been generated.
-    const availableMaterials = Object.keys(state.generated)
-      .filter(mat => !(mat === "worksheet"   && !matchedWorksheet))
-      .filter(mat => !(mat === "sampleScript" && !matchedSampleScript));
-    const allGenerated = availableMaterials.every(mat => state.generated[mat]);
-    document.getElementById("pdfCtas")?.classList.toggle("is-empty", allGenerated);
+    // Each CTA lives inside its own section now and is hidden via
+    // .pdf-cta.is-generated once its material exists, so there's no
+    // wrapper-level "all generated → collapse" pass needed anymore.
     updateNavSlider();
   }
 
@@ -1600,9 +1599,6 @@
 
   // ---- Before You Go + Are You Sure (Recreate) modals ----
   document.addEventListener("DOMContentLoaded", () => {
-    // Attach pdf-ctas to the mini lesson section immediately (it starts outside sections in HTML).
-    movePdfCtas();
-
     const byg = wireModal("#bygModal");
     const ays = wireModal("#aysModal");
     const backLink = document.querySelector("a.back-btn");
@@ -1651,13 +1647,20 @@
         html.classList.add("generating-material");
         userNavigatedDuringLoad = false;
         loadingMaterialInProgress = loadingMaterial;
-        // Scroll to the inline loading card so the user sees the animation start.
+        // Move the loading card INTO the section being generated so the
+        // loading animation occupies the same slot the finished material
+        // will appear in — never at the bottom of the iframe.
+        const targetSection = document.getElementById(
+          loadingMaterial === "worksheet" ? "section-worksheet" : "section-sampleScript"
+        );
+        const loadingCard = document.getElementById("newMaterialLoading");
+        if (targetSection && loadingCard) targetSection.appendChild(loadingCard);
+        // Scroll to the section so the user sees the animation start.
         suppressScrollNav = true;
         requestAnimationFrame(() => {
-          const loadingCard = document.getElementById("newMaterialLoading");
           const pa = document.querySelector(".page-area");
-          if (loadingCard && pa) {
-            pa.scrollTo({ top: loadingCard.offsetTop, behavior: "smooth" });
+          if (targetSection && pa) {
+            pa.scrollTo({ top: targetSection.offsetTop, behavior: "smooth" });
             pa.addEventListener("scrollend", () => { suppressScrollNav = false; }, { once: true });
             setTimeout(() => { suppressScrollNav = false; }, 1200);
           } else {
@@ -1672,6 +1675,13 @@
         document.documentElement.classList.remove("generating-material");
         document.documentElement.classList.remove("loading-worksheet");
         document.documentElement.classList.remove("loading-samplescript");
+        // Return the loading card to its original spot inside .page-area so
+        // future generations can move it again into the right section.
+        const loadingCard = document.getElementById("newMaterialLoading");
+        const paForLoaderReturn = document.querySelector(".page-area");
+        if (loadingCard && paForLoaderReturn && loadingCard.parentElement !== paForLoaderReturn) {
+          paForLoaderReturn.appendChild(loadingCard);
+        }
         loadingMaterialInProgress = null;
         const navigatedAway = userNavigatedDuringLoad;
         userNavigatedDuringLoad = false;
