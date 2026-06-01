@@ -1187,10 +1187,10 @@
   // Available Mini Lesson variants — each pairs a WebP preview image with its lesson key.
   // Key format matches the filename suffix: G{grade}M{mission}L{lesson}.
   const MINI_LESSON_VARIANTS = [
-    { key: "G3M3L7",  webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G3M3L7.webp" },
-    { key: "G4M5L6",  webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G4M5L6.webp" },
-    { key: "G5M6L19", webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G5M6L19.webp" },
-    { key: "G8M2L10", webp: "assets/targeted_materials/preview/mini_lesson/webp/mini_lesson_G8M2L10.webp" },
+    { key: "G3M3L7",  webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G3M3L7.webp" },
+    { key: "G4M5L6",  webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G4M5L6.webp" },
+    { key: "G5M6L19", webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G5M6L19.webp" },
+    { key: "G8M2L10", webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G8M2L10.webp" },
   ];
 
   // Build "G{grade}M{mission}L{lesson}" from the URL's loc + lesson params.
@@ -1477,20 +1477,20 @@
   // started on (or the last one they recreated to).
   // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
   const WORKSHEET_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G3M3L7@2x.webp" },
-    G4M5L6:  { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G4M5L6@2x.webp" },
-    G5M6L19: { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G5M6L19@2x.webp" },
-    G8M2L10: { webp: "assets/targeted_materials/preview/student_materials/webp/student_materials_G8M2L10@2x.webp" },
+    G3M3L7:  { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G3M3L7@2x.webp" },
+    G4M5L6:  { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G4M5L6@2x.webp" },
+    G5M6L19: { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G5M6L19@2x.webp" },
+    G8M2L10: { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G8M2L10@2x.webp" },
   };
   const matchedWorksheet = WORKSHEET_VARIANTS[lessonKey || currentVariant.key] ?? null;
   if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
 
   // Sample Script variants keyed by lesson key.
   const SAMPLE_SCRIPT_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G3M3L7.webp" },
-    G4M5L6:  { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G4M5L6.webp" },
-    G5M6L19: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G5M6L19.webp" },
-    G8M2L10: { webp: "assets/targeted_materials/preview/sample_script/webp/sample_script_G8M2L10.webp" },
+    G3M3L7:  { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G3M3L7.webp" },
+    G4M5L6:  { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G4M5L6.webp" },
+    G5M6L19: { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G5M6L19.webp" },
+    G8M2L10: { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G8M2L10.webp" },
   };
   const matchedSampleScript = SAMPLE_SCRIPT_VARIANTS[lessonKey || currentVariant.key] ?? null;
 
