@@ -339,6 +339,10 @@
     display: inline-flex; align-items: center; justify-content: center;
     flex: none;
   }
+  /* MVP: download isn't wired up to anything meaningful yet — hide both
+     instances (top button-group + Before-You-Go modal). */
+  .btn-icon[aria-label="Download"],
+  #bygDownload { display: none !important; }
 
   /* ===== Shared secondary-button interaction states =====
      All aqua-outlined buttons (aqua border + aqua text/icon + white fill)
@@ -1740,9 +1744,31 @@
     }
 
     // What the AYS modal will recreate when the user clicks Confirm.
-    //   null → the currently-displayed PDF (top RECREATE behavior)
+    //   null → recreate the Mini Lesson (top RECREATE behavior — always Mini
+    //          Lesson, never any other material; worksheet + sample script
+    //          are cleared so the slots return to their CTA state)
     //   "worksheet" / "sampleScript" → that specific material (sparkle btn)
     let pendingMaterial = null;
+
+    // The top RECREATE button is hard-wired to the Mini Lesson: it forces
+    // us back to miniLesson view AND clears any previously-generated
+    // worksheet / sample script (they go back to a clean CTA slot).
+    function prepareTopRecreate() {
+      pendingMaterial = null;
+      state.currentView = "miniLesson";
+      state.generated.worksheet    = false;
+      state.generated.sampleScript = false;
+      // Remove .visible so the worksheet / sample-script sections fall back
+      // to showing their CTA card instead of the previously-generated preview.
+      document.getElementById("section-worksheet")?.classList.remove("visible");
+      document.getElementById("section-sampleScript")?.classList.remove("visible");
+      // Clear the preview <img> src so the old image doesn't linger.
+      const wsImg = document.getElementById("lessonPreviewWorksheet");
+      const ssImg = document.getElementById("lessonPreviewSampleScript");
+      if (wsImg) { wsImg.removeAttribute("src"); wsImg.classList.remove("img-loaded"); }
+      if (ssImg) { ssImg.removeAttribute("src"); ssImg.classList.remove("img-loaded"); }
+      syncSidenavAndCtas();
+    }
 
     if (ays) {
       // Clicking the "RECREATE" button in the top button-group opens the AYS
@@ -1750,7 +1776,7 @@
       // in which case we go straight to the recreate flow.
       const recreateBtn = document.querySelector(".btn-secondary");
       recreateBtn?.addEventListener("click", () => {
-        pendingMaterial = null;          // recreate current view
+        prepareTopRecreate();
         if (skipAysModal) triggerLoadingThenRender(null);
         else ays.open();
       });
@@ -1759,6 +1785,8 @@
 
       // "RECREATE" in the modal: respect the "Don't show this again" checkbox,
       // then close modal and run the recreate flow against pendingMaterial.
+      // (If pendingMaterial is null we're recreating the Mini Lesson — the
+      // wipe of the other materials has already happened in prepareTopRecreate.)
       document.getElementById("aysRecreate")?.addEventListener("click", () => {
         const dontShow = document.getElementById("aysDontShow");
         if (dontShow?.checked) skipAysModal = true;

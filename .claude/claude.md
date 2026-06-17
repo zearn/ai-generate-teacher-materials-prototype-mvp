@@ -1,7 +1,11 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Zearn Teacher Prototype — project instructions
 
 Read this at the start of every session. For full design specs see `design.md`.
-For where work was last left, see `summary.md`.
+`summary.md` is a historical handoff doc from an earlier session — it's not kept up to date; don't treat it as current status.
 
 ---
 
@@ -68,7 +72,9 @@ When the user does ask for a commit:
 | `create-resources-95a534VKBScVGb3WUOvN.html` | The AI Targeted Materials page (main work focus lately) |
 | `tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html` | The Tower Alerts source page (Create Resources link → modal → create-resources-95a534VKBScVGb3WUOvN.html) |
 | `assets/` | SVG icons, sparkles, design references. SVGs base64-inlined into HTML. |
-| `assets/pdf/` | Runtime PDFs loaded by PDF.js (Mini Lesson A.pdf, Worksheet A.pdf, Sample Script A.pdf, etc.) |
+| `assets/pdf/` | Legacy runtime PDFs (Mini Lesson A.pdf, Worksheet A.pdf, Sample Script A.pdf) + `mini_lessons/mini_lesson_{key}-compressed.pdf` per lesson key |
+| `assets/targeted_materials/preview/{mini_lesson,student_materials,sample_script}/{webp,png}/` | Preview images rendered at page load — filenames follow `{type}_{key}@2x.webp` (e.g. `mini_lesson_G5M6L19@2x.webp`) |
+| `assets/targeted_materials/download/pdf/` | Download PDFs — one per material per lesson key |
 | `.claude/launch.json` | Preview server config (Python http.server on port 8765) |
 | `.claude/settings.local.json` | Claude Code permissions / settings (local-only, gitignored) |
 
@@ -94,15 +100,25 @@ Always reference the CSS custom properties in each file's `:root`. Don't
 hard-code hex values inline. The key tokens:
 
 ```
---yellow:  #fad232    (active nav tab, yellow stripe)
---aqua:    #007694    (links, lessons, primary buttons; hover inverts to aqua fill + white text; --aqua-pressed #005c73 for :active)
---purple:  #7029a5    (alert card border, alert count, tower-circle, exclamation)
---purple-bg: #faf1ff  (active sidenav background, Mini Lesson highlight)
---fuchsia: #f182ea    (active sidenav left border, sparkles accent)
---charcoal:     #303b40    (primary text)
---gray-bg: #f6f6f6    (page background, filter container backgrounds)
---gray-30: #c7c7c7    (sub-nav border, modal divider)
---gray-15: #e1e1e1    (subnav item bottom border)
+--yellow:        #fad232    (active nav tab, yellow stripe)
+--aqua:          #007694    (links, lessons, primary buttons; hover inverts to aqua fill + white text)
+--aqua-pressed:  #005c73    (--aqua darkened 22%; :active press state)
+--purple:        #7029a5    (alert card border, alert count, tower-circle, BETA pill)
+--purple-bg:     #faf1ff    (active sidenav background, CTA card background)
+--fuchsia:       #f182ea    (active sidenav left border, sparkles accent)
+--fuchsia-spark: #ea74e3    (big sparkle icon fill)
+--charcoal:      #303b40    (primary text)
+--charcoal-2:    #435259    (breadcrumb text)
+--gray-bg:       #f6f6f6    (page background)
+--gray-10:       #ebebeb    (section header bands: PROBLEM / TEACHER GUIDANCE)
+--gray-15:       #e1e1e1    (subnav item bottom border, skeleton bars)
+--gray-30:       #c7c7c7    (sub-nav border, modal divider)
+--gray-40:       #b4b4b4    (Coming Soon disabled text, vertical bar indicator)
+--gray-60:       #8e8e8e    (Coming Soon label)
+--gray-65:       #838383    ("Generated …" timestamp)
+--gray-75:       #6e6e6e    (Problem Set label)
+--green:         #00875a    (completed alert check icon)
+--answer-red:    #d2000f    (red italic answer text in problems)
 --card-dropshadow: 1px 1px 3px 0 rgba(0,0,0,0.24)  (X1Y1B3 — all white cards)
 ```
 
@@ -158,6 +174,60 @@ from the viewBox. Otherwise `<img>` renders at 0×0.
   DPR=2 renders crisp text without dropping content.
 - `renderPdf(pdfUrl)` accepts an optional URL; the `currentPdfUrl` variable
   tracks the most recently loaded PDF so recreate uses the right one.
+
+---
+
+## JS architecture — create-resources page
+
+The inline `<script>` in `create-resources-*.html` is a mini state machine.
+Key concepts to understand before editing it:
+
+### URL param `lessonKey`
+`?lessonKey=G5M6L19` (or `G3M3L7`, `G4M5L6`, `G8M2L10`) selects which
+variant's assets to load. Drives `currentVariant` and the `*_VARIANTS` lookups.
+Falls back to a default if absent.
+
+### Variant maps
+Three `const` objects keyed by lesson key:
+- `MINI_LESSON_VARIANTS` — PDF path + preview `.webp` path per lesson
+- `WORKSHEET_VARIANTS` — preview `.webp` path per lesson
+- `SAMPLE_SCRIPT_VARIANTS` — preview `.webp` path per lesson
+
+If no variant matches the URL key, `matchedWorksheet` / `matchedSampleScript`
+are `null` and the `.no-worksheet` class is added to `<html>` to hide the
+Student Materials CTA.
+
+### `state` object
+```js
+state = {
+  generated:   { worksheet: false, sampleScript: false },
+  currentView: "miniLesson",          // "miniLesson" | "worksheet" | "sampleScript"
+  generatedAt: { miniLesson, worksheet, sampleScript },  // timestamp strings
+}
+```
+
+### CTA slot pattern
+Each material lives in its own section (`#section-miniLesson`, `#section-worksheet`,
+`#section-sampleScript`). Each section contains both the preview `<img>` AND the
+CTA card. Adding `.visible` to the section reveals the image and hides the CTA
+via CSS (no JS toggling needed per element). The `state.generated[mat]` flag
+drives whether the section is `.visible`.
+
+### Key functions
+| Function | What it does |
+|---|---|
+| `triggerLoadingThenRender(material)` | Runs the 9s loading animation, then renders the target material. `null` = recreate `currentView`; `"worksheet"` / `"sampleScript"` = first-time generation. |
+| `syncSidenavAndCtas()` | Syncs all DOM classes to `state` — sidenav active/generated/current indicators and CTA `.is-generated` states. Call after any `state` mutation. |
+| `updateNavSlider()` | Repositions the purple sliding highlight in the sidenav to the active item. Called by `syncSidenavAndCtas()`. |
+| `renderMaterial(material)` | Shows the `<img>` preview for the given material key; adds `.visible` to its section; updates `state`. |
+| `adjustPageAreaHeight()` | Recalculates `.page-area` height to fit viewport after CTAs appear or the window resizes. |
+
+### HTML class flags on `<html>`
+- `.loading` → initial 9s skeleton state
+- `.loaded` → real content visible
+- `.recreating` → mid-generation state (sidenav + button group stay, page area shows loading)
+- `.ctas-visible` → end-of-page CTAs revealed (added 1.5s after render)
+- `.no-worksheet` → lesson has no student materials variant; hides that CTA
 
 ---
 
