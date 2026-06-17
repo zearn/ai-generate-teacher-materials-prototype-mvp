@@ -316,7 +316,9 @@ and shouldn't be built:
 
 ## Git
 
-- Repo: `git@github.com:zearn/ai-generate-teacher-materials-prototype.git`
+- Repo: `git@github.com:zearn/ai-generate-teacher-materials-prototype-mvp.git`
+  (MVP iteration; cloned with full history from
+  `ai-generate-teacher-materials-prototype`, now independent)
 - Repo-local git identity: `AngyBrooksZ <angy@zearn.org>` (global is still
   `angyb` for personal projects — don't change global).
 - Pushes use SSH. There was a pending HTTPS PAT awaiting Zearn org approval

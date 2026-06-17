@@ -62,7 +62,7 @@ HTML files with inlined base64 assets. No build step, no framework.
 
 ### Git state
 
-- Repo: `git@github.com:zearn/ai-generate-teacher-materials-prototype.git`
+- Repo: `git@github.com:zearn/ai-generate-teacher-materials-prototype-mvp.git`
 - Two commits pushed:
   1. Initial commit (cloned prototypes + assets)
   2. Unused-asset rename + PDF path update
