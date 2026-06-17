@@ -1191,10 +1191,10 @@
   // Available Mini Lesson variants — each pairs a WebP preview image with its lesson key.
   // Key format matches the filename suffix: G{grade}M{mission}L{lesson}.
   const MINI_LESSON_VARIANTS = [
-    { key: "G3M3L7",  webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G3M3L7.webp" },
-    { key: "G4M5L6",  webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G4M5L6.webp" },
-    { key: "G5M6L19", webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G5M6L19.webp" },
-    { key: "G8M2L10", webp: "assets/targeted_materials/preview/preview_mini_lesson/webp/mini_lesson_G8M2L10.webp" },
+    { key: "G3M3L7",  webp: "assets/images/webp/mini_lessons/mini_lesson_G3M3L7.webp" },
+    { key: "G4M5L6",  webp: "assets/images/webp/mini_lessons/mini_lesson_G4M5L6.webp" },
+    { key: "G5M6L19", webp: "assets/images/webp/mini_lessons/mini_lesson_G5M6L19.webp" },
+    { key: "G8M2L10", webp: "assets/images/webp/mini_lessons/mini_lesson_G8M2L10.webp" },
   ];
 
   // Build "G{grade}M{mission}L{lesson}" from the URL's loc + lesson params.
@@ -1387,43 +1387,24 @@
     updateNavSlider();
   }, 9000);
 
-  // ---- Compute the download PDF path based on which materials have been generated ----
-  // Always downloads a combined PDF that includes everything generated so far.
-  function getDownloadPdfUrl() {
-    const key = currentVariant.key;
-    const hasWorksheet    = state.generated.worksheet;
-    const hasSampleScript = state.generated.sampleScript;
-    let folder;
-    if (hasWorksheet && hasSampleScript) {
-      folder = "pdf_mini_lesson_student_materials_sample_script";
-    } else if (hasWorksheet) {
-      folder = "pdf_mini_lesson_student_materials";
-    } else if (hasSampleScript) {
-      folder = "pdf_mini_lesson_sample_script";
-    } else {
-      folder = "pdf_mini_lesson";
-    }
-    return `assets/targeted_materials/download/pdf/${folder}/pdf_${key}_mini_lesson.pdf`;
-  }
-
-  // ---- Download / Print the combined PDF for all generated materials ----
-  function downloadCurrentPdf() {
-    const url = getDownloadPdfUrl();
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = url.split("/").pop();
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
-  // Print only the PDF itself (not the surrounding prototype UI). We load
-  // the PDF into a hidden same-origin iframe and call print() on its
-  // contentWindow — Chrome's built-in PDF viewer honors this. If the
-  // browser blocks it we fall back to opening the PDF in a new tab so the
-  // user can print from there.
+  // ---- Print the generated materials (the on-screen webp previews) ----
+  // The old flow printed a combined PDF from assets/targeted_materials/download;
+  // that folder has been archived to assets/not-used and the Download button is
+  // unwired (to be rebuilt later). The app now renders webp previews, so Print
+  // outputs exactly what's visible: each generated material's preview image,
+  // one per page. Images are loaded into a hidden iframe so we print only the
+  // materials, not the surrounding prototype UI.
   let pdfPrintFrame = null;
-  function printCurrentPdf() {
-    const url = getDownloadPdfUrl();
+  function printCurrentMaterials() {
+    const imgs = [...document.querySelectorAll("img.lesson-preview")]
+      .filter(img => img.getAttribute("src") && img.offsetParent !== null);
+    if (!imgs.length) return;
+    const body = imgs.map(img => `<img src="${img.src}" />`).join("");
+    const doc = `<!doctype html><html><head><meta charset="utf-8" />`
+      + `<style>@page{margin:0}html,body{margin:0;padding:0}`
+      + `img{display:block;width:100%;page-break-after:always}`
+      + `img:last-child{page-break-after:auto}</style></head>`
+      + `<body>${body}</body></html>`;
     if (!pdfPrintFrame) {
       pdfPrintFrame = document.createElement("iframe");
       Object.assign(pdfPrintFrame.style, {
@@ -1433,24 +1414,19 @@
       document.body.appendChild(pdfPrintFrame);
     }
     pdfPrintFrame.onload = () => {
-      // Built-in PDF viewer needs a moment after `load` before print() works.
+      // Give the (already-cached) preview images a moment to paint before print.
       setTimeout(() => {
         try {
           pdfPrintFrame.contentWindow.focus();
           pdfPrintFrame.contentWindow.print();
-        } catch (e) {
-          window.open(url, "_blank");
-        }
+        } catch (e) { /* no-op */ }
       }, 200);
     };
-    pdfPrintFrame.src = url;
+    pdfPrintFrame.srcdoc = doc;
   }
 
   document.querySelectorAll(".btn-icon[aria-label='Print']").forEach(b =>
-    b.addEventListener("click", printCurrentPdf)
-  );
-  document.querySelectorAll(".btn-icon[aria-label='Download']").forEach(b =>
-    b.addEventListener("click", downloadCurrentPdf)
+    b.addEventListener("click", printCurrentMaterials)
   );
 
   // ---- Shared modal helper ----
@@ -1481,20 +1457,20 @@
   // started on (or the last one they recreated to).
   // Worksheet variants keyed by lesson key (same G#M#L# scheme as mini lessons).
   const WORKSHEET_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G3M3L7@2x.webp" },
-    G4M5L6:  { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G4M5L6@2x.webp" },
-    G5M6L19: { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G5M6L19@2x.webp" },
-    G8M2L10: { webp: "assets/targeted_materials/preview/preview_student_materials/webp/student_materials_G8M2L10@2x.webp" },
+    G3M3L7:  { webp: "assets/images/webp/student_materials/student_materials_G3M3L7@2x.webp" },
+    G4M5L6:  { webp: "assets/images/webp/student_materials/student_materials_G4M5L6@2x.webp" },
+    G5M6L19: { webp: "assets/images/webp/student_materials/student_materials_G5M6L19@2x.webp" },
+    G8M2L10: { webp: "assets/images/webp/student_materials/student_materials_G8M2L10@2x.webp" },
   };
   const matchedWorksheet = WORKSHEET_VARIANTS[lessonKey || currentVariant.key] ?? null;
   if (!matchedWorksheet) document.documentElement.classList.add("no-worksheet");
 
   // Sample Script variants keyed by lesson key.
   const SAMPLE_SCRIPT_VARIANTS = {
-    G3M3L7:  { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G3M3L7.webp" },
-    G4M5L6:  { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G4M5L6.webp" },
-    G5M6L19: { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G5M6L19.webp" },
-    G8M2L10: { webp: "assets/targeted_materials/preview/preview_sample_script/webp/sample_script_G8M2L10.webp" },
+    G3M3L7:  { webp: "assets/images/webp/sample_scripts/sample_script_G3M3L7.webp" },
+    G4M5L6:  { webp: "assets/images/webp/sample_scripts/sample_script_G4M5L6.webp" },
+    G5M6L19: { webp: "assets/images/webp/sample_scripts/sample_script_G5M6L19.webp" },
+    G8M2L10: { webp: "assets/images/webp/sample_scripts/sample_script_G8M2L10.webp" },
   };
   const matchedSampleScript = SAMPLE_SCRIPT_VARIANTS[lessonKey || currentVariant.key] ?? null;
 
@@ -1609,8 +1585,7 @@
 
     if (byg && backLink) {
       backLink.addEventListener("click", e => { e.preventDefault(); byg.open(); });
-      document.getElementById("bygPrint")?.addEventListener("click", printCurrentPdf);
-      document.getElementById("bygDownload")?.addEventListener("click", downloadCurrentPdf);
+      document.getElementById("bygPrint")?.addEventListener("click", printCurrentMaterials);
     }
 
     // In-memory only — cleared on any page reload (sessionStorage would
@@ -1950,7 +1925,7 @@
 
     <div class="body">
       <h2 class="title" id="bygTitle">Before you go</h2>
-      <p class="msg">This BETA version does not save your documents.<br/>Use the buttons to print or download if you don't want to lose it!</p>
+      <p class="msg">This BETA version does not save your documents.<br/>If you want to keep a copy, use the print button below before you go back to the Tower Alerts report.</p>
     </div>
 
     <div class="buttons">
