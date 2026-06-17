@@ -17,8 +17,8 @@ locally via a Python HTTP server on port 8765.
 
 - `tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html` — Reports → Tower Alerts page (10 student
   alert cards, filters, modal).
-- `create-resources-95a534VKBScVGb3WUOvN.html` — AI Targeted Materials page (loads PDFs via PDF.js
-  inside a scrollable card, with loading state, modals, recreate flow, and CTAs).
+- `create-resources-95a534VKBScVGb3WUOvN.html` — AI Targeted Materials page (renders webp preview
+  images inside a scrollable card, with loading state, modals, recreate flow, and CTAs).
 
 No build step. No framework. Vanilla HTML/CSS/JS, intentionally.
 
@@ -71,10 +71,10 @@ When the user does ask for a commit:
 |---|---|
 | `create-resources-95a534VKBScVGb3WUOvN.html` | The AI Targeted Materials page (main work focus lately) |
 | `tower-alerts-prototype-iBGSV5YMFky3cZJiZNEY.html` | The Tower Alerts source page (Create Resources link → modal → create-resources-95a534VKBScVGb3WUOvN.html) |
-| `assets/` | SVG icons, sparkles, design references. SVGs base64-inlined into HTML. |
-| `assets/pdf/` | Legacy runtime PDFs (Mini Lesson A.pdf, Worksheet A.pdf, Sample Script A.pdf) + `mini_lessons/mini_lesson_{key}-compressed.pdf` per lesson key |
-| `assets/targeted_materials/preview/{mini_lesson,student_materials,sample_script}/{webp,png}/` | Preview images rendered at page load — filenames follow `{type}_{key}@2x.webp` (e.g. `mini_lesson_G5M6L19@2x.webp`) |
-| `assets/targeted_materials/download/pdf/` | Download PDFs — one per material per lesson key |
+| `assets/` | Top-level asset root. Holds `images/` and `not-used/` only. |
+| `assets/images/svg/` | All icon/sparkle SVG source files. Base64-inlined into the HTML (not loaded by path at runtime). |
+| `assets/images/webp/{mini_lessons,student_materials,sample_scripts}/` | Preview images rendered at page load. Filenames keep their original prefix — `mini_lesson_{key}.webp`, `student_materials_{key}@2x.webp`, `sample_script_{key}.webp`. Referenced by the `*_VARIANTS` maps in create-resources. |
+| `assets/not-used/` | Archive of everything not referenced by the app: old design-reference PNGs/SVGs/PDFs, the legacy runtime PDFs, the per-key preview PNGs, and the archived `targeted_materials/download/pdf/` tree (the unwired Download feature — rebuild later). Nothing here is loaded at runtime. |
 | `.claude/launch.json` | Preview server config (Python http.server on port 8765) |
 | `.claude/settings.local.json` | Claude Code permissions / settings (local-only, gitignored) |
 
@@ -165,15 +165,19 @@ from the viewBox. Otherwise `<img>` renders at 0×0.
 >   how the secondary-button + create-resources-link hover/press treatments
 >   work today.
 
-### PDF rendering (PDF.js)
+### Preview rendering & printing (webp)
 
-- Multi-page PDFs only. **Do not** use a single tall page (PDF.js silently
-  drops content from canvases over a certain size — was losing the rainfall
-  chart entirely).
-- DPR cap at 2 for retina sharpness. With multi-page normal-sized PDFs,
-  DPR=2 renders crisp text without dropping content.
-- `renderPdf(pdfUrl)` accepts an optional URL; the `currentPdfUrl` variable
-  tracks the most recently loaded PDF so recreate uses the right one.
+- The app renders **webp preview images**, not live PDFs. PDF.js was removed
+  (no `getDocument` / `renderPdf` / `currentPdfUrl`). Each material's preview
+  `<img>` gets its `src` from the `*_VARIANTS` maps when generated.
+- **Print** (`printCurrentMaterials`) collects the on-screen, visible
+  `img.lesson-preview` elements that have a `src`, builds a hidden iframe with
+  those images (one per page), and calls `print()` on it — so it prints exactly
+  what's generated, in DOM order (mini lesson → worksheet → sample script).
+  Note: calling `print()` opens the native dialog, which blocks the renderer —
+  don't fire it during automated preview verification; test the selector instead.
+- **Download** is unwired (button is CSS-hidden); its PDF code was removed and
+  the PDFs archived to `assets/not-used/`. To be rebuilt later.
 
 ---
 
@@ -189,7 +193,7 @@ Falls back to a default if absent.
 
 ### Variant maps
 Three `const` objects keyed by lesson key:
-- `MINI_LESSON_VARIANTS` — PDF path + preview `.webp` path per lesson
+- `MINI_LESSON_VARIANTS` — preview `.webp` path per lesson
 - `WORKSHEET_VARIANTS` — preview `.webp` path per lesson
 - `SAMPLE_SCRIPT_VARIANTS` — preview `.webp` path per lesson
 
@@ -252,22 +256,28 @@ drives whether the section is `.visible`.
 
 ## Asset conventions
 
-- **`assets/*.svg`** — icon source files downloaded from Figma. These are NOT
-  loaded at runtime by the HTML. Instead they get inlined into the HTML as
+- **`assets/images/svg/*.svg`** — icon source files downloaded from Figma. These
+  are NOT loaded at runtime by the HTML. Instead they get inlined into the HTML as
   **base64 data URIs** inside `<img src="data:image/svg+xml;base64,...">`.
   When you add a new icon: download the SVG, fix it (strip `width="100%"
   height="100%"`, replace `preserveAspectRatio="none"` with `xMidYMid meet`,
   add explicit width/height from the viewBox), base64-encode, paste inline.
-- **`assets/pdf/*.pdf`** — run-time PDFs loaded by PDF.js via `getDocument()`.
-  These ARE fetched at runtime, so the filename must match exactly (spaces and
-  all). Loaded via the `renderPdf(pdfUrl)` function — don't hardcode paths
-  elsewhere.
-- **`assets/*.png`** — design references and screenshots used during
-  development. Files suffixed with `-not-used` (e.g. `rainfall-chart-not-used.png`)
-  are intentionally retained as historical references; do not delete or rely on them.
-- **Naming**: kebab-case for SVGs (`back-arrow.svg`, `modal-close-x.svg`),
-  Title Case with spaces for PDFs (`Mini Lesson A.pdf`) since those are
-  user-facing filenames that match what the user uploads.
+  Because they're inlined, moving/renaming a source SVG never affects the app.
+- **`assets/images/webp/{mini_lessons,student_materials,sample_scripts}/*.webp`** —
+  the preview images that ARE fetched at runtime (via the `*_VARIANTS` maps in
+  create-resources). Paths must match exactly. Print also reads these on-screen
+  webp previews (see `printCurrentMaterials`).
+- **No runtime PDFs.** PDF.js / `getDocument()` / `renderPdf()` were removed; the
+  app renders webp previews only. The legacy runtime PDFs and the Download-feature
+  PDFs (`targeted_materials/download/pdf/`) are archived under `assets/not-used/`
+  pending a Download rebuild — don't wire anything to them.
+- **`assets/not-used/`** — design references, screenshots, archived PDFs, and the
+  per-key preview PNGs. Nothing here is loaded at runtime; retained as historical
+  references. Don't delete or rely on these.
+- **Naming**: kebab-case for SVGs (`back-arrow.svg`, `modal-close-x.svg`); webp
+  previews keep their `{type}_{key}` filename (some carry an `@2x` suffix). Any
+  PDFs that get re-introduced use Title Case with spaces (`Mini Lesson A.pdf`)
+  since those are user-facing filenames matching what the user uploads.
 
 ### HTML filename obfuscation
 
@@ -309,8 +319,8 @@ and shouldn't be built:
 - **No cross-browser polishing.** Targeting modern Chrome. Don't add IE
   fallbacks, Firefox-specific tweaks, or Safari workarounds unless the
   user reports a specific issue.
-- **No external dependencies** beyond what's already loaded (PDF.js from
-  CDN, Google Fonts). Don't add npm packages, no build step, no bundler.
+- **No external dependencies** beyond what's already loaded (Google Fonts).
+  PDF.js has been removed. Don't add npm packages, no build step, no bundler.
 
 ---
 
