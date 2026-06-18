@@ -12,6 +12,7 @@
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
+import CreateTargetedMaterialsModal from "../components/CreateTargetedMaterialsModal.astro";
 
 const STUDENTS = [
   { name: "Suzanne Alvarez",  count: 3 },
@@ -343,7 +344,15 @@ const ALERTS: Array<{
       </div>
     </main>
   </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <CreateTargetedMaterialsModal />
 </BaseLayout>
+
+<script>
+  import "../scripts/tower-alerts.ts";
+</script>
 
 <style>
   .header-wrap {
@@ -907,4 +916,17 @@ const ALERTS: Array<{
   .event .ts {
     font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
   }
+
+  /* ===== Help tooltip ===== */
+  .tooltip {
+    position: absolute; pointer-events: none;
+    max-width: 280px;
+    background: var(--charcoal-95); color: var(--white);
+    padding: 8px 10px; border-radius: 4px;
+    font-size: 13px; line-height: 1.4;
+    z-index: 50; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transform: translateY(calc(-100% - 8px));
+    opacity: 0; transition: opacity 0.12s;
+  }
+  .tooltip.show { opacity: 1; }
 </style>

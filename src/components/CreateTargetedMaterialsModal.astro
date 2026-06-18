@@ -1,0 +1,213 @@
+---
+/**
+ * Create Targeted Materials modal (Figma 17491:1953). Opened from an alert
+ * card's "Create Targeted Materials" link on the Tower Alerts page. Its
+ * student / mission-lesson / objective fields are populated by the page script
+ * from the clicked link's data-* attributes; CREATE navigates to the link href.
+ *
+ * Distinct from the generic Modal.astro shell (fuchsia stripe, inline
+ * sparkle + BETA heading, objective card, radio options, no footer divider),
+ * so this is a dedicated component. It keeps the `.modal-overlay` root +
+ * `.modal-close` button conventions so src/scripts/modal.ts wireModal drives it.
+ *
+ * CSS ported 1:1 from the prototype with exact-match brand tokens.
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  id?: string;
+}
+const { id = "ctmModal" } = Astro.props;
+---
+
+<div class="modal-overlay" id={id} role="dialog" aria-modal="true" aria-labelledby="ctmModalTitle" hidden>
+  <div class="modal-card" role="document">
+    <button class="modal-close" type="button" aria-label="Close">
+      <Icon name="modal-close-x" size={24} />
+    </button>
+
+    <div class="modal-heading">
+      <span class="sparkles" aria-hidden="true"><Icon name="modal-sparkles-pink" /></span>
+      <h1 id="ctmModalTitle">CREATE TARGETED MATERIALS<span class="modal-beta">BETA</span></h1>
+    </div>
+
+    <p class="modal-intro">
+      <strong id="ctmStudent">Elijah Park</strong> struggled on
+      <span id="ctmMissionLesson">Mission 3, Lesson 4</span>, and may need support on the following objective:
+    </p>
+
+    <div class="objective-card">
+      <p id="ctmObjective">Interpret and represent patterns when multiplying by 10, 100, and 1,000 in arrays and numerically.</p>
+    </div>
+
+    <p class="modal-select-label">Select what you want Zearn AI to create:</p>
+
+    <div class="modal-options">
+      <div class="modal-option selected">
+        <span class="checkbox" aria-hidden="true"><Icon name="modal-checkbox-checked" size={24} /></span>
+        <span class="label">Mini Lesson</span>
+      </div>
+      <div class="modal-option disabled" aria-disabled="true">
+        <span class="checkbox" aria-hidden="true"><span class="checkbox-empty"></span></span>
+        <span class="label-wrap">
+          <span class="label">Problem Set</span>
+          <span class="coming-soon">Coming Soon</span>
+        </span>
+      </div>
+    </div>
+
+    <button class="modal-create-btn" type="button" id="ctmCreateBtn">
+      <Icon name="modal-sparkles-white" size={16} />
+      <span>CREATE</span>
+    </button>
+
+    <div class="modal-disclaimer">
+      Reminder: AI can make mistakes! Review this content for accuracy.<br />
+      We do not use student data with generative AI.&nbsp;<a href="#">View Zearn's AI data policy.</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.70);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    position: relative;
+    background: var(--white);
+    border-top: 16px solid var(--fuchsia-45);
+    border-radius: 4px;
+    box-shadow: 1px 1px 1.5px rgba(128, 128, 128, 0.5);
+    width: 604px; max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 32px 32px;
+    color: var(--charcoal-95);
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 24px; height: 24px;
+    background: transparent; border: none; cursor: pointer; padding: 0;
+    line-height: 0;
+    color: var(--charcoal-90); /* modal-close-x is currentColor (was #414C52) */
+  }
+  .modal-heading {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .modal-heading .sparkles { width: 21.1654px; height: 20.7946px; flex: none; }
+  .modal-heading h1 {
+    margin: 0;
+    font-size: 20px; font-weight: 400; line-height: 48px;
+    color: var(--charcoal-95); white-space: nowrap;
+  }
+  .modal-beta {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 11px; font-weight: 700; line-height: 15px;
+    color: var(--purple-90);
+    background: var(--purple-5);
+    border: 1px solid var(--purple-90);
+    border-radius: 3.5px;
+    vertical-align: middle;
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+  }
+  .modal-intro {
+    font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+    text-align: center; margin: 0 0 24px;
+  }
+  .modal-intro strong { font-weight: 600; }
+  .objective-card {
+    background: var(--purple-5);
+    border: 1px solid var(--purple-15);
+    border-radius: 10px;
+    padding: 24px 8px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .objective-card p {
+    margin: 0; font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--charcoal-95);
+  }
+  .modal-select-label {
+    font-size: 16px; font-weight: 400; line-height: 1.5;
+    color: var(--black); text-align: center;
+    margin: 0 0 8px;
+  }
+  .modal-options {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .modal-option {
+    width: 302px; height: 60px;
+    border-radius: 30px;
+    display: flex; align-items: center;
+    padding: 0 22px;
+    background: var(--white);
+    box-sizing: border-box;
+  }
+  .modal-option.selected {
+    background: var(--aqua-10);
+    border: 3px solid var(--aqua-60);
+  }
+  .modal-option.disabled {
+    border: 1px solid #DDE0E3;
+    color: var(--gray-40);
+    justify-content: flex-start;
+  }
+  .modal-option .checkbox {
+    width: 24px; height: 24px; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-right: 4px;
+  }
+  /* Empty checkbox: sized to match the inner square of the checked SVG above
+     (15×15, 2.5px radius). Border matches the disabled label's gray so the
+     whole row reads as one disabled unit. */
+  .modal-option .checkbox-empty {
+    width: 15px; height: 15px;
+    border: 1px solid var(--gray-45);
+    background: var(--white);
+    border-radius: 2.5px;
+    box-sizing: border-box;
+  }
+  .modal-option .label {
+    font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--charcoal-95);
+  }
+  .modal-option.disabled .label { color: var(--gray-40); }
+  .modal-option.disabled .label-wrap {
+    display: flex; align-items: center; gap: 28px;
+    flex: 1; min-width: 0;
+  }
+  .modal-option.disabled .coming-soon {
+    font-size: 16px; font-weight: 400; line-height: 24px;
+    color: var(--gray-40);
+    margin-left: auto;
+  }
+  .modal-create-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    background: var(--aqua-75);
+    color: var(--white);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 24px;
+    margin: 0 auto 24px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600; line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .modal-create-btn:hover { background: var(--aqua-85); }
+  .modal-disclaimer {
+    text-align: center;
+    font-size: 14px; line-height: 1.5; color: var(--black);
+  }
+  .modal-disclaimer a { color: var(--aqua-75); font-weight: 600; text-decoration: none; }
+  .modal-disclaimer a:hover { text-decoration: underline; }
+</style>
