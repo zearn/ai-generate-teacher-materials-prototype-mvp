@@ -1,0 +1,347 @@
+---
+/**
+ * Tower Alerts page (Reports → Class Reports → Tower Alerts). Source page: the
+ * teacher's struggling-student alerts; each card links to create-resources.
+ *
+ * Straight 1:1 port of tower-alerts-prototype-*.html (4 alerts, not "10").
+ * PHASE 1 (this chunk, T1a): static chrome + layout skeleton — full TopNav,
+ * breadcrumb, page-header, selector pill, hero. T1b = filter sidebar, T1c =
+ * alert cards. Phase 2 = filters + Create Targeted Materials modal + nav.
+ *
+ * Page-specific chrome is inline here (only this page uses the full nav).
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+---
+
+<BaseLayout title="Tower Alerts — Zearn">
+  <div class="header-wrap">
+    <nav class="top-nav">
+      <div class="nav">
+        <div class="left">
+          <span class="logo-wrap"><Icon name="zearn-logo" /></span>
+          <button class="top-tab">CURRICULUM</button>
+          <button class="top-tab active">REPORTS</button>
+        </div>
+        <div class="right">
+          <a class="link link-assignments" href="#">Assignments</a>
+          <a class="link link-roster" href="#">Roster</a>
+          <a class="link link-resources" href="#">Resources</a>
+          <a class="link link-help" href="#" aria-label="Help (opens in a new tab)">
+            Help<Icon name="open-new-tab" />
+          </a>
+          <div class="account-box">
+            <span class="school-chip">School<br />Account</span>
+            <span class="account-name">Ahmed</span>
+            <span class="caret"><Icon name="chevron-down-name" /></span>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="yellow-bar"></div>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li>
+          <a class="crumb-link" href="#">Reports</a>
+          <span class="crumb-sep" aria-hidden="true"><Icon name="chevron-right-bc" /></span>
+        </li>
+        <li>
+          <a class="crumb-link" href="#">Class Reports</a>
+          <span class="crumb-sep" aria-hidden="true"><Icon name="chevron-right-bc" /></span>
+        </li>
+        <li>
+          <button class="crumb-select" aria-haspopup="true">
+            Tower Alerts
+            <span class="caret"><Icon name="chevron-down-tower" /></span>
+          </button>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="page-area">
+    <main>
+      <section class="page-header">
+        <h1>
+          Tower Alerts
+          <span class="help-link" id="helpIcon" tabindex="0" data-tip="An alert is triggered when a student struggles repeatedly on the same concept in a tower.">
+            <Icon name="help-circle" title="Help" />
+          </span>
+        </h1>
+        <p class="subtitle">An alert is triggered when a student struggles repeatedly on the same concept in a tower.</p>
+      </section>
+
+      <section class="selector">
+        <button class="pill">
+          Kleinfeldt - Grade 4
+          <span class="caret" aria-hidden="true"><Icon name="chevron-small-down" /></span>
+        </button>
+      </section>
+
+      <section class="hero">
+        <div class="left">
+          <span class="icon"><Icon name="purple-people" size={72} /></span>
+          <div>
+            <h2>Kleinfeldt - Grade 4</h2>
+            <div class="meta">Grade 4 | 25 Students</div>
+          </div>
+        </div>
+        <button class="print-btn"><Icon name="print" /> Print</button>
+      </section>
+
+      <div class="columns">
+        <!-- T1b: filter sidebar -->
+        <aside class="filter-placeholder">Filters (T1b)</aside>
+        <!-- T1c: alert cards -->
+        <div class="alerts-placeholder">Alert cards (T1c)</div>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .header-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    background: var(--white);
+    height: 64px;
+    display: flex;
+    justify-content: center;
+  }
+  .yellow-bar { height: 4px; background: var(--yellow-20); }
+  .header-wrap.scrolled .breadcrumb {
+    box-shadow: inset 0 -1px 0 0 var(--gray-30), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  }
+  .top-nav .nav { display: flex; justify-content: space-between; width: 992px; }
+  .top-nav .left { display: flex; align-items: center; }
+  .logo-wrap { width: 112px; padding-right: 16px; display: flex; align-items: center; }
+  .top-tab {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 16px/24px inherit;
+    text-transform: uppercase;
+    color: var(--charcoal-95);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .top-tab.active { background: var(--yellow-20); color: var(--black); }
+
+  .top-nav .right { position: relative; width: 566px; height: 64px; }
+  .top-nav .right .link {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font: 600 16px/24px inherit;
+    color: var(--charcoal-95);
+    background: var(--white);
+    text-decoration: none;
+  }
+  .link-assignments { left: 0; }
+  .link-roster { left: 119.56px; }
+  .link-resources { left: 195.77px; }
+  .link-help { left: 297.6px; }
+  .account-box {
+    position: absolute;
+    left: 381.68px;
+    top: 0;
+    bottom: 0;
+    min-width: 120px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border-left: 1px solid var(--gray-30);
+    border-right: 1px solid var(--gray-30);
+  }
+  .school-chip {
+    background: var(--green-80);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 14.4px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 4px 8px;
+  }
+  .account-name {
+    font: 600 16px/24px inherit;
+    color: var(--charcoal-95);
+    margin-right: 4px;
+  }
+  .account-box .caret { display: inline-flex; color: var(--charcoal-95); }
+
+  /* ===== Breadcrumb ===== */
+  .breadcrumb {
+    background: var(--gray-5);
+    box-shadow: inset 0 -1px 0 0 var(--gray-30);
+    height: 56px;
+    display: flex;
+    justify-content: center;
+  }
+  .breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    width: 992px;
+    height: 100%;
+  }
+  .breadcrumb li { height: 56px; display: flex; align-items: center; }
+  .breadcrumb .crumb-link {
+    color: var(--charcoal-90);
+    font: 600 16px/21px inherit;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 1px;
+  }
+  .breadcrumb .crumb-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 1px;
+    background: var(--charcoal-90);
+    transition: height 0.12s ease;
+  }
+  .breadcrumb .crumb-link:hover::after { height: 4px; }
+  .breadcrumb .crumb-sep {
+    padding: 0 13.58px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--charcoal-90);
+  }
+  .breadcrumb .crumb-select {
+    background: var(--white);
+    border: 1px solid var(--gray-30);
+    padding: 1px 29px 1px 9px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    color: var(--aqua-75);
+    font: 600 16px/20px inherit;
+    position: relative;
+    min-width: 64px;
+    cursor: pointer;
+  }
+  .crumb-select .caret {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    color: var(--aqua-75);
+  }
+
+  /* ===== Page area / card ===== */
+  .page-area {
+    background: var(--gray-5);
+    padding: 24px 32px 48px;
+    display: flex;
+    justify-content: center;
+  }
+  main {
+    width: 1024px;
+    background: var(--white);
+    padding: 0 16px;
+    border-radius: 4px;
+    box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 3px 0;
+  }
+
+  .page-header { padding: 24px 0 32px; text-align: center; }
+  .page-header h1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font: 600 20px/30px inherit;
+    color: var(--charcoal-95);
+  }
+  .help-link {
+    display: inline-flex;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    cursor: help;
+    color: var(--aqua-75);
+  }
+  .page-header .subtitle {
+    margin: 0;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--charcoal-95);
+  }
+
+  .selector { padding: 0 84px 0 100px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--gray-5);
+    padding: 8px 16px;
+    color: var(--aqua-75);
+    font: 600 16px/24px inherit;
+    border: 0;
+    cursor: pointer;
+  }
+  .pill .caret { margin-left: 8px; display: inline-flex; color: var(--aqua-75); }
+
+  .hero {
+    padding: 16px 84px 56px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .hero .left { display: flex; align-items: flex-start; gap: 16px; }
+  .hero .icon { width: 72px; height: 72px; padding-top: 6px; display: inline-flex; }
+  .hero h2 {
+    font: 400 32px/48px inherit;
+    margin: 0;
+    color: var(--charcoal-95);
+    white-space: nowrap;
+  }
+  .hero .meta { font-size: 20px; line-height: 30px; color: var(--charcoal-95); }
+  .print-btn {
+    margin-top: 38px;
+    height: 40px;
+    min-width: 104px;
+    border: 1px solid var(--aqua-75);
+    border-radius: 25px;
+    background: var(--white);
+    color: var(--aqua-75);
+    font: 600 16px inherit;
+    padding: 0 21px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  /* 2-col layout */
+  .columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; padding-bottom: 48px; }
+  .filter-placeholder,
+  .alerts-placeholder {
+    border: 1px dashed var(--gray-30);
+    border-radius: 4px;
+    padding: 24px;
+    color: var(--gray-60);
+    min-height: 200px;
+  }
+</style>

@@ -153,8 +153,23 @@ Follow `astro-migration-plan.md`. Immediate:
      not wired (unreachable — every set has materials).
    **→ `create-resources` is feature-complete.** Deferred polish: scroll-position
    tracking of the sidenav current-view indicator.
-   **NEXT: port `tower-alerts`** (new page — scope with 3–5 questions first), then
-   retire the old HTML files + the cleanup in item 6.
+   **NEXT: port `tower-alerts`** — decided: **phased, straight 1:1 port, filters
+   match the prototype** (no new functionality). Source: `tower-alerts-prototype-*.html`
+   (1243 lines; **4 alerts** — Elijah Park / Porter Levy / Jesse Williamson / Paul
+   Derrick — *not* the "10" design.md claims). Needs a NEW **full TopNav**
+   (Curriculum/Reports tabs + Assignments/Roster/Resources/Help links + account
+   chip + yellow-bar, scroll shadow), breadcrumb, page-header (help tooltip,
+   selector pill, hero, print), filter sidebar (completed toggle, date dropdown,
+   Students + Content collapsible lists), `AlertCard` (tower-circle icon, student
+   row + report link, Create Targeted Materials link, alert count + bang, event
+   timeline), load-more, and the **Create Targeted Materials modal** →
+   `/create-resources?student=&lesson=&loc=`. Phasing: Phase 1 = static chrome +
+   cards (data server-rendered from an `ALERTS` array); Phase 2 = filters + modal
+   + nav. Then retire the old HTML + cleanup (item 6).
+   **Progress:** ✅ T1a — chrome scaffold (full TopNav + breadcrumb + page-header +
+   selector pill + hero + columns skeleton) in `src/pages/tower-alerts.astro`
+   (page-specific chrome inline; icons via `<Icon>`; tokenized). Verified.
+   **Next:** T1b filter sidebar → T1c `AlertCard` + `ALERTS` data → Phase 2.
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,
