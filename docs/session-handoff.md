@@ -1,4 +1,4 @@
-# Session handoff — 2026-06-17
+# Session handoff — 2026-06-18
 
 Context for the next session. **Read `.claude/claude.md` first, then this, then
 [`docs/astro-migration-plan.md`](astro-migration-plan.md) and
@@ -178,19 +178,29 @@ Follow `astro-migration-plan.md`. Immediate:
      `:8765`, NOT computed-value checks.
    • ✅ Prototype tweak (commit 50f70a6): Content "ALL" pill now matches Students
      (the first/twirl-less content row gets `padding: 0 8px`).
-   • **NEXT — T1b (filter sidebar), prepped:** prototype CSS lines 226–410; filter
-     markup 844–905; right-column scaffold (sort-row + #alerts + load-more) 907–930.
-     Data to server-render: `STUDENTS` (25; name+count, count>0 → `semibold` +
-     count) + `GRADES` (Kindergarten…Grade 8; "Grade 4" count 40 → `semibold`),
-     each list prepended with a selected "ALL … 40&nbsp;Results" row. Icons:
-     Date/Struggles + Sort carets = `chevron-down-dropdown`/`chevron-down-sort`
-     (24px, charcoal-95); panel chevrons = `chevron-up-students`/`chevron-up-content`
-     (aqua, rotate 180° when `.collapsed`); content twirl = `chevron-right-grade`.
-     Color map (consistent w/ T1a): exact = aqua-75 / charcoal-95 / yellow-20 /
-     gray-5 / white / purple-90 / gray-40; `--line`(#ccc)→gray-30,
-     `--line-2`(#999)→gray-55, `--aqua-pressed`(#005c73)→aqua-85,
-     `--charcoal-2`(#435259)→charcoal-90. Then T1c (`AlertCard` + the 4 `ALERTS`)
-     → Phase 2 (filters / Create-Targeted-Materials modal / nav).
+   • ✅ T1b — filter sidebar + right-column scaffold (commit a90edb2). `STUDENTS`
+     (25) + `GRADES` (9) server-rendered; filter-box (toggle, Date/Struggles
+     dropdowns), collapsible Students/Content panels with ALL pills + count/weight
+     rules, sort-row, results count, empty `#alerts`, LOAD MORE. CSS verbatim with
+     mapped tokens (`--line`→gray-30, `--line-2`→gray-55, `--aqua-pressed`→aqua-85).
+     Verified by screenshot diff vs `:8765`.
+   • ✅ T1c — alert cards (commit 26bbbee). 4 cards server-rendered from `ALERTS`:
+     tower-circle, student row + report link, Create Targeted Materials link
+     (link-sparkle + `/create-resources?student=&lesson=&loc=`), count + circle-bang,
+     breadcrumb-meta, lesson link, desc, event timeline (icon-bang / green check).
+     Verified by screenshot diff.
+   • ✅ Phase 2 — interactivity + modal (commit 5a418a9, **Opus 4.8**). New
+     `CreateTargetedMaterialsModal.astro` (fuchsia stripe, sparkle+BETA heading,
+     objective card, Mini Lesson/Problem Set radios, CREATE, disclaimer — CSS 1:1
+     with exact tokens; `#DDE0E3` kept literal). New `src/scripts/tower-alerts.ts`:
+     panel collapse, Completed toggle, help tooltip, breadcrumb scroll-shadow, modal
+     wiring (intercept links → populate student/mission-lesson/objective from
+     `data-*` → CREATE navigates). Verified modal + interactions vs prototype;
+     `astro build` clean. **`tower-alerts` is now fully ported.**
+
+   **NEXT (post-port cleanup):** see item 6 — both pages are now ported, so retire
+   the old HTML prototypes (after a final parity pass), drop unused tokens, and
+   rewrite `claude.md` for the Astro architecture.
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,
@@ -213,10 +223,11 @@ Follow `astro-migration-plan.md`. Immediate:
 - **Model / effort + STOP-POINTS:** the agent **cannot switch its own
   model/effort** — the user sets it (`/model`, `/fast`, `/config`). So **stop at a
   tier boundary and tell the user what to switch to before continuing; do NOT
-  proceed past it on your own.** Plan for the rest of the migration:
-  - **T1b + T1c** (verbatim porting of the filter sidebar + alert cards) →
-    **Sonnet 4.6, medium–high**.
-  - ⚠️ **STOP before Phase 2** (state machine / Create-Targeted-Materials modal /
-    nav wiring) and tell the user to switch to **Opus 4.8, high**.
+  proceed past it on your own.** This worked as intended for the tower-alerts port:
+  - ✅ **T1b + T1c** ran on **Sonnet 4.6, medium–high**.
+  - ✅ **Phase 2** (modal + nav/state wiring) ran on **Opus 4.8, high** after the
+    user switched at the stop-point.
+  The remaining post-port cleanup (retire old HTML, token cleanup, claude.md
+  rewrite) is low-risk and fine on **Sonnet 4.6**.
   Non-negotiable at any tier: screenshot-diff each page against the `:8765`
   prototype before claiming it's faithful (memory `port-css-verbatim-visual-diff`).
