@@ -108,7 +108,7 @@ Follow `astro-migration-plan.md`. Immediate:
    in-browser. **Deferred to assembly:** the sidenav state machine (active/
    generated/current sync, real `updateNavSlider`, sparkle-click → generation,
    back-link → byg modal) and the loading skeleton.
-5. 🔶 **Assemble `create-resources` — Phase 1 DONE, Phase 2 next.**
+5. ✅ **Assemble `create-resources` — DONE (Phase 1 + 2a–2d), all verified.**
    **Variant model RESOLVED (shuffle bag):** a pool of mini-lesson *sets* (5 in
    the end state, 4 now); each set = mini lesson + 1-of-N aligned student
    materials + 1-of-N aligned sample scripts. On arrival a random set shows; top
@@ -147,8 +147,14 @@ Follow `astro-migration-plan.md`. Immediate:
      today) + sidenav sync (sparkle↔refresh via `.is-swapped`, generated/current,
      slider). Sidenav nav scrolls + sets current view. Verified in-browser.
      (Scroll-position tracking of current-view is a deferred polish item.)
-     **Next:** 2d — print (`printCurrentMaterials` + #bygPrint) + `?student=` →
-     subnav title + `.no-worksheet` (likely a no-op since every set has materials).
+     ✅ **2d done:** print (`printCurrentMaterials` → hidden iframe of the visible
+     webp previews in DOM order; both Print buttons wired via `aria-label="Print"`)
+     + `?student=` → subnav title + document title. `.no-worksheet` intentionally
+     not wired (unreachable — every set has materials).
+   **→ `create-resources` is feature-complete.** Deferred polish: scroll-position
+   tracking of the sidenav current-view indicator.
+   **NEXT: port `tower-alerts`** (new page — scope with 3–5 questions first), then
+   retire the old HTML files + the cleanup in item 6.
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,

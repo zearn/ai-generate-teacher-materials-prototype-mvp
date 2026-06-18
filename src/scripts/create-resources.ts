@@ -331,8 +331,6 @@ document.querySelector<HTMLAnchorElement>("a.back-btn")?.addEventListener("click
   e.preventDefault();
   byg?.open();
 });
-// TODO (2d): wire #bygPrint → printCurrentMaterials.
-
 // Top RECREATE → always the Mini Lesson (ays unless "don't show again" was set).
 document.getElementById("recreateBtn")?.addEventListener("click", () => {
   pendingMaterial = null;
@@ -381,3 +379,57 @@ function navScrollTo(material: "miniLesson" | "worksheet" | "sampleScript") {
 document.getElementById("navMiniLesson")?.addEventListener("click", () => navScrollTo("miniLesson"));
 document.getElementById("navStudentMaterials")?.addEventListener("click", () => navScrollTo("worksheet"));
 document.getElementById("navSampleScript")?.addEventListener("click", () => navScrollTo("sampleScript"));
+
+// ---- Print: the on-screen webp previews (one per page) via a hidden iframe ----
+// Outputs exactly what's generated, in DOM order; prints only the materials, not
+// the surrounding UI. (Note: print() opens the native dialog — don't fire it in
+// automated checks.)
+let printFrame: HTMLIFrameElement | null = null;
+function printCurrentMaterials() {
+  const imgs = [...document.querySelectorAll<HTMLImageElement>("img.lesson-preview")]
+    .filter((img) => img.getAttribute("src") && img.offsetParent !== null);
+  if (!imgs.length) return;
+  const body = imgs.map((img) => `<img src="${img.src}" />`).join("");
+  const doc =
+    `<!doctype html><html><head><meta charset="utf-8" />` +
+    `<style>@page{margin:0}html,body{margin:0;padding:0}` +
+    `img{display:block;width:100%;page-break-after:always}` +
+    `img:last-child{page-break-after:auto}</style></head>` +
+    `<body>${body}</body></html>`;
+  if (!printFrame) {
+    printFrame = document.createElement("iframe");
+    Object.assign(printFrame.style, {
+      position: "fixed", left: "-9999px", top: "-9999px",
+      width: "0", height: "0", border: "0", visibility: "hidden",
+    });
+    document.body.appendChild(printFrame);
+  }
+  printFrame.onload = () => {
+    setTimeout(() => {
+      try {
+        printFrame!.contentWindow?.focus();
+        printFrame!.contentWindow?.print();
+      } catch {
+        /* no-op */
+      }
+    }, 200);
+  };
+  printFrame.srcdoc = doc;
+}
+// Both Print buttons (button-group + Before-You-Go modal) carry aria-label="Print".
+document
+  .querySelectorAll<HTMLButtonElement>('button[aria-label="Print"]')
+  .forEach((b) => b.addEventListener("click", printCurrentMaterials));
+
+// ---- URL params: student → subnav title; lesson → doc title (context only) ----
+// The mini lesson itself is random (shuffle bag), not matched to the lesson param.
+const params = new URLSearchParams(location.search);
+const student = params.get("student");
+const lesson = params.get("lesson");
+if (student) {
+  const title = document.querySelector(".center-title");
+  if (title) title.textContent = `Targeted Materials for ${student}`;
+  document.title = `Create Resources – ${student}${lesson ? ` – ${lesson}` : ""} – Zearn`;
+}
+// (.no-worksheet from the prototype is intentionally not wired: in the shuffle-bag
+//  model every set has student materials, so it's unreachable.)
