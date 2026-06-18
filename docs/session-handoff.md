@@ -166,10 +166,31 @@ Follow `astro-migration-plan.md`. Immediate:
    `/create-resources?student=&lesson=&loc=`. Phasing: Phase 1 = static chrome +
    cards (data server-rendered from an `ALERTS` array); Phase 2 = filters + modal
    + nav. Then retire the old HTML + cleanup (item 6).
-   **Progress:** ✅ T1a — chrome scaffold (full TopNav + breadcrumb + page-header +
-   selector pill + hero + columns skeleton) in `src/pages/tower-alerts.astro`
-   (page-specific chrome inline; icons via `<Icon>`; tokenized). Verified.
-   **Next:** T1b filter sidebar → T1c `AlertCard` + `ALERTS` data → Phase 2.
+   **Progress:**
+   • ✅ T1a — chrome scaffold (full TopNav + breadcrumb + page-header + selector
+     pill + hero + columns skeleton) in `src/pages/tower-alerts.astro` (page chrome
+     inline; icons via `<Icon>`; colors tokenized). Verified.
+   • ✅ Typography fix (commit c3ca2d2): T1a had used `font: … inherit` shorthands —
+     invalid CSS, silently dropped, so all type fell to default sizes. Now verbatim
+     `font-weight`/`font-size`/`line-height`. **LESSON (memory
+     `port-css-verbatim-visual-diff`):** port prototype CSS verbatim — no `font:`
+     shorthand — and verify by side-by-side screenshot diff vs the prototype on
+     `:8765`, NOT computed-value checks.
+   • ✅ Prototype tweak (commit 50f70a6): Content "ALL" pill now matches Students
+     (the first/twirl-less content row gets `padding: 0 8px`).
+   • **NEXT — T1b (filter sidebar), prepped:** prototype CSS lines 226–410; filter
+     markup 844–905; right-column scaffold (sort-row + #alerts + load-more) 907–930.
+     Data to server-render: `STUDENTS` (25; name+count, count>0 → `semibold` +
+     count) + `GRADES` (Kindergarten…Grade 8; "Grade 4" count 40 → `semibold`),
+     each list prepended with a selected "ALL … 40&nbsp;Results" row. Icons:
+     Date/Struggles + Sort carets = `chevron-down-dropdown`/`chevron-down-sort`
+     (24px, charcoal-95); panel chevrons = `chevron-up-students`/`chevron-up-content`
+     (aqua, rotate 180° when `.collapsed`); content twirl = `chevron-right-grade`.
+     Color map (consistent w/ T1a): exact = aqua-75 / charcoal-95 / yellow-20 /
+     gray-5 / white / purple-90 / gray-40; `--line`(#ccc)→gray-30,
+     `--line-2`(#999)→gray-55, `--aqua-pressed`(#005c73)→aqua-85,
+     `--charcoal-2`(#435259)→charcoal-90. Then T1c (`AlertCard` + the 4 `ALERTS`)
+     → Phase 2 (filters / Create-Targeted-Materials modal / nav).
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,
