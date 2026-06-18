@@ -392,6 +392,8 @@
     display: flex; align-items: center; justify-content: space-between;
     border-radius: 12px;
   }
+  /* "ALL" row (no twirl, always first): match the Students list's ALL pill height. */
+  .list.content-list .row:first-child .label-wrap { padding: 0 8px; }
   .list.content-list .row.selected .label-wrap { background: var(--aqua); color: var(--white); }
   .list.content-list .row.selected .label-wrap .count { color: var(--white); }
   .list.content-list .row.selected { background: transparent; color: var(--charcoal); }
