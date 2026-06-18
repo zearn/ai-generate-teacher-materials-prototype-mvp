@@ -1,0 +1,42 @@
+---
+/**
+ * Before You Go modal (Figma 17776:8319). Shown when leaving via "Back to Tower
+ * Alerts". Footer: primary BACK TO TOWER ALERTS (navigates) + Print.
+ *
+ * The unwired Download icon button is intentionally omitted (CSS-hidden in the
+ * prototype, pending the Download rebuild — see claude.md). Page script wires
+ * the overlay via wireModal("#bygModal").
+ */
+import Modal from "./Modal.astro";
+import Button from "./Button.astro";
+
+interface Props {
+  id?: string;
+  /** Where BACK TO TOWER ALERTS navigates. */
+  href?: string;
+}
+const { id = "bygModal", href = "/tower-alerts" } = Astro.props;
+---
+
+<Modal id={id} title="Before you go" width={600}>
+  <p class="byg-msg">
+    This BETA version does not save your documents.<br />
+    If you want to keep a copy, use the print button below before you go back to
+    the Tower Alerts report.
+  </p>
+  <Fragment slot="footer">
+    <Button variant="primary" size="md" href={href} id="bygBackBtn" label="Back to Tower Alerts" />
+    <Button variant="icon" size="md" icon="print-btn" iconSize={17} id="bygPrint" aria-label="Print" />
+  </Fragment>
+</Modal>
+
+<style>
+  .byg-msg {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--black);
+    text-align: center;
+  }
+</style>

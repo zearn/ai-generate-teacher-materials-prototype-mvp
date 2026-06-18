@@ -1,0 +1,42 @@
+/* Resets + global typography. Color values come only from tokens.css. */
+
+/* Shared non-color tokens. The standard white-card shadow (X1Y1B3) used by the
+   sidenav, button-group, and page-area cards. */
+:root {
+  --card-dropshadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.24);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Source Sans Pro", system-ui, -apple-system, sans-serif;
+  color: var(--charcoal-95);
+  background: var(--gray-5);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Footer is the one place that uses Oxygen (see design.md typography). */
+footer,
+.footer {
+  font-family: "Oxygen", "Source Sans Pro", sans-serif;
+}
+
+a {
+  color: var(--aqua-75);
+}
+a:hover {
+  color: var(--aqua-85);
+}
+a:active {
+  color: var(--aqua-95);
+}

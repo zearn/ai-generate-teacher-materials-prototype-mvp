@@ -4,8 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Zearn Teacher Prototype — project instructions
 
-Read this at the start of every session. For full design specs see `design.md`.
-`summary.md` is a historical handoff doc from an earlier session — it's not kept up to date; don't treat it as current status.
+Read this at the start of every session. **For current status + next steps, read
+`docs/session-handoff.md` first.** For full design specs see `docs/design.md`;
+for the Astro migration plan + interactivity analysis see
+`docs/astro-migration-plan.md`.
+`.claude/summary.md` is an older historical handoff — not kept up to date; prefer
+`docs/session-handoff.md`.
 
 ---
 
@@ -34,6 +38,13 @@ this and explicitly invites it.
 value, the Figma design context is the source of truth (over PNG/PDF exports).
 
 **Style tweaks should be terse.** One-line acknowledgements, not paragraphs.
+
+**Docs edits are pre-approved** (see `settings.local.json`): `docs/*.md`
+(`design.md`, `astro-migration-plan.md`) and the `.claude/*.md` files. Edit them
+without asking, but **always announce what you changed** so Angy can follow
+along. Note: files in `.claude/` are gated by Claude Code as "sensitive" and may
+still prompt regardless of the allow-list — that's why `design.md` was moved to
+`docs/` (freely editable). `claude.md`/`summary.md` must stay in `.claude/`.
 
 **Do not add UI elements that aren't in the Figma/PNG**, even with good
 rationalization. If a value needs to be made visible for debugging or demoing

@@ -1,0 +1,88 @@
+---
+/**
+ * TopNav — simplified "user flow" variant (create-resources): logo (absolute
+ * left) + centered page title (sparkle + uppercase text + BETA pill), 64px,
+ * 4px yellow-20 bottom border, 992px inner. The full Curriculum/Reports variant
+ * (tower-alerts) is deferred until that page is ported.
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  title?: string;
+  /** Where the logo links. */
+  logoHref?: string;
+}
+const { title = "Zearn AI Targeted Materials", logoHref = "#" } = Astro.props;
+---
+
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a class="logo" href={logoHref} aria-label="Zearn home"><Icon name="zearn-logo" /></a>
+    <div class="page-title">
+      <span class="sparkle"><Icon name="sparkle-big" size={20} /></span>
+      <span class="title-text">{title}</span>
+      <span class="beta-pill">BETA</span>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .top-nav {
+    background: var(--white);
+    height: 64px;
+    border-bottom: 4px solid var(--yellow-20);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .nav-inner {
+    width: 992px;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 64px;
+    width: 112px;
+    display: flex;
+    align-items: center;
+  }
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 33px;
+  }
+  .sparkle {
+    flex: none;
+    display: inline-flex;
+  }
+  .title-text {
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--charcoal-95);
+  }
+  .beta-pill {
+    height: 18px;
+    padding: 0 8px;
+    border-radius: 4px;
+    background: var(--purple-5);
+    border: 1px solid var(--purple-90);
+    color: var(--purple-90);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>
