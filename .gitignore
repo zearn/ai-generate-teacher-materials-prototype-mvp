@@ -16,6 +16,11 @@ Thumbs.db
 # ===== Claude Code local state =====
 .claude/settings.local.json
 
+# ===== Astro / Node =====
+node_modules/
+dist/
+.astro/
+
 # ===== Misc =====
 *.log
 .env

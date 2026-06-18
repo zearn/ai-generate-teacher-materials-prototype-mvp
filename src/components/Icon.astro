@@ -1,0 +1,81 @@
+---
+/**
+ * Icon — inlines a cleaned SVG from src/icons/ as a true <svg>.
+ *
+ * Color: single-color UI glyphs use fill="currentColor", so they follow the CSS
+ *   `color` of their context (the whole point of the migration — no more
+ *   baked-in base64 hex, no filter hacks for hover/press). Multi-color brand
+ *   art (zearn-logo, the sparkles, tower-circle, purple-people, the checkbox)
+ *   keeps its literal fills.
+ *
+ * Size: defaults to the icon's intrinsic viewBox dimensions. Override per call
+ *   with `size` (square) or `width`/`height`. These are emitted as ATTRIBUTES,
+ *   so component CSS (e.g. `.sidenav-sparkle svg { width: 12px }`) still wins —
+ *   letting designers size icons by context.
+ *
+ * IDs: every id (and its url(#…) / href="#…" references) is namespaced with a
+ *   random per-render prefix, so inlining the same icon many times on one page
+ *   can't cause duplicate-id / clipPath collisions.
+ */
+const modules = import.meta.glob<string>("../icons/*.svg", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+interface Props {
+  name: string;
+  size?: number | string;
+  width?: number | string;
+  height?: number | string;
+  class?: string;
+  /** When set, the icon is exposed to AT as role="img" with this label;
+   *  otherwise it's aria-hidden (decorative — the default). */
+  title?: string;
+}
+
+const { name, size, width, height, class: className, title } = Astro.props;
+
+const raw = modules[`../icons/${name}.svg`];
+if (!raw) {
+  throw new Error(
+    `<Icon name="${name}" /> — no SVG found at src/icons/${name}.svg`
+  );
+}
+
+// Default dimensions from "viewBox='minX minY W H'".
+const vb = raw.match(/viewBox="([^"]*)"/)?.[1]?.trim().split(/\s+/);
+const w = size ?? width ?? vb?.[2];
+const h = size ?? height ?? vb?.[3];
+
+// Namespace ids so repeated inlining can't collide. Literal replaceAll is safe:
+// each match includes its delimiter (`id="X"`, `url(#X)`, `href="#X"`), so e.g.
+// `id="Vector"` never matches inside `id="Vector_2"`.
+let svg = raw;
+const ids = [...new Set([...svg.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]))];
+if (ids.length) {
+  const uid = `i${Math.random().toString(36).slice(2, 8)}`;
+  for (const id of ids) {
+    svg = svg
+      .replaceAll(`id="${id}"`, `id="${uid}-${id}"`)
+      .replaceAll(`url(#${id})`, `url(#${uid}-${id})`)
+      .replaceAll(`href="#${id}"`, `href="#${uid}-${id}"`);
+  }
+}
+
+// Inject our attributes onto the root <svg> (sources carry none of these).
+const attrs = [
+  w != null ? `width="${w}"` : "",
+  h != null ? `height="${h}"` : "",
+  className ? `class="${className}"` : "",
+  title
+    ? `role="img" aria-label="${title}"`
+    : `aria-hidden="true" focusable="false"`,
+]
+  .filter(Boolean)
+  .join(" ");
+
+svg = svg.replace(/<svg\b/, `<svg ${attrs}`);
+---
+
+<Fragment set:html={svg} />

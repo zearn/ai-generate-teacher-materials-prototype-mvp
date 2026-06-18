@@ -1,0 +1,167 @@
+/*
+ * create-resources state gating (global, but only imported by create-resources.astro).
+ * Controls DISPLAY by the <html> state classes — .loading (default) / .loaded /
+ * .recreating / .loading-worksheet / .loading-samplescript / .no-worksheet — and
+ * per-section .visible. Component scoped styles handle appearance; this handles
+ * which pieces show in each state. Lives here (not scoped) because the rules
+ * cross component boundaries (sidenav items, page sections, button-group).
+ *
+ * DEFAULT = loading. The client script adds `.loaded` to <html> after the load
+ * delay; the inverted default means the loading state survives even if a preview
+ * environment strips classes added during load.
+ */
+
+/* ===== Sidenav loading skeleton ===== */
+.nav-skeleton {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.nav-skeleton .skel-bar {
+  height: 18px;
+  border-radius: 5px;
+  margin: 12px 16px;
+  background-color: var(--gray-15);
+  background-image: linear-gradient(
+    90deg,
+    rgba(225, 225, 225, 0.1) 0%,
+    rgba(225, 225, 225, 1) 50%,
+    rgba(225, 225, 225, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.5s ease-in-out infinite;
+}
+@keyframes skel-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ===== Loading content (message + sparkle illustration) ===== */
+.loading-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  padding: 64px 36px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--white);
+  transition: opacity 0.5s ease;
+}
+/* Loader message + sparkle (shared by .loading-content and .new-material-loading). */
+.loading-message {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.loading-message.fade-in {
+  opacity: 1;
+}
+.sparkle-anim {
+  margin-top: 48px;
+  width: 147.333px;
+  height: 176.661px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sparkle-anim svg {
+  width: 130.447px;
+  height: 163.54px;
+  transform: rotate(6.19deg);
+}
+/* Each sparkle cycles fill between fuchsia-5 (lightest) and fuchsia-60 (darkest),
+   staggered so they're out of sync. */
+@keyframes sparkle-fade {
+  0%, 100% { fill: var(--fuchsia-5); }
+  50% { fill: var(--fuchsia-60); }
+}
+.sparkle-anim .sparkle-1 { animation: sparkle-fade 2.4s ease-in-out infinite; }
+.sparkle-anim .sparkle-2 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -0.8s; }
+.sparkle-anim .sparkle-3 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -1.6s; }
+
+/* ===== DEFAULT (loading): hide real content, show skeleton + loading card ===== */
+.sidenav > .sidenav-active,
+.sidenav > .subnav-item,
+.sidenav > .coming-soon,
+.main-col > .button-group,
+.material-section { display: none; }
+.nav-skeleton { display: flex; }
+.page-area { height: 532px; }
+
+/* ===== Loaded: hide loading, show real ===== */
+.loaded .nav-skeleton { display: none; }
+html.loaded .loading-content { opacity: 0; pointer-events: none; }
+.loaded .sidenav > .sidenav-active { display: flex; }
+.loaded .sidenav > .subnav-item { display: flex; }
+.loaded .sidenav > .coming-soon { display: flex; }
+.loaded .main-col > .button-group { display: block; }
+.loaded #section-miniLesson { display: block; }
+/* Worksheet / Sample Script sections stay as "slots" in the loaded state — each
+   holds either its CTA card (before generation) or the generated preview. */
+.loaded #section-worksheet,
+.loaded #section-sampleScript { display: block; }
+#section-worksheet > .lesson-preview,
+#section-sampleScript > .lesson-preview { display: none; }
+#section-worksheet.visible > .lesson-preview,
+#section-sampleScript.visible > .lesson-preview { display: block; }
+.material-section > .pdf-cta { margin: 36px; }
+.material-section.visible > .pdf-cta { display: none; }
+.material-section.visible { display: block; }
+/* Loaded: sections carry their own shadow, so drop the container's. */
+html.loaded .page-area {
+  box-shadow: none;
+  padding-bottom: 6px;
+}
+
+/* A CTA hides once its material is generated (the section's preview shows instead). */
+.pdf-cta.is-generated { display: none; }
+
+/* ===== Recreating (mini-lesson recreate): overlay on top of .loaded ===== */
+/* Sidenav stays; the page-area shows the loading overlay; button-group + sections
+   hide. The html.recreating qualifier outranks the .loaded rules above. */
+html.recreating .material-section { display: none !important; }
+html.recreating .loading-content { opacity: 1; pointer-events: auto; }
+html.recreating .page-area {
+  height: 532px;
+  box-shadow: var(--card-dropshadow);
+  padding-bottom: 0;
+}
+html.recreating .main-col > .button-group { display: none; }
+
+/* ===== Material generation (worksheet / sample script) ===== */
+/* While generating, hide that section's CTA + preview; the loader (moved into the
+   section by the script) shows in its place. Mini lesson + button-group stay. */
+html.loading-worksheet #section-worksheet > .lesson-preview,
+html.loading-worksheet #section-worksheet > .pdf-cta { display: none !important; }
+html.loading-samplescript #section-sampleScript > .lesson-preview,
+html.loading-samplescript #section-sampleScript > .pdf-cta { display: none !important; }
+
+/* The inline loader: a white card by default; sheds its chrome once moved into a
+   material-section (the section already provides the background + shadow). */
+.new-material-loading {
+  display: none;
+  width: 792px;
+  min-height: 532px;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 36px 0;
+  box-sizing: border-box;
+  background: var(--white);
+  box-shadow: var(--card-dropshadow);
+}
+.material-section > .new-material-loading {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  box-shadow: none;
+}

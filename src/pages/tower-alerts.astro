@@ -1,0 +1,932 @@
+---
+/**
+ * Tower Alerts page (Reports → Class Reports → Tower Alerts). Source page: the
+ * teacher's struggling-student alerts; each card links to create-resources.
+ *
+ * Straight 1:1 port of tower-alerts-prototype-*.html (4 alerts, not "10").
+ * PHASE 1 (this chunk, T1a+T1b): static chrome + layout skeleton + filter
+ * sidebar + right-column scaffold. T1c = alert cards. Phase 2 = filters +
+ * Create Targeted Materials modal + nav.
+ *
+ * Page-specific chrome is inline here (only this page uses the full nav).
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import CreateTargetedMaterialsModal from "../components/CreateTargetedMaterialsModal.astro";
+
+const STUDENTS = [
+  { name: "Suzanne Alvarez",  count: 3 },
+  { name: "Brianna Barrios",  count: 5 },
+  { name: "Trina Brown",      count: 0 },
+  { name: "Paul Derrick",     count: 2 },
+  { name: "Sebastian Diaz",   count: 0 },
+  { name: "Janiya DuBuque",   count: 2 },
+  { name: "Fernando Garcia",  count: 3 },
+  { name: "Jordan Goldstein", count: 2 },
+  { name: "Roxanne Jacobson", count: 0 },
+  { name: "Franklin Joseph",  count: 0 },
+  { name: "Alexia Lee",       count: 0 },
+  { name: "Porter Levy",      count: 1 },
+  { name: "Alberto Martinez", count: 3 },
+  { name: "Grace McCarty",    count: 0 },
+  { name: "Elijah Park",      count: 4 },
+  { name: "Ashin Patel",      count: 4 },
+  { name: "Jose Perez",       count: 3 },
+  { name: "Iliana Peters",    count: 4 },
+  { name: "Naomi Sachs",      count: 1 },
+  { name: "Jaiden Thomas",    count: 0 },
+  { name: "Olivia Tran",      count: 0 },
+  { name: "Jada Williams",    count: 0 },
+  { name: "Jesse Williamson", count: 3 },
+  { name: "Sam Wyman",        count: 0 },
+  { name: "Benjamin Young",   count: 0 },
+];
+
+const GRADES = [
+  { name: "Kindergarten", count: null as number | null },
+  { name: "Grade 1",      count: null },
+  { name: "Grade 2",      count: null },
+  { name: "Grade 3",      count: null },
+  { name: "Grade 4",      count: 40 },
+  { name: "Grade 5",      count: null },
+  { name: "Grade 6",      count: null },
+  { name: "Grade 7",      count: null },
+  { name: "Grade 8",      count: null },
+];
+
+const ALERTS: Array<{
+  student: string; loc: string; lesson: string; desc: string;
+  events: Array<{ type: "alert" | "completed"; ts: string }>;
+  count: number;
+}> = [
+  {
+    student: "Elijah Park", loc: "Grade 8 | Mission 2 | Topic C",
+    lesson: "Lesson 10: Meet Slope",
+    desc: "Find the slope of a line on a grid using properties of slope triangles.",
+    events: [
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:37 PM" },
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:32 PM" },
+      { type: "alert", ts: "Tue, Mar 31, 2026, 3:48 PM" },
+      { type: "alert", ts: "Tue, Mar 31, 2026, 3:11 PM" },
+    ], count: 4,
+  },
+  {
+    student: "Porter Levy", loc: "Grade 3 | Mission 3 | Topic B",
+    lesson: "Lesson 7: Savvy Sixes and Sevens",
+    desc: "Interpret the unknown in multiplication and division to model and solve problems using units of 6 and 7.",
+    events: [
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:11 PM" },
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:06 PM" },
+    ], count: 2,
+  },
+  {
+    student: "Jesse Williamson", loc: "Grade 5 | Mission 6 | Topic D",
+    lesson: "Lesson 19: Line Graph Greatness",
+    desc: "Plot data on line graphs and analyze trends.",
+    events: [
+      { type: "completed", ts: "Wed, Apr 1, 2026, 2:53 PM" },
+      { type: "alert",     ts: "Tue, Mar 31, 2026, 2:52 PM" },
+    ], count: 1,
+  },
+  {
+    student: "Paul Derrick", loc: "Grade 4 | Mission 5 | Topic A",
+    lesson: "Lesson 6: Area Model - Breakdown!",
+    desc: "Decompose fractions using area models to show equivalence.",
+    events: [
+      { type: "completed", ts: "Wed, Apr 1, 2026, 2:50 PM" },
+      { type: "alert",     ts: "Wed, Apr 1, 2026, 2:46 PM" },
+    ], count: 1,
+  },
+];
+---
+
+<BaseLayout title="Tower Alerts — Zearn">
+  <div class="header-wrap">
+    <nav class="top-nav">
+      <div class="nav">
+        <div class="left">
+          <span class="logo-wrap"><Icon name="zearn-logo" /></span>
+          <button class="top-tab">CURRICULUM</button>
+          <button class="top-tab active">REPORTS</button>
+        </div>
+        <div class="right">
+          <a class="link link-assignments" href="#">Assignments</a>
+          <a class="link link-roster" href="#">Roster</a>
+          <a class="link link-resources" href="#">Resources</a>
+          <a class="link link-help" href="#" aria-label="Help (opens in a new tab)">
+            Help<Icon name="open-new-tab" />
+          </a>
+          <div class="account-box">
+            <span class="school-chip">School<br />Account</span>
+            <span class="account-name">Ahmed</span>
+            <span class="caret"><Icon name="chevron-down-name" /></span>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="yellow-bar"></div>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li>
+          <a class="crumb-link" href="#">Reports</a>
+          <span class="crumb-sep" aria-hidden="true"><Icon name="chevron-right-bc" /></span>
+        </li>
+        <li>
+          <a class="crumb-link" href="#">Class Reports</a>
+          <span class="crumb-sep" aria-hidden="true"><Icon name="chevron-right-bc" /></span>
+        </li>
+        <li>
+          <button class="crumb-select" aria-haspopup="true">
+            Tower Alerts
+            <span class="caret"><Icon name="chevron-down-tower" /></span>
+          </button>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="page-area">
+    <main>
+      <section class="page-header">
+        <h1>
+          Tower Alerts
+          <span class="help-link" id="helpIcon" tabindex="0" data-tip="An alert is triggered when a student struggles repeatedly on the same concept in a tower.">
+            <Icon name="help-circle" title="Help" />
+          </span>
+        </h1>
+        <p class="subtitle">An alert is triggered when a student struggles repeatedly on the same concept in a tower.</p>
+      </section>
+
+      <section class="selector">
+        <button class="pill">
+          Kleinfeldt - Grade 4
+          <span class="caret" aria-hidden="true"><Icon name="chevron-small-down" /></span>
+        </button>
+      </section>
+
+      <section class="hero">
+        <div class="left">
+          <span class="icon"><Icon name="purple-people" size={72} /></span>
+          <div>
+            <h2>Kleinfeldt - Grade 4</h2>
+            <div class="meta">Grade 4 | 25 Students</div>
+          </div>
+        </div>
+        <button class="print-btn"><Icon name="print" /> Print</button>
+      </section>
+
+      <div class="columns">
+
+        <!-- LEFT: Filter sidebar -->
+        <aside>
+          <div class="filter-header"><span>Filter by</span></div>
+
+          <div class="filter-box">
+            <div class="filter-row">
+              <label>Completed Towers</label>
+              <div class="toggle on" id="completedToggle" role="switch" aria-checked="true">
+                <span class="label-hide">Hide</span>
+                <span class="switch" tabindex="0">
+                  <span class="track"></span>
+                  <span class="knob"></span>
+                </span>
+                <span class="label-show">Show</span>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <label for="dateFilter">Date</label>
+              <div class="dropdown">
+                <select id="dateFilter">
+                  <option>All</option>
+                  <option>Past Week</option>
+                  <option selected>Past 2 Weeks</option>
+                  <option>Past 3 Weeks</option>
+                  <option>Past Month</option>
+                  <option>Past 6 Months</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <label for="strugglesFilter">Struggles</label>
+              <div class="dropdown">
+                <select id="strugglesFilter">
+                  <option selected>1 or more</option>
+                  <option>2 or more</option>
+                  <option>3 or more</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Students panel -->
+          <div class="panel" id="studentsPanel">
+            <button class="panel-header" data-toggle="studentsPanel">
+              Students
+              <span class="chev" aria-hidden="true"><Icon name="chevron-up-students" size={16} /></span>
+            </button>
+            <div class="list" id="studentList">
+              <div class="row selected"><span>ALL</span><span class="count">40&nbsp;Results</span></div>
+              {STUDENTS.map(s => (
+                <div class={`row ${s.count > 0 ? 'semibold' : 'regular'}`}>
+                  <span>{s.name}</span>
+                  {s.count > 0 && <span class="count">{s.count}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Content panel -->
+          <div class="panel" id="contentPanel">
+            <button class="panel-header" data-toggle="contentPanel">
+              Content
+              <span class="chev" aria-hidden="true"><Icon name="chevron-up-content" size={16} /></span>
+            </button>
+            <div class="list content-list" id="contentList">
+              <div class="row selected">
+                <span class="label-wrap"><span>ALL</span><span class="count">40&nbsp;Results</span></span>
+              </div>
+              {GRADES.map(g => (
+                <div class={`row ${g.count != null ? 'semibold' : 'regular'}`}>
+                  <span class="twirl"><Icon name="chevron-right-grade" size={16} /></span>
+                  <span class="label-wrap">
+                    <span>{g.name}</span>
+                    {g.count != null && <span class="count">{g.count}</span>}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT: Sort + alerts + load more -->
+        <section>
+          <div class="sort-row">
+            <div class="sort-left">
+              <span class="label">Sort by</span>
+              <div class="dropdown wide lg">
+                <select id="sortBy">
+                  <option selected>Date: Newest</option>
+                  <option>Date: Earliest</option>
+                  <option>Content: Newest</option>
+                  <option>Content: Earliest</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+            <div class="results-count"><span>40</span><span class="rest">&nbsp;Results</span></div>
+          </div>
+
+          <div class="alerts" id="alerts">
+            {ALERTS.map(a => (
+              <article class="alert">
+                <div class="alert-icon">
+                  <Icon name="tower-circle" size={48} />
+                </div>
+                <div class="alert-head">
+                  <div class="alert-info">
+                    <div class="student-row">
+                      <span class="student-name">{a.student}</span>
+                      <a class="student-report-link" href="#" title="View student report">
+                        <Icon name="student-report-v2" size={16} />
+                      </a>
+                    </div>
+                  </div>
+                  <div class="alert-side">
+                    <a class="create-resources"
+                       href={`/create-resources?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}&loc=${encodeURIComponent(a.loc)}`}
+                       data-student={a.student}
+                       data-lesson={a.lesson}
+                       data-loc={a.loc}
+                       data-desc={a.desc}>
+                      <Icon name="link-sparkle" size={18} />
+                      Create Targeted Materials
+                    </a>
+                    <span class="alert-divider"></span>
+                    <span class="alert-count">{a.count}</span>
+                    <span class="bang-icon">
+                      <Icon name="circle-bang" size={24} />
+                    </span>
+                  </div>
+                </div>
+                <div class="breadcrumb-meta">{a.loc}</div>
+                <a class="lesson-link" href="#">{a.lesson}</a>
+                <div class="alert-desc">{a.desc}</div>
+                <div class="sep"></div>
+                {a.events.map(e => (
+                  <div class={`event evt-${e.type}`}>
+                    <span class="ico">
+                      {e.type === "completed" ? (
+                        <svg class="alert-check" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M6 11.2L2.8 8 1.4 9.4 6 14l9-9-1.4-1.4z"/>
+                        </svg>
+                      ) : (
+                        <Icon name="icon-bang" />
+                      )}
+                    </span>
+                    <span class="label">{e.type === "completed" ? "Completed" : "Alert"}</span>
+                    <span class="ts">{e.ts}</span>
+                  </div>
+                ))}
+              </article>
+            ))}
+          </div>
+
+          <div class="load-more-wrap">
+            <button class="load-more">LOAD MORE</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <CreateTargetedMaterialsModal />
+</BaseLayout>
+
+<script>
+  import "../scripts/tower-alerts.ts";
+</script>
+
+<style>
+  .header-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    background: var(--white);
+    height: 64px;
+    display: flex;
+    justify-content: center;
+  }
+  .yellow-bar { height: 4px; background: var(--yellow-20); }
+  .header-wrap.scrolled .breadcrumb {
+    box-shadow: inset 0 -1px 0 0 var(--gray-30), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  }
+  .top-nav .nav { display: flex; justify-content: space-between; width: 992px; }
+  .top-nav .left { display: flex; align-items: center; }
+  .logo-wrap { width: 112px; padding-right: 16px; display: flex; align-items: center; }
+  .top-tab {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: uppercase;
+    color: var(--charcoal-95);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .top-tab.active { background: var(--yellow-20); color: var(--black); }
+
+  .top-nav .right { position: relative; width: 566px; height: 64px; }
+  .top-nav .right .link {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--charcoal-95);
+    background: var(--white);
+    text-decoration: none;
+  }
+  .link-assignments { left: 0; }
+  .link-roster { left: 119.56px; }
+  .link-resources { left: 195.77px; }
+  .link-help { left: 297.6px; }
+  .account-box {
+    position: absolute;
+    left: 381.68px;
+    top: 0;
+    bottom: 0;
+    min-width: 120px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border-left: 1px solid var(--gray-30);
+    border-right: 1px solid var(--gray-30);
+  }
+  .school-chip {
+    background: var(--green-80);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 14.4px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 4px 8px;
+  }
+  .account-name {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--charcoal-95);
+    margin-right: 4px;
+  }
+  .account-box .caret { display: inline-flex; color: var(--charcoal-95); }
+
+  /* ===== Breadcrumb ===== */
+  .breadcrumb {
+    background: var(--gray-5);
+    box-shadow: inset 0 -1px 0 0 var(--gray-30);
+    height: 56px;
+    display: flex;
+    justify-content: center;
+  }
+  .breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    width: 992px;
+    height: 100%;
+  }
+  .breadcrumb li { height: 56px; display: flex; align-items: center; }
+  .breadcrumb .crumb-link {
+    color: var(--charcoal-90);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 21px;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 1px;
+  }
+  .breadcrumb .crumb-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 1px;
+    background: var(--charcoal-90);
+    transition: height 0.12s ease;
+  }
+  .breadcrumb .crumb-link:hover::after { height: 4px; }
+  .breadcrumb .crumb-sep {
+    padding: 0 13.58px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--charcoal-90);
+  }
+  .breadcrumb .crumb-select {
+    background: var(--white);
+    border: 1px solid var(--gray-30);
+    padding: 1px 29px 1px 9px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    color: var(--aqua-75);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 20px;
+    position: relative;
+    min-width: 64px;
+    cursor: pointer;
+  }
+  .crumb-select .caret {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    color: var(--aqua-75);
+  }
+
+  /* ===== Page area / card ===== */
+  .page-area {
+    background: var(--gray-5);
+    padding: 24px 32px 48px;
+    display: flex;
+    justify-content: center;
+  }
+  main {
+    width: 1024px;
+    background: var(--white);
+    padding: 0 16px;
+    border-radius: 4px;
+    box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 3px 0;
+  }
+
+  .page-header { padding: 24px 0 32px; text-align: center; }
+  .page-header h1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
+    color: var(--charcoal-95);
+  }
+  .help-link {
+    display: inline-flex;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    cursor: help;
+    color: var(--aqua-75);
+  }
+  .page-header .subtitle {
+    margin: 0;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--charcoal-95);
+  }
+
+  .selector { padding: 0 84px 0 100px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--gray-5);
+    padding: 8px 16px;
+    color: var(--aqua-75);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    border: 0;
+    cursor: pointer;
+  }
+  .pill .caret { margin-left: 8px; display: inline-flex; color: var(--aqua-75); }
+
+  .hero {
+    padding: 16px 84px 56px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .hero .left { display: flex; align-items: flex-start; gap: 16px; }
+  .hero .icon { width: 72px; height: 72px; padding-top: 6px; display: inline-flex; }
+  .hero h2 {
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 48px;
+    margin: 0;
+    color: var(--charcoal-95);
+    white-space: nowrap;
+  }
+  .hero .meta { font-size: 20px; line-height: 30px; color: var(--charcoal-95); }
+  .print-btn {
+    margin-top: 38px;
+    height: 40px;
+    min-width: 104px;
+    border: 1px solid var(--aqua-75);
+    border-radius: 25px;
+    background: var(--white);
+    color: var(--aqua-75);
+    font-weight: 600;
+    font-size: 16px;
+    padding: 0 21px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  /* 2-col layout */
+  .columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; }
+
+  /* ===== Filter sidebar ===== */
+  .filter-header {
+    height: 56px; display: flex; align-items: center;
+    padding: 0 16px; font-weight: 400;
+  }
+  .filter-header span { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+  .filter-box {
+    background: var(--gray-5);
+    padding: 24px 16px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; }
+  .filter-row > label { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+  .toggle {
+    position: relative; width: 117px; height: 24px;
+    display: flex; align-items: center;
+  }
+  .toggle .label-hide { position: absolute; left: 0; }
+  .toggle .label-show { position: absolute; left: 79px; }
+  .toggle .switch {
+    position: absolute; left: 39px; top: 1px;
+    width: 32px; height: 22px; cursor: pointer;
+  }
+  .toggle .switch .track {
+    position: absolute; inset: 1px 0;
+    background: var(--gray-30);
+    border: 1px solid var(--aqua-75);
+    border-radius: 10px;
+    box-shadow: inset 0 0 1px 1px var(--aqua-75);
+    overflow: hidden;
+  }
+  .toggle .switch .track::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 20px; background: var(--aqua-75);
+    transition: width 0.15s ease;
+  }
+  .toggle .switch .knob {
+    position: absolute; left: 10px; top: 0;
+    width: 22px; height: 22px;
+    background: var(--white);
+    border: 2px solid var(--aqua-75); border-radius: 50%;
+    box-shadow: 1px 1px 3px 0 #b3b3b3;
+    transition: left 0.15s ease;
+  }
+  .toggle.off .switch .track::before { width: 0; }
+  .toggle.off .switch .knob { left: 0; }
+
+  .dropdown { position: relative; width: 136px; height: 40px; }
+  .dropdown.wide { width: 184px; }
+  .dropdown select {
+    appearance: none; -webkit-appearance: none;
+    width: 100%; height: 100%;
+    background: var(--white);
+    border: 1px solid var(--gray-55); border-radius: 4px;
+    padding: 8px 35px 8px 11px;
+    font: inherit; color: var(--charcoal-95);
+    font-size: 14px; line-height: 21px;
+  }
+  .dropdown.lg select { font-size: 16px; line-height: 24px; }
+  .dropdown .caret {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px;
+    pointer-events: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--charcoal-95);
+  }
+
+  /* Students / Content panels */
+  .panel {
+    background: var(--gray-5); padding: 0 0 16px 0;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 16px;
+  }
+  .panel:last-child { margin-bottom: 0; }
+  .panel-header {
+    width: 100%; padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--aqua-75); font-weight: 600; font-size: 16px; line-height: 24px;
+    background: none; border: none; cursor: pointer;
+  }
+  .panel-header .chev {
+    width: 16px; height: 8.298px; display: inline-flex;
+    transition: transform 0.15s ease;
+  }
+  .panel.collapsed .chev { transform: rotate(180deg); }
+  .panel.collapsed .list { display: none; }
+  .panel.collapsed { padding-bottom: 0; }
+
+  .list {
+    width: 288px;
+    background: var(--white);
+    border: 1px solid var(--gray-55);
+    border-radius: 4px;
+    max-height: 258px; overflow: auto;
+    padding: 16px;
+  }
+  .list .row {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+    line-height: 1.5;
+    border-radius: 12px;
+    padding: 0 8px;
+    margin-top: 8px;
+    color: var(--charcoal-95);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background-color: transparent;
+    transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .list .row > span:first-child {
+    width: 172px;
+    text-align: left;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .list .row .count { font-size: 16px; overflow: initial; }
+  .list .row.regular { font-weight: 400; }
+  .list .row:hover,
+  .list .row:focus,
+  .list .row:active { background-color: rgba(0, 0, 0, 0.078); }
+  .list .row.selected {
+    background-color: var(--aqua-75);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .list .row.selected .count { color: var(--white); }
+  .list .row.selected:hover,
+  .list .row.selected:focus { background-color: var(--aqua-85); }
+  .list .row.selected:active { background-color: #003e4d; }
+  .list .row.partially-selected {
+    border-color: var(--aqua-75);
+    color: var(--aqua-75);
+    background-color: transparent;
+  }
+  .list .row.partially-selected:hover,
+  .list .row.partially-selected:focus {
+    border-color: var(--aqua-85);
+    color: var(--aqua-85);
+    background-color: var(--white);
+  }
+  .list .row.partially-selected:active { border-color: #003e4d; color: #003e4d; }
+
+  /* Content list */
+  .list.content-list { padding: 17px 9px 13px; }
+  .list.content-list .row { padding: 0; margin-bottom: 0; }
+  .list.content-list .row .twirl {
+    width: 24px; height: 24px; margin: 8px 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--charcoal-95);
+  }
+  .list.content-list .row .label-wrap {
+    flex: 1; padding: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 12px;
+  }
+  .list.content-list .row:first-child .label-wrap { padding: 0 8px; }
+  .list.content-list .row.selected .label-wrap { background: var(--aqua-75); color: var(--white); }
+  .list.content-list .row.selected .label-wrap .count { color: var(--white); }
+  .list.content-list .row.selected { background: transparent; color: var(--charcoal-95); }
+
+  /* Right column: Sort + results */
+  .sort-row {
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .sort-left { display: flex; align-items: center; }
+  .sort-left .label { padding: 0 16px 0 24px; font-weight: 600; font-size: 16px; line-height: 24px; }
+  .results-count {
+    padding: 16px;
+    font-weight: 600; font-size: 16px; line-height: 24px; color: var(--charcoal-95);
+  }
+  .results-count .rest { font-weight: 400; }
+
+  .alerts { display: flex; flex-direction: column; gap: 16px; }
+
+  .load-more-wrap {
+    height: 56px;
+    display: flex; justify-content: center; align-items: flex-end;
+    margin-bottom: 48px;
+  }
+  .load-more {
+    height: 40px; min-width: 104px;
+    border: 1px solid var(--aqua-75); border-radius: 25px;
+    background: var(--white); color: var(--aqua-75);
+    font-weight: 600; font-size: 16px;
+    text-transform: uppercase;
+    padding: 0 21px;
+    cursor: pointer;
+  }
+  .print-btn:hover,
+  .load-more:hover { background: var(--aqua-75); color: var(--white); }
+  .print-btn:active,
+  .load-more:active {
+    background: var(--aqua-85);
+    border-color: var(--aqua-85);
+    color: var(--white);
+  }
+
+  /* ===== Alert cards (T1c) ===== */
+  .alert {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--purple);
+    border-left: 8px solid var(--purple);
+    border-radius: 4px;
+    padding: 16px 24px 24px 36px;
+    margin-bottom: 16px;
+  }
+  .alert-icon {
+    position: absolute; left: -28px; top: 16px;
+    width: 48px; height: 48px;
+  }
+  .alert-head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .alert-info { display: flex; flex-direction: column; gap: 8px; }
+  .student-row { display: flex; align-items: center; gap: 8px; }
+  .student-name {
+    font-weight: 400; font-size: 20px; line-height: 30px; color: var(--charcoal-95);
+  }
+  .student-report-link {
+    display: inline-flex; align-items: center; height: 24px; padding-left: 8px;
+    color: var(--aqua-75);
+  }
+  .breadcrumb-meta {
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95); margin: 8px 0;
+  }
+  .lesson-link {
+    font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua-75);
+    max-width: 568px; display: block;
+  }
+  .lesson-link:hover { text-decoration: underline; }
+  .alert-side {
+    display: flex; align-items: center; margin-left: 16px;
+    font-weight: 600; color: var(--purple);
+  }
+  .create-resources {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--aqua-75);
+    font-weight: 600; font-size: 16px; line-height: 1.5;
+    white-space: nowrap;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 4px;
+  }
+  .create-resources:hover {
+    color: var(--aqua-85);
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-75);
+  }
+  .create-resources:active {
+    color: #00485a;
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-85);
+  }
+  .alert-divider {
+    width: 1px; align-self: stretch;
+    background: var(--gray-30);
+    min-height: 32px;
+    margin: 0 16px;
+  }
+  .alert-count {
+    font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple);
+  }
+  .bang-icon {
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .alert-desc {
+    padding: 8px 0 16px;
+    font-weight: 400; font-size: 14px; line-height: 21px;
+    color: var(--charcoal-95); max-width: 567px;
+  }
+  .sep { border-top: 1px solid var(--gray-30); }
+  .event {
+    display: flex; align-items: center;
+    height: 24px; margin-top: 8px;
+    border: none; background: transparent;
+  }
+  .event:first-of-type { margin-top: 12px; }
+  .event .ico {
+    width: 14.5px; height: 14.5px;
+    margin-left: 4.7px; margin-right: 13px;
+    display: inline-flex; flex-shrink: 0;
+    color: var(--purple);
+  }
+  .event.evt-completed .ico {
+    background: var(--green-80); border-radius: 50%;
+    color: var(--white); align-items: center; justify-content: center;
+  }
+  .alert-check {
+    background: var(--green-80);
+    color: var(--white);
+    border-radius: 50%;
+    width: 14.5px; height: 14.5px;
+    padding: 3px;
+  }
+  .event .label {
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+    margin-right: 8px;
+  }
+  .event .ts {
+    font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+  }
+
+  /* ===== Help tooltip ===== */
+  .tooltip {
+    position: absolute; pointer-events: none;
+    max-width: 280px;
+    background: var(--charcoal-95); color: var(--white);
+    padding: 8px 10px; border-radius: 4px;
+    font-size: 13px; line-height: 1.4;
+    z-index: 50; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transform: translateY(calc(-100% - 8px));
+    opacity: 0; transition: opacity 0.12s;
+  }
+  .tooltip.show { opacity: 1; }
+</style>

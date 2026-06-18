@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Placeholder index for the Astro scaffold. Real screens get ported from the
+// existing HTML / built from Figma frames — see docs/astro-migration-plan.md.
+const screens = [
+  { href: "/tower-alerts", label: "Tower Alerts" },
+  { href: "/create-resources", label: "AI Targeted Materials" },
+];
+---
+
+<BaseLayout title="Zearn Prototype — index">
+  <main style="max-width: 1024px; margin: 0 auto; padding: 48px 24px;">
+    <h1 style="color: var(--charcoal-95);">Zearn AI Targeted Materials — prototype</h1>
+    <p style="color: var(--gray-75);">
+      Astro scaffold. Screens are being ported from the existing HTML prototype.
+    </p>
+    <ul>
+      {screens.map((s) => (
+        <li><a href={s.href}>{s.label}</a></li>
+      ))}
+    </ul>
+  </main>
+</BaseLayout>

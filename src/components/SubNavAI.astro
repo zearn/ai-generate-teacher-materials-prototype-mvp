@@ -1,0 +1,88 @@
+---
+/**
+ * SubNav — 48px bar under the TopNav: "Back to Tower Alerts" (absolute left,
+ * circular back-arrow + label that underlines on hover) + centered
+ * "Targeted Materials for {studentName}". 992px inner.
+ *
+ * The back link is rendered as an <a href>; on create-resources the page script
+ * intercepts the click to open the Before-You-Go modal (wired at assembly).
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  studentName?: string;
+  backHref?: string;
+}
+const { studentName = "Elijah Park", backHref = "/tower-alerts" } = Astro.props;
+---
+
+<div class="sub-nav">
+  <div class="nav-inner">
+    <a class="back-btn" href={backHref} aria-label="Back to Tower Alerts">
+      <span class="back-icon"><Icon name="back-arrow" size={32} /></span>
+      <span class="label">Back to Tower Alerts</span>
+    </a>
+    <span class="center-title">Targeted Materials for {studentName}</span>
+  </div>
+</div>
+
+<style>
+  .sub-nav {
+    background: var(--white);
+    height: 48px;
+    border-bottom: 1px solid var(--gray-30);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-inner {
+    width: 992px;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .center-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--charcoal-95);
+  }
+  .back-btn {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--charcoal-95);
+    text-decoration: none;
+  }
+  .back-icon {
+    flex: none;
+    display: inline-flex;
+    /* back-arrow ring+arrow are currentColor (white disc stays literal) */
+    color: var(--aqua-75);
+  }
+  .back-btn .label {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    color: var(--charcoal-95);
+    /* Pre-set thickness/offset so :hover only turns the line on. */
+    text-decoration-thickness: 4px;
+    text-underline-offset: 4px;
+  }
+  .back-btn:hover .label {
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-75);
+  }
+  .back-btn:active .label {
+    color: var(--charcoal-100);
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-95);
+  }
+</style>
