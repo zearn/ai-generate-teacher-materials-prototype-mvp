@@ -52,6 +52,51 @@ const GRADES = [
   { name: "Grade 7",      count: null },
   { name: "Grade 8",      count: null },
 ];
+
+const ALERTS: Array<{
+  student: string; loc: string; lesson: string; desc: string;
+  events: Array<{ type: "alert" | "completed"; ts: string }>;
+  count: number;
+}> = [
+  {
+    student: "Elijah Park", loc: "Grade 8 | Mission 2 | Topic C",
+    lesson: "Lesson 10: Meet Slope",
+    desc: "Find the slope of a line on a grid using properties of slope triangles.",
+    events: [
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:37 PM" },
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:32 PM" },
+      { type: "alert", ts: "Tue, Mar 31, 2026, 3:48 PM" },
+      { type: "alert", ts: "Tue, Mar 31, 2026, 3:11 PM" },
+    ], count: 4,
+  },
+  {
+    student: "Porter Levy", loc: "Grade 3 | Mission 3 | Topic B",
+    lesson: "Lesson 7: Savvy Sixes and Sevens",
+    desc: "Interpret the unknown in multiplication and division to model and solve problems using units of 6 and 7.",
+    events: [
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:11 PM" },
+      { type: "alert", ts: "Wed, Apr 1, 2026, 3:06 PM" },
+    ], count: 2,
+  },
+  {
+    student: "Jesse Williamson", loc: "Grade 5 | Mission 6 | Topic D",
+    lesson: "Lesson 19: Line Graph Greatness",
+    desc: "Plot data on line graphs and analyze trends.",
+    events: [
+      { type: "completed", ts: "Wed, Apr 1, 2026, 2:53 PM" },
+      { type: "alert",     ts: "Tue, Mar 31, 2026, 2:52 PM" },
+    ], count: 1,
+  },
+  {
+    student: "Paul Derrick", loc: "Grade 4 | Mission 5 | Topic A",
+    lesson: "Lesson 6: Area Model - Breakdown!",
+    desc: "Decompose fractions using area models to show equivalence.",
+    events: [
+      { type: "completed", ts: "Wed, Apr 1, 2026, 2:50 PM" },
+      { type: "alert",     ts: "Wed, Apr 1, 2026, 2:46 PM" },
+    ], count: 1,
+  },
+];
 ---
 
 <BaseLayout title="Tower Alerts — Zearn">
@@ -236,7 +281,58 @@ const GRADES = [
           </div>
 
           <div class="alerts" id="alerts">
-            <!-- T1c: alert cards rendered here -->
+            {ALERTS.map(a => (
+              <article class="alert">
+                <div class="alert-icon">
+                  <Icon name="tower-circle" size={48} />
+                </div>
+                <div class="alert-head">
+                  <div class="alert-info">
+                    <div class="student-row">
+                      <span class="student-name">{a.student}</span>
+                      <a class="student-report-link" href="#" title="View student report">
+                        <Icon name="student-report-v2" size={16} />
+                      </a>
+                    </div>
+                  </div>
+                  <div class="alert-side">
+                    <a class="create-resources"
+                       href={`/create-resources?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}&loc=${encodeURIComponent(a.loc)}`}
+                       data-student={a.student}
+                       data-lesson={a.lesson}
+                       data-loc={a.loc}
+                       data-desc={a.desc}>
+                      <Icon name="link-sparkle" size={18} />
+                      Create Targeted Materials
+                    </a>
+                    <span class="alert-divider"></span>
+                    <span class="alert-count">{a.count}</span>
+                    <span class="bang-icon">
+                      <Icon name="circle-bang" size={24} />
+                    </span>
+                  </div>
+                </div>
+                <div class="breadcrumb-meta">{a.loc}</div>
+                <a class="lesson-link" href="#">{a.lesson}</a>
+                <div class="alert-desc">{a.desc}</div>
+                <div class="sep"></div>
+                {a.events.map(e => (
+                  <div class={`event evt-${e.type}`}>
+                    <span class="ico">
+                      {e.type === "completed" ? (
+                        <svg class="alert-check" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M6 11.2L2.8 8 1.4 9.4 6 14l9-9-1.4-1.4z"/>
+                        </svg>
+                      ) : (
+                        <Icon name="icon-bang" />
+                      )}
+                    </span>
+                    <span class="label">{e.type === "completed" ? "Completed" : "Alert"}</span>
+                    <span class="ts">{e.ts}</span>
+                  </div>
+                ))}
+              </article>
+            ))}
           </div>
 
           <div class="load-more-wrap">
@@ -706,5 +802,109 @@ const GRADES = [
     background: var(--aqua-85);
     border-color: var(--aqua-85);
     color: var(--white);
+  }
+
+  /* ===== Alert cards (T1c) ===== */
+  .alert {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--purple);
+    border-left: 8px solid var(--purple);
+    border-radius: 4px;
+    padding: 16px 24px 24px 36px;
+    margin-bottom: 16px;
+  }
+  .alert-icon {
+    position: absolute; left: -28px; top: 16px;
+    width: 48px; height: 48px;
+  }
+  .alert-head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .alert-info { display: flex; flex-direction: column; gap: 8px; }
+  .student-row { display: flex; align-items: center; gap: 8px; }
+  .student-name {
+    font-weight: 400; font-size: 20px; line-height: 30px; color: var(--charcoal-95);
+  }
+  .student-report-link {
+    display: inline-flex; align-items: center; height: 24px; padding-left: 8px;
+    color: var(--aqua-75);
+  }
+  .breadcrumb-meta {
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95); margin: 8px 0;
+  }
+  .lesson-link {
+    font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua-75);
+    max-width: 568px; display: block;
+  }
+  .lesson-link:hover { text-decoration: underline; }
+  .alert-side {
+    display: flex; align-items: center; margin-left: 16px;
+    font-weight: 600; color: var(--purple);
+  }
+  .create-resources {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--aqua-75);
+    font-weight: 600; font-size: 16px; line-height: 1.5;
+    white-space: nowrap;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 4px;
+  }
+  .create-resources:hover {
+    color: var(--aqua-85);
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-75);
+  }
+  .create-resources:active {
+    color: #00485a;
+    text-decoration-line: underline;
+    text-decoration-color: var(--aqua-85);
+  }
+  .alert-divider {
+    width: 1px; align-self: stretch;
+    background: var(--gray-30);
+    min-height: 32px;
+    margin: 0 16px;
+  }
+  .alert-count {
+    font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple);
+  }
+  .bang-icon {
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .alert-desc {
+    padding: 8px 0 16px;
+    font-weight: 400; font-size: 14px; line-height: 21px;
+    color: var(--charcoal-95); max-width: 567px;
+  }
+  .sep { border-top: 1px solid var(--gray-30); }
+  .event {
+    display: flex; align-items: center;
+    height: 24px; margin-top: 8px;
+    border: none; background: transparent;
+  }
+  .event:first-of-type { margin-top: 12px; }
+  .event .ico {
+    width: 14.5px; height: 14.5px;
+    margin-left: 4.7px; margin-right: 13px;
+    display: inline-flex; flex-shrink: 0;
+    color: var(--purple);
+  }
+  .event.evt-completed .ico {
+    background: var(--green-80); border-radius: 50%;
+    color: var(--white); align-items: center; justify-content: center;
+  }
+  .alert-check {
+    background: var(--green-80);
+    color: var(--white);
+    border-radius: 50%;
+    width: 14.5px; height: 14.5px;
+    padding: 3px;
+  }
+  .event .label {
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+    margin-right: 8px;
+  }
+  .event .ts {
+    font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
   }
 </style>
