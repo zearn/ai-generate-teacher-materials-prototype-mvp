@@ -140,8 +140,15 @@ Follow `astro-migration-plan.md`. Immediate:
      `/tower-alerts`). Added the `.recreating` gating; `wireModal` (modal.ts)
      drives both modals. Reset happens on *confirm* (not on RECREATE-click, so
      Cancel loses nothing — a small improvement over the prototype). Verified.
-     **Next:** 2c on-demand generation (random 1-of-N) + A1↔A2 toggle + sidenav
-     generated/current sync → 2d print + `?student=` → title + `.no-worksheet`.
+     ✅ **2c done:** on-demand generation — CTA / sidenav sparkle → in-place loader
+     (`newMaterialLoading` moved into the section; mini lesson + button-group stay)
+     → reveals the **aligned** student-materials / sample-script (random 1-of-N of
+     the current set; recreate **toggles** A1↔A2 — degrades to the single variant
+     today) + sidenav sync (sparkle↔refresh via `.is-swapped`, generated/current,
+     slider). Sidenav nav scrolls + sets current view. Verified in-browser.
+     (Scroll-position tracking of current-view is a deferred polish item.)
+     **Next:** 2d — print (`printCurrentMaterials` + #bygPrint) + `?student=` →
+     subnav title + `.no-worksheet` (likely a no-op since every set has materials).
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,

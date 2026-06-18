@@ -52,7 +52,8 @@
   background: var(--white);
   transition: opacity 0.5s ease;
 }
-.loading-content .loading-message {
+/* Loader message + sparkle (shared by .loading-content and .new-material-loading). */
+.loading-message {
   margin: 0;
   font-size: 22px;
   font-weight: 400;
@@ -62,10 +63,10 @@
   opacity: 0;
   transition: opacity 0.5s ease;
 }
-.loading-content .loading-message.fade-in {
+.loading-message.fade-in {
   opacity: 1;
 }
-.loading-content .sparkle-anim {
+.sparkle-anim {
   margin-top: 48px;
   width: 147.333px;
   height: 176.661px;
@@ -73,7 +74,7 @@
   align-items: center;
   justify-content: center;
 }
-.loading-content .sparkle-anim svg {
+.sparkle-anim svg {
   width: 130.447px;
   height: 163.54px;
   transform: rotate(6.19deg);
@@ -84,9 +85,9 @@
   0%, 100% { fill: var(--fuchsia-5); }
   50% { fill: var(--fuchsia-60); }
 }
-.loading-content .sparkle-anim .sparkle-1 { animation: sparkle-fade 2.4s ease-in-out infinite; }
-.loading-content .sparkle-anim .sparkle-2 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -0.8s; }
-.loading-content .sparkle-anim .sparkle-3 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -1.6s; }
+.sparkle-anim .sparkle-1 { animation: sparkle-fade 2.4s ease-in-out infinite; }
+.sparkle-anim .sparkle-2 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -0.8s; }
+.sparkle-anim .sparkle-3 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -1.6s; }
 
 /* ===== DEFAULT (loading): hide real content, show skeleton + loading card ===== */
 .sidenav > .sidenav-active,
@@ -136,3 +137,31 @@ html.recreating .page-area {
   padding-bottom: 0;
 }
 html.recreating .main-col > .button-group { display: none; }
+
+/* ===== Material generation (worksheet / sample script) ===== */
+/* While generating, hide that section's CTA + preview; the loader (moved into the
+   section by the script) shows in its place. Mini lesson + button-group stay. */
+html.loading-worksheet #section-worksheet > .lesson-preview,
+html.loading-worksheet #section-worksheet > .pdf-cta { display: none !important; }
+html.loading-samplescript #section-sampleScript > .lesson-preview,
+html.loading-samplescript #section-sampleScript > .pdf-cta { display: none !important; }
+
+/* The inline loader: a white card by default; sheds its chrome once moved into a
+   material-section (the section already provides the background + shadow). */
+.new-material-loading {
+  display: none;
+  width: 792px;
+  min-height: 532px;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 36px 0;
+  box-sizing: border-box;
+  background: var(--white);
+  box-shadow: var(--card-dropshadow);
+}
+.material-section > .new-material-loading {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  box-shadow: none;
+}

@@ -21,10 +21,22 @@ const html = document.documentElement;
 // ---- State (in-memory only; a reload wipes it, per spec) ----
 const state = {
   currentSet: null as LessonSet | null,
-  generated: { worksheet: false, sampleScript: false },
+  generated: { worksheet: false, sampleScript: false } as Record<string, boolean>,
   currentView: "miniLesson" as "miniLesson" | "worksheet" | "sampleScript",
   generatedAt: { miniLesson: null, worksheet: null, sampleScript: null } as
     Record<string, string | null>,
+  // Which 1-of-N variant is currently shown per material (null = not yet generated).
+  materialIndex: { worksheet: null, sampleScript: null } as Record<string, number | null>,
+};
+
+const SECTION_IDS: Record<string, string> = {
+  miniLesson: "section-miniLesson",
+  worksheet: "section-worksheet",
+  sampleScript: "section-sampleScript",
+};
+const PREVIEW_IDS: Record<string, string> = {
+  worksheet: "lessonPreviewWorksheet",
+  sampleScript: "lessonPreviewSampleScript",
 };
 
 // ---- Mini-lesson shuffle bag: unique random cycle, no repeats until exhausted ----
@@ -135,6 +147,54 @@ function renderMiniLesson(webpUrl: string) {
   if (webpUrl) img.src = webpUrl;
 }
 
+function scrollToSection(sectionId: string) {
+  const pa = document.querySelector<HTMLElement>(".page-area");
+  const section = document.getElementById(sectionId);
+  if (pa && section) pa.scrollTo({ top: section.offsetTop, behavior: "smooth" });
+}
+
+// Pick the webp for a material from the CURRENT set: random 1-of-N on first
+// generation; toggle to the next (A1↔A2) on recreate.
+function pickMaterialWebp(material: "worksheet" | "sampleScript"): string | null {
+  const arr = material === "worksheet"
+    ? state.currentSet?.studentMaterials
+    : state.currentSet?.sampleScripts;
+  if (!arr || arr.length === 0) return null;
+  const cur = state.materialIndex[material];
+  const idx = cur == null ? Math.floor(Math.random() * arr.length) : (cur + 1) % arr.length;
+  state.materialIndex[material] = idx;
+  return arr[idx];
+}
+
+// Reveal a freshly generated section (fade its preview in).
+function revealSection(material: "worksheet" | "sampleScript", webp: string | null) {
+  const section = document.getElementById(SECTION_IDS[material]);
+  const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
+  if (!section || !img) return;
+  section.classList.add("visible");
+  img.classList.add("fade-in-img");
+  img.classList.remove("img-loaded");
+  img.onload = () => {
+    requestAnimationFrame(() => img.classList.add("img-loaded"));
+    adjustPageAreaHeight();
+    if (!html.classList.contains("ctas-visible")) scheduleCtas();
+  };
+  if (webp) img.src = webp;
+}
+
+// Re-render an already-visible section's preview (recreate toggle).
+function reRenderSection(material: "worksheet" | "sampleScript", webp: string | null) {
+  const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
+  if (!img) return;
+  img.classList.add("fade-in-img");
+  img.classList.remove("img-loaded");
+  img.onload = () => {
+    requestAnimationFrame(() => img.classList.add("img-loaded"));
+    adjustPageAreaHeight();
+  };
+  if (webp) img.src = webp;
+}
+
 // ---- Loading messages (cycle every 3s; clip-fade via .fade-in) ----
 const LOADING_MESSAGES = [
   "Zearn AI is creating materials for your student right now.",
@@ -191,26 +251,56 @@ window.setTimeout(() => {
 }, LOADING_MS);
 
 // ---- Generate / recreate flow ----
-// 2b: only the Mini Lesson recreate (material === null) is wired. 2c adds the
-// worksheet / sample-script generation + A1↔A2 toggle branches.
+//   null         → recreate the Mini Lesson (next set from the bag; reset materials)
+//   "worksheet"  → generate / recreate Student Materials (random 1-of-N, then toggle)
+//   "sampleScript" → generate / recreate the Sample Script
 function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null) {
   hideCtasNow();
   setTimestamp("");
   const isMiniLessonRecreate = material === null;
+
   if (isMiniLessonRecreate) {
     document.querySelector(".page-area")?.scrollTo({ top: 0 });
     html.classList.add("recreating");
+  } else {
+    // Move the inline loader into the target section; the section's CTA + preview
+    // are hidden by the loading-worksheet / loading-samplescript rules. Mini lesson
+    // + button-group stay put.
+    html.classList.add(material === "worksheet" ? "loading-worksheet" : "loading-samplescript");
+    const section = document.getElementById(SECTION_IDS[material]);
+    const loader = document.getElementById("newMaterialLoading");
+    if (section && loader) section.appendChild(loader);
+    requestAnimationFrame(() => scrollToSection(SECTION_IDS[material]));
   }
+
   startLoadingCycle();
   window.setTimeout(() => {
     stopLoadingCycle();
-    html.classList.remove("recreating");
-    if (isMiniLessonRecreate) {
-      // Dependent materials were aligned to the old lesson — reset to ungenerated.
+    html.classList.remove("recreating", "loading-worksheet", "loading-samplescript");
+    // Return the loader to the page-area so it can be reused next time.
+    const loader = document.getElementById("newMaterialLoading");
+    const pa = document.querySelector(".page-area");
+    if (loader && pa && loader.parentElement !== pa) pa.appendChild(loader);
+
+    if (material === "worksheet" || material === "sampleScript") {
+      const wasGenerated = state.generated[material];
+      const webp = pickMaterialWebp(material);
+      state.generated[material] = true;
+      state.currentView = material;
+      state.generatedAt[material] = formatNow();
+      syncSidenavAndCtas();
+      if (wasGenerated) reRenderSection(material, webp);
+      else revealSection(material, webp);
+      setTimestamp(state.generatedAt[material]);
+    } else {
+      // Mini lesson recreate: dependent materials were aligned to the old lesson —
+      // reset them, then draw the next set from the bag.
       state.generated.worksheet = false;
       state.generated.sampleScript = false;
       state.generatedAt.worksheet = null;
       state.generatedAt.sampleScript = null;
+      state.materialIndex.worksheet = null;
+      state.materialIndex.sampleScript = null;
       for (const id of ["section-worksheet", "section-sampleScript"]) {
         document.getElementById(id)?.classList.remove("visible");
       }
@@ -218,7 +308,6 @@ function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null)
         const img = document.getElementById(id) as HTMLImageElement | null;
         if (img) { img.removeAttribute("src"); img.classList.remove("img-loaded"); }
       }
-      // Draw the next mini lesson from the shuffle bag.
       const next = nextMiniLesson();
       state.currentSet = next;
       state.currentView = "miniLesson";
@@ -230,20 +319,23 @@ function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null)
   }, LOADING_MS);
 }
 
-// ---- Modal wiring: Before You Go (back) + Are You Sure (recreate) ----
+// ---- Modals + interactions ----
 const byg = wireModal("#bygModal");
 const ays = wireModal("#aysModal");
 let skipAysModal = false; // in-memory only (resets on reload)
+// What AYS will recreate on confirm: null = Mini Lesson, else that material.
+let pendingMaterial: "worksheet" | "sampleScript" | null = null;
 
-// Back to Tower Alerts → confirm via byg (its primary <a> then navigates).
+// Back to Tower Alerts → byg (its primary <a> then navigates to /tower-alerts).
 document.querySelector<HTMLAnchorElement>("a.back-btn")?.addEventListener("click", (e) => {
   e.preventDefault();
   byg?.open();
 });
 // TODO (2d): wire #bygPrint → printCurrentMaterials.
 
-// Top RECREATE → ays (or straight to recreate if "don't show again" was set).
+// Top RECREATE → always the Mini Lesson (ays unless "don't show again" was set).
 document.getElementById("recreateBtn")?.addEventListener("click", () => {
+  pendingMaterial = null;
   if (skipAysModal) triggerLoadingThenRender(null);
   else ays?.open();
 });
@@ -252,5 +344,40 @@ document.getElementById("aysRecreate")?.addEventListener("click", () => {
   const dontShow = document.getElementById("aysDontShow") as HTMLInputElement | null;
   if (dontShow?.checked) skipAysModal = true;
   ays?.close();
-  triggerLoadingThenRender(null);
+  triggerLoadingThenRender(pendingMaterial);
 });
+
+// End-of-page CTA buttons → first-time generation.
+document.getElementById("ctaStudentMaterials")?.addEventListener("click", () => triggerLoadingThenRender("worksheet"));
+document.getElementById("ctaSampleScript")?.addEventListener("click", () => triggerLoadingThenRender("sampleScript"));
+
+// Sidenav sparkle buttons: generate (first time, no modal) or recreate (ays unless skipped).
+function wireSparkle(subnavId: string, material: "worksheet" | "sampleScript") {
+  document.querySelector(`#${subnavId} .sparkle-btn`)?.addEventListener("click", (e) => {
+    e.stopPropagation(); // don't also fire the row's nav click
+    if (state.generated[material]) {
+      pendingMaterial = material;
+      if (skipAysModal) triggerLoadingThenRender(material);
+      else ays?.open();
+    } else {
+      triggerLoadingThenRender(material);
+    }
+  });
+}
+wireSparkle("navStudentMaterials", "worksheet");
+wireSparkle("navSampleScript", "sampleScript");
+
+// Sidenav row navigation: scroll to the section; set current view for Mini Lesson
+// or an already-generated material. (Scroll-position tracking of currentView is a
+// later polish pass.)
+function navScrollTo(material: "miniLesson" | "worksheet" | "sampleScript") {
+  if (material === "miniLesson" || state.generated[material]) {
+    state.currentView = material;
+    syncSidenavAndCtas();
+    setTimestamp(state.generatedAt[material]);
+  }
+  scrollToSection(SECTION_IDS[material]);
+}
+document.getElementById("navMiniLesson")?.addEventListener("click", () => navScrollTo("miniLesson"));
+document.getElementById("navStudentMaterials")?.addEventListener("click", () => navScrollTo("worksheet"));
+document.getElementById("navSampleScript")?.addEventListener("click", () => navScrollTo("sampleScript"));
