@@ -210,5 +210,13 @@ Follow `astro-migration-plan.md`. Immediate:
   "ask before committing" still applies.)
 - **Style:** clone the design 1:1; don't invent UI; announce `docs/` + `.claude/`
   doc edits; ask 3–5 clarifying questions before building something new.
-- **Effort:** mechanical porting is fine at medium; reserve max for genuinely
-  hard design/debug problems.
+- **Model / effort + STOP-POINTS:** the agent **cannot switch its own
+  model/effort** — the user sets it (`/model`, `/fast`, `/config`). So **stop at a
+  tier boundary and tell the user what to switch to before continuing; do NOT
+  proceed past it on your own.** Plan for the rest of the migration:
+  - **T1b + T1c** (verbatim porting of the filter sidebar + alert cards) →
+    **Sonnet 4.6, medium–high**.
+  - ⚠️ **STOP before Phase 2** (state machine / Create-Targeted-Materials modal /
+    nav wiring) and tell the user to switch to **Opus 4.8, high**.
+  Non-negotiable at any tier: screenshot-diff each page against the `:8765`
+  prototype before claiming it's faithful (memory `port-css-verbatim-visual-diff`).
