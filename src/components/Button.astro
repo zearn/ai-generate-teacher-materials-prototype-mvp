@@ -24,7 +24,8 @@ import Icon from "./Icon.astro";
 
 interface Props {
   variant?: "primary" | "secondary" | "icon";
-  size?: "xs" | "sm" | "md";
+  /** xs=24px, sm=32px/14px, md=40px/16px, cta=32px/16px (the end-of-page CTA pill). */
+  size?: "xs" | "sm" | "md" | "cta";
   /** Icon name from src/icons/. Leading icon for text variants; the glyph for `icon`. */
   icon?: string;
   /** Second glyph shown when the button has class `is-swapped` (e.g. the sidenav
@@ -156,10 +157,15 @@ const style = minWidth ? `min-width:${minWidth}px` : undefined;
     height: 40px;
     font-size: 16px;
   }
+  .btn--cta {
+    height: 32px;
+    font-size: 16px;
+  }
   .btn:not(.btn--icon) {
     gap: 6px;
   }
-  .btn--sm:not(.btn--icon) {
+  .btn--sm:not(.btn--icon),
+  .btn--cta:not(.btn--icon) {
     padding: 0 12px;
   }
   .btn--md:not(.btn--icon) {

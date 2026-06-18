@@ -108,10 +108,34 @@ Follow `astro-migration-plan.md`. Immediate:
    in-browser. **Deferred to assembly:** the sidenav state machine (active/
    generated/current sync, real `updateNavSlider`, sparkle-click → generation,
    back-link → byg modal) and the loading skeleton.
-   **NEXT: assemble `create-resources`** (compose chrome + disclaimer + main
-   column + state machine), verify, then **tower-alerts**.
-5. Decide variant routing (query param vs `getStaticPaths` per variant) — see
-   the plan; recommended: query param for the first pass.
+5. 🔶 **Assemble `create-resources` — Phase 1 DONE, Phase 2 next.**
+   **Variant model RESOLVED (shuffle bag):** a pool of mini-lesson *sets* (5 in
+   the end state, 4 now); each set = mini lesson + 1-of-N aligned student
+   materials + 1-of-N aligned sample scripts. On arrival a random set shows; top
+   RECREATE draws the **next** in a **unique random cycle** (no repeats until all
+   shown, then reshuffle). Generating a material picks a random 1-of-N of the
+   *current* set; recreating it **toggles** to the other (A1↔A2). Recreating the
+   mini lesson **resets** generated materials to ungenerated. Set is **random,
+   not** matched to the selection (selection = context only) → **query-param
+   page**, no `lessonKey` matching. Loading at **3s** for testing (`LOADING_MS`
+   → 9000 later). Data: `src/data/lessonSets.ts` (`MINI_LESSONS`; single-variant
+   arrays today — 2-of-each + a 5th set drop in later as pure data).
+   • **Phase 1 (done):** `src/pages/create-resources.astro` — static loaded state
+     (chrome + plain-text disclaimer + sidenav + button-group + page-area showing
+     the mini lesson + the two CTA cards). 12 webp previews copied to
+     `public/previews/`. Added a `cta` size to `Button` (32px/16px CTA pill).
+     Route `/create-resources` (clean, **not** obfuscated like the HTML files —
+     confirm if you want obfuscation applied to Astro routes). Verified in-browser.
+   • **Phase 2 (in progress) — `src/scripts/create-resources.ts`:**
+     ✅ **2a done:** loading flow (skeleton + cycling message + 3-sparkle animation,
+     `LOADING_MS`=3000) → `.loaded` → mini-lesson **shuffle bag** (unique cycle) +
+     initial render + `formatNow()` timestamp + slider. Loading/loaded gating in
+     `src/styles/create-resources.css` (global, page-imported, since it crosses
+     components). SideNavAI got the skeleton; its placeholder slider script was
+     removed (script's `updateNavSlider` owns it now). Verified in-browser.
+     **Next:** 2b recreate (ays) + back (byg) modal wiring → 2c on-demand
+     generation (random 1-of-N) + A1↔A2 toggle + sidenav generated/current sync →
+     2d print + `?student=` → title + `.no-worksheet`.
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,

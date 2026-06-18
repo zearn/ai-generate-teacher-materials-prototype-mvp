@@ -15,6 +15,14 @@ import Button from "./Button.astro";
 ---
 
 <aside class="sidenav">
+  <!-- Loading skeleton (shown while not .loaded; styled in create-resources.css) -->
+  <div class="nav-skeleton" aria-hidden="true">
+    <div class="skel-bar"></div>
+    <div class="skel-bar"></div>
+    <div class="skel-bar"></div>
+    <div class="skel-bar"></div>
+  </div>
+
   <div class="nav-slider" id="navSlider" aria-hidden="true"></div>
 
   <div class="sidenav-active ml-active" id="navMiniLesson">
@@ -56,21 +64,6 @@ import Button from "./Button.astro";
     <span class="tag">Coming Soon</span>
   </div>
 </aside>
-
-<script>
-  // Placeholder slider positioner — parks the highlight under the active item.
-  // Superseded by updateNavSlider() in the create-resources page script.
-  function placeSlider() {
-    const slider = document.getElementById("navSlider");
-    const active = document.getElementById("navMiniLesson");
-    if (!slider || !active) return;
-    slider.style.top = active.offsetTop + "px";
-    slider.style.height = active.offsetHeight + "px";
-    slider.style.opacity = "1";
-  }
-  placeSlider();
-  window.addEventListener("load", placeSlider);
-</script>
 
 <style>
   .sidenav {

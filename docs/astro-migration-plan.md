@@ -177,17 +177,19 @@ you opt in. So the migration splits each screen into two halves:
 | Tower-alerts `ALERTS` array + filters + cards | `AlertCard.astro` (data in frontmatter) + `tower-alerts.ts` for filter interactivity | Cards server-rendered from the array; filtering is client JS. |
 | Create-Resources modal → navigate with URL params | `<a>` / client nav to the routed page | Builds `?student=…&lesson=…`. |
 
-### Decision to make: variant routing (query param vs static route)
-Today `?lessonKey=G5M6L19` is read at runtime. Two options in Astro:
-- **(A) Keep the query param** — one static page; client script picks the
-  variant. Lowest-risk 1:1 port; URLs unchanged. **Recommended for first pass.**
-- **(B) Static route per variant** via `getStaticPaths()` →
-  `src/pages/create-resources/[lessonKey].astro`. Variant known at build, so the
-  mini-lesson preview can be **server-rendered** (no client switching), faster
-  and more idiomatic. Costs a URL change; `student` stays a query param.
-
-Recommend shipping **(A)** to reach parity, then consider **(B)** as an
-optimization once the port is proven.
+### Resolved: variant model = shuffle bag (query-param page)
+Not a `lessonKey`-matched variant — the page simulates an AI generating
+*different* aligned materials each time. A pool of mini-lesson **sets** (5 in the
+end state, 4 today); each set = mini lesson + 1-of-N aligned student materials +
+1-of-N aligned sample scripts. On arrival a **random** set shows; top RECREATE
+draws the **next** in a **unique random cycle** (no repeats until all shown, then
+reshuffle). Generating a material picks a random 1-of-N of the *current* set;
+recreating it **toggles** to the other (A1↔A2). Recreating the mini lesson
+**resets** generated materials to ungenerated (re-generate aligned to the new
+lesson). The set is **random, not** matched to the previous screen's
+grade/mission/lesson (that's context only) → one **query-param page**
+(`?student=…`), client-side bag, **no `lessonKey` matching**. Data lives in
+`src/data/lessonSets.ts`. (Static-route-per-variant is moot — sets are random.)
 
 ### Risks / sequencing
 - **Script timing:** Astro deferred modules run post-parse — good, but confirm
