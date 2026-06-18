@@ -1,9 +1,12 @@
 # Astro Migration Plan
 
+> **STATUS: COMPLETE (2026-06-18).** Both pages are fully ported and the old
+> HTML prototypes have been retired. This doc is now a historical record of
+> decisions and architecture. For current status, see `docs/session-handoff.md`.
+
 Planning doc for moving the Zearn AI Targeted Materials prototype from two
 self-contained vanilla HTML files to an Astro project. Captures the decisions
-made and the proposed structure. **Nothing here is built yet** — this is the
-scope for review.
+made and the proposed structure.
 
 ---
 
@@ -253,11 +256,11 @@ grade/mission/lesson (that's context only) → one **query-param page**
   `base.css`. Sidenav state machine + loading skeleton deferred to assembly.
   Verified in-browser.
 
-**In progress / next up:**
-- **Assemble `create-resources`** — compose chrome (TopNav/SubNav) + disclaimer +
-  sidenav + main column, port the page state machine + loading flow, and wire the
-  modals (back-link → byg, sparkle/RECREATE → ays). Then verify → `tower-alerts`.
-  Preview with `preview_start("astro")` (port 4321).
+**Both pages fully ported and verified:**
+- ✅ `create-resources` — shuffle-bag state machine, all modals, sidenav sync, print.
+- ✅ `tower-alerts` — full nav + cards + filter sidebar + CTM modal + interactivity.
 
-**Everything else from the existing prototype is untouched** — the two HTML
-files still work and are the source of truth for parity until ported.
+**Old HTML prototypes retired** (`tower-alerts-prototype-*.html`,
+`create-resources-*.html` deleted). The Astro pages at `/tower-alerts` and
+`/create-resources` are now the only implementations. Served via `npm run dev`
+(port 4321); `preview_start({ name: "astro" })`.

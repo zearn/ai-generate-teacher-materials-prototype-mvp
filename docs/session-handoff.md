@@ -1,4 +1,4 @@
-# Session handoff — 2026-06-18
+# Session handoff — 2026-06-18 (updated)
 
 Context for the next session. **Read `.claude/claude.md` first, then this, then
 [`docs/astro-migration-plan.md`](astro-migration-plan.md) and
@@ -198,15 +198,34 @@ Follow `astro-migration-plan.md`. Immediate:
      `data-*` → CREATE navigates). Verified modal + interactions vs prototype;
      `astro build` clean. **`tower-alerts` is now fully ported.**
 
-   **NEXT (post-port cleanup):** see item 6 — both pages are now ported, so retire
-   the old HTML prototypes (after a final parity pass), drop unused tokens, and
-   rewrite `claude.md` for the Astro architecture.
-6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
-   `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
-   **after** the structure lands. **Doc nits (we matched the prototype on both,
-   reconcile when convenient):** design.md says button labels are 16px but the
-   prototype's RECREATE is 14px; design.md says the modal top stripe is aqua-75
-   but the prototype uses aqua-40 (#1CC7E6).
+6. ✅ **Post-port cleanup — DONE.**
+   - Token audit: `--fuchsia-spark` and `--help-bg` were already absent from the
+     Astro codebase; `--fuchsia-5` and `--gray-55` are actively used and kept.
+     Nothing to remove from `tokens.css`.
+   - **Old HTML prototypes retired**: `tower-alerts-prototype-*.html` and
+     `create-resources-95a534VKBScVGb3WUOvN.html` deleted after a final parity
+     screenshot pass (Astro pages match the prototypes 1:1). The Python `prototype`
+     server entry was removed from `.claude/launch.json` — only the `astro` server
+     remains.
+   - **`CLAUDE.md` rewritten** for the Astro architecture: updated "What this
+     project is", file map, local preview, design tokens table (brand-system names),
+     patterns (Icon.astro, Modal.astro/wireModal, CSS gating, deferred scripts),
+     JS architecture (shuffle bag, `state` object, key functions), known quirks
+     (Astro-specific), asset conventions (`src/icons/`, `public/previews/`), and
+     route naming. Removed HTML filename obfuscation section. Updated "no external
+     deps" bullet (Astro/TS stack is now present).
+   - **`astro-migration-plan.md`** marked COMPLETE at top; "In progress" section
+     updated to reflect both pages ported and HTML prototypes retired.
+   **Doc nits (low-priority, reconcile when convenient):** design.md says button
+   labels are 16px but the prototype's RECREATE is 14px; design.md says the modal
+   top stripe is aqua-75 but the prototype uses aqua-40 (#1CC7E6).
+
+## Current repo state (after cleanup)
+- **Astro is the only implementation.** Two live pages: `/tower-alerts` and
+  `/create-resources`. No more HTML prototype files. Server: `npm run dev` (4321).
+- **Branch `astro-migration`** is 7+ commits ahead of `main`. Ready to open a PR
+  when Angy approves.
+- **`npm run build` is green.**
 
 ## Working notes for the agent
 - **Permissions:** read/grep/glob/inspect + `docs/**` and `src/**` edits are
