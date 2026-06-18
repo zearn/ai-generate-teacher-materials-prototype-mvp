@@ -4,14 +4,54 @@
  * teacher's struggling-student alerts; each card links to create-resources.
  *
  * Straight 1:1 port of tower-alerts-prototype-*.html (4 alerts, not "10").
- * PHASE 1 (this chunk, T1a): static chrome + layout skeleton — full TopNav,
- * breadcrumb, page-header, selector pill, hero. T1b = filter sidebar, T1c =
- * alert cards. Phase 2 = filters + Create Targeted Materials modal + nav.
+ * PHASE 1 (this chunk, T1a+T1b): static chrome + layout skeleton + filter
+ * sidebar + right-column scaffold. T1c = alert cards. Phase 2 = filters +
+ * Create Targeted Materials modal + nav.
  *
  * Page-specific chrome is inline here (only this page uses the full nav).
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
+
+const STUDENTS = [
+  { name: "Suzanne Alvarez",  count: 3 },
+  { name: "Brianna Barrios",  count: 5 },
+  { name: "Trina Brown",      count: 0 },
+  { name: "Paul Derrick",     count: 2 },
+  { name: "Sebastian Diaz",   count: 0 },
+  { name: "Janiya DuBuque",   count: 2 },
+  { name: "Fernando Garcia",  count: 3 },
+  { name: "Jordan Goldstein", count: 2 },
+  { name: "Roxanne Jacobson", count: 0 },
+  { name: "Franklin Joseph",  count: 0 },
+  { name: "Alexia Lee",       count: 0 },
+  { name: "Porter Levy",      count: 1 },
+  { name: "Alberto Martinez", count: 3 },
+  { name: "Grace McCarty",    count: 0 },
+  { name: "Elijah Park",      count: 4 },
+  { name: "Ashin Patel",      count: 4 },
+  { name: "Jose Perez",       count: 3 },
+  { name: "Iliana Peters",    count: 4 },
+  { name: "Naomi Sachs",      count: 1 },
+  { name: "Jaiden Thomas",    count: 0 },
+  { name: "Olivia Tran",      count: 0 },
+  { name: "Jada Williams",    count: 0 },
+  { name: "Jesse Williamson", count: 3 },
+  { name: "Sam Wyman",        count: 0 },
+  { name: "Benjamin Young",   count: 0 },
+];
+
+const GRADES = [
+  { name: "Kindergarten", count: null as number | null },
+  { name: "Grade 1",      count: null },
+  { name: "Grade 2",      count: null },
+  { name: "Grade 3",      count: null },
+  { name: "Grade 4",      count: 40 },
+  { name: "Grade 5",      count: null },
+  { name: "Grade 6",      count: null },
+  { name: "Grade 7",      count: null },
+  { name: "Grade 8",      count: null },
+];
 ---
 
 <BaseLayout title="Tower Alerts — Zearn">
@@ -91,10 +131,119 @@ import Icon from "../components/Icon.astro";
       </section>
 
       <div class="columns">
-        <!-- T1b: filter sidebar -->
-        <aside class="filter-placeholder">Filters (T1b)</aside>
-        <!-- T1c: alert cards -->
-        <div class="alerts-placeholder">Alert cards (T1c)</div>
+
+        <!-- LEFT: Filter sidebar -->
+        <aside>
+          <div class="filter-header"><span>Filter by</span></div>
+
+          <div class="filter-box">
+            <div class="filter-row">
+              <label>Completed Towers</label>
+              <div class="toggle on" id="completedToggle" role="switch" aria-checked="true">
+                <span class="label-hide">Hide</span>
+                <span class="switch" tabindex="0">
+                  <span class="track"></span>
+                  <span class="knob"></span>
+                </span>
+                <span class="label-show">Show</span>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <label for="dateFilter">Date</label>
+              <div class="dropdown">
+                <select id="dateFilter">
+                  <option>All</option>
+                  <option>Past Week</option>
+                  <option selected>Past 2 Weeks</option>
+                  <option>Past 3 Weeks</option>
+                  <option>Past Month</option>
+                  <option>Past 6 Months</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <label for="strugglesFilter">Struggles</label>
+              <div class="dropdown">
+                <select id="strugglesFilter">
+                  <option selected>1 or more</option>
+                  <option>2 or more</option>
+                  <option>3 or more</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Students panel -->
+          <div class="panel" id="studentsPanel">
+            <button class="panel-header" data-toggle="studentsPanel">
+              Students
+              <span class="chev" aria-hidden="true"><Icon name="chevron-up-students" size={16} /></span>
+            </button>
+            <div class="list" id="studentList">
+              <div class="row selected"><span>ALL</span><span class="count">40&nbsp;Results</span></div>
+              {STUDENTS.map(s => (
+                <div class={`row ${s.count > 0 ? 'semibold' : 'regular'}`}>
+                  <span>{s.name}</span>
+                  {s.count > 0 && <span class="count">{s.count}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Content panel -->
+          <div class="panel" id="contentPanel">
+            <button class="panel-header" data-toggle="contentPanel">
+              Content
+              <span class="chev" aria-hidden="true"><Icon name="chevron-up-content" size={16} /></span>
+            </button>
+            <div class="list content-list" id="contentList">
+              <div class="row selected">
+                <span class="label-wrap"><span>ALL</span><span class="count">40&nbsp;Results</span></span>
+              </div>
+              {GRADES.map(g => (
+                <div class={`row ${g.count != null ? 'semibold' : 'regular'}`}>
+                  <span class="twirl"><Icon name="chevron-right-grade" size={16} /></span>
+                  <span class="label-wrap">
+                    <span>{g.name}</span>
+                    {g.count != null && <span class="count">{g.count}</span>}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT: Sort + alerts + load more -->
+        <section>
+          <div class="sort-row">
+            <div class="sort-left">
+              <span class="label">Sort by</span>
+              <div class="dropdown wide lg">
+                <select id="sortBy">
+                  <option selected>Date: Newest</option>
+                  <option>Date: Earliest</option>
+                  <option>Content: Newest</option>
+                  <option>Content: Earliest</option>
+                </select>
+                <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
+              </div>
+            </div>
+            <div class="results-count"><span>40</span><span class="rest">&nbsp;Results</span></div>
+          </div>
+
+          <div class="alerts" id="alerts">
+            <!-- T1c: alert cards rendered here -->
+          </div>
+
+          <div class="load-more-wrap">
+            <button class="load-more">LOAD MORE</button>
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
@@ -352,13 +501,210 @@ import Icon from "../components/Icon.astro";
   }
 
   /* 2-col layout */
-  .columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; padding-bottom: 48px; }
-  .filter-placeholder,
-  .alerts-placeholder {
-    border: 1px dashed var(--gray-30);
+  .columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; }
+
+  /* ===== Filter sidebar ===== */
+  .filter-header {
+    height: 56px; display: flex; align-items: center;
+    padding: 0 16px; font-weight: 400;
+  }
+  .filter-header span { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+  .filter-box {
+    background: var(--gray-5);
+    padding: 24px 16px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; }
+  .filter-row > label { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+  .toggle {
+    position: relative; width: 117px; height: 24px;
+    display: flex; align-items: center;
+  }
+  .toggle .label-hide { position: absolute; left: 0; }
+  .toggle .label-show { position: absolute; left: 79px; }
+  .toggle .switch {
+    position: absolute; left: 39px; top: 1px;
+    width: 32px; height: 22px; cursor: pointer;
+  }
+  .toggle .switch .track {
+    position: absolute; inset: 1px 0;
+    background: var(--gray-30);
+    border: 1px solid var(--aqua-75);
+    border-radius: 10px;
+    box-shadow: inset 0 0 1px 1px var(--aqua-75);
+    overflow: hidden;
+  }
+  .toggle .switch .track::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 20px; background: var(--aqua-75);
+    transition: width 0.15s ease;
+  }
+  .toggle .switch .knob {
+    position: absolute; left: 10px; top: 0;
+    width: 22px; height: 22px;
+    background: var(--white);
+    border: 2px solid var(--aqua-75); border-radius: 50%;
+    box-shadow: 1px 1px 3px 0 #b3b3b3;
+    transition: left 0.15s ease;
+  }
+  .toggle.off .switch .track::before { width: 0; }
+  .toggle.off .switch .knob { left: 0; }
+
+  .dropdown { position: relative; width: 136px; height: 40px; }
+  .dropdown.wide { width: 184px; }
+  .dropdown select {
+    appearance: none; -webkit-appearance: none;
+    width: 100%; height: 100%;
+    background: var(--white);
+    border: 1px solid var(--gray-55); border-radius: 4px;
+    padding: 8px 35px 8px 11px;
+    font: inherit; color: var(--charcoal-95);
+    font-size: 14px; line-height: 21px;
+  }
+  .dropdown.lg select { font-size: 16px; line-height: 24px; }
+  .dropdown .caret {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px;
+    pointer-events: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--charcoal-95);
+  }
+
+  /* Students / Content panels */
+  .panel {
+    background: var(--gray-5); padding: 0 0 16px 0;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 16px;
+  }
+  .panel:last-child { margin-bottom: 0; }
+  .panel-header {
+    width: 100%; padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--aqua-75); font-weight: 600; font-size: 16px; line-height: 24px;
+    background: none; border: none; cursor: pointer;
+  }
+  .panel-header .chev {
+    width: 16px; height: 8.298px; display: inline-flex;
+    transition: transform 0.15s ease;
+  }
+  .panel.collapsed .chev { transform: rotate(180deg); }
+  .panel.collapsed .list { display: none; }
+  .panel.collapsed { padding-bottom: 0; }
+
+  .list {
+    width: 288px;
+    background: var(--white);
+    border: 1px solid var(--gray-55);
     border-radius: 4px;
-    padding: 24px;
-    color: var(--gray-60);
-    min-height: 200px;
+    max-height: 258px; overflow: auto;
+    padding: 16px;
+  }
+  .list .row {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+    line-height: 1.5;
+    border-radius: 12px;
+    padding: 0 8px;
+    margin-top: 8px;
+    color: var(--charcoal-95);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background-color: transparent;
+    transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .list .row > span:first-child {
+    width: 172px;
+    text-align: left;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .list .row .count { font-size: 16px; overflow: initial; }
+  .list .row.regular { font-weight: 400; }
+  .list .row:hover,
+  .list .row:focus,
+  .list .row:active { background-color: rgba(0, 0, 0, 0.078); }
+  .list .row.selected {
+    background-color: var(--aqua-75);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .list .row.selected .count { color: var(--white); }
+  .list .row.selected:hover,
+  .list .row.selected:focus { background-color: var(--aqua-85); }
+  .list .row.selected:active { background-color: #003e4d; }
+  .list .row.partially-selected {
+    border-color: var(--aqua-75);
+    color: var(--aqua-75);
+    background-color: transparent;
+  }
+  .list .row.partially-selected:hover,
+  .list .row.partially-selected:focus {
+    border-color: var(--aqua-85);
+    color: var(--aqua-85);
+    background-color: var(--white);
+  }
+  .list .row.partially-selected:active { border-color: #003e4d; color: #003e4d; }
+
+  /* Content list */
+  .list.content-list { padding: 17px 9px 13px; }
+  .list.content-list .row { padding: 0; margin-bottom: 0; }
+  .list.content-list .row .twirl {
+    width: 24px; height: 24px; margin: 8px 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--charcoal-95);
+  }
+  .list.content-list .row .label-wrap {
+    flex: 1; padding: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 12px;
+  }
+  .list.content-list .row:first-child .label-wrap { padding: 0 8px; }
+  .list.content-list .row.selected .label-wrap { background: var(--aqua-75); color: var(--white); }
+  .list.content-list .row.selected .label-wrap .count { color: var(--white); }
+  .list.content-list .row.selected { background: transparent; color: var(--charcoal-95); }
+
+  /* Right column: Sort + results */
+  .sort-row {
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .sort-left { display: flex; align-items: center; }
+  .sort-left .label { padding: 0 16px 0 24px; font-weight: 600; font-size: 16px; line-height: 24px; }
+  .results-count {
+    padding: 16px;
+    font-weight: 600; font-size: 16px; line-height: 24px; color: var(--charcoal-95);
+  }
+  .results-count .rest { font-weight: 400; }
+
+  .alerts { display: flex; flex-direction: column; gap: 16px; }
+
+  .load-more-wrap {
+    height: 56px;
+    display: flex; justify-content: center; align-items: flex-end;
+    margin-bottom: 48px;
+  }
+  .load-more {
+    height: 40px; min-width: 104px;
+    border: 1px solid var(--aqua-75); border-radius: 25px;
+    background: var(--white); color: var(--aqua-75);
+    font-weight: 600; font-size: 16px;
+    text-transform: uppercase;
+    padding: 0 21px;
+    cursor: pointer;
+  }
+  .print-btn:hover,
+  .load-more:hover { background: var(--aqua-75); color: var(--white); }
+  .print-btn:active,
+  .load-more:active {
+    background: var(--aqua-85);
+    border-color: var(--aqua-85);
+    color: var(--white);
   }
 </style>
