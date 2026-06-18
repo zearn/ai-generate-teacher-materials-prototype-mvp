@@ -18,6 +18,8 @@ import SubNavAI from "../components/SubNavAI.astro";
 import SideNavAI from "../components/SideNavAI.astro";
 import Button from "../components/Button.astro";
 import Icon from "../components/Icon.astro";
+import BeforeYouGoModal from "../components/BeforeYouGoModal.astro";
+import AreYouSureModal from "../components/AreYouSureModal.astro";
 import "../styles/create-resources.css";
 
 // The mini lesson + timestamp are set by create-resources.ts after the loading
@@ -46,7 +48,7 @@ const generatedAt = "Generated April 6, 2026 - 3:52pm";
         <div class="button-group">
           <span class="generated" id="generatedTimestamp">{generatedAt}</span>
           <div class="btn-cluster">
-            <Button variant="secondary" size="sm" icon="arrows-rotate-reverse-btn" iconSize={16} label="Recreate" />
+            <Button variant="secondary" size="sm" icon="arrows-rotate-reverse-btn" iconSize={16} id="recreateBtn" label="Recreate" />
             <Button variant="icon" size="sm" icon="print-btn" iconSize={17} aria-label="Print" />
           </div>
         </div>
@@ -103,6 +105,9 @@ const generatedAt = "Generated April 6, 2026 - 3:52pm";
       </div>
     </div>
   </main>
+
+  <BeforeYouGoModal />
+  <AreYouSureModal />
 </BaseLayout>
 
 <script>

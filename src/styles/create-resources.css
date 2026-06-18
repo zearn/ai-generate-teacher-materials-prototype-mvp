@@ -121,3 +121,18 @@ html.loaded .page-area {
   box-shadow: none;
   padding-bottom: 6px;
 }
+
+/* A CTA hides once its material is generated (the section's preview shows instead). */
+.pdf-cta.is-generated { display: none; }
+
+/* ===== Recreating (mini-lesson recreate): overlay on top of .loaded ===== */
+/* Sidenav stays; the page-area shows the loading overlay; button-group + sections
+   hide. The html.recreating qualifier outranks the .loaded rules above. */
+html.recreating .material-section { display: none !important; }
+html.recreating .loading-content { opacity: 1; pointer-events: auto; }
+html.recreating .page-area {
+  height: 532px;
+  box-shadow: var(--card-dropshadow);
+  padding-bottom: 0;
+}
+html.recreating .main-col > .button-group { display: none; }

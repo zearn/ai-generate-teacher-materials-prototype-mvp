@@ -11,6 +11,7 @@
  * sidenav generated/current sync, print, ?student= → title, .no-worksheet.
  */
 import { MINI_LESSONS, type LessonSet } from "../data/lessonSets";
+import { wireModal } from "./modal";
 
 /** Loading duration. 3000 for testing; production is 9000. */
 const LOADING_MS = 3000;
@@ -100,6 +101,29 @@ function updateNavSlider() {
   slider.style.height = (activeEl as HTMLElement).offsetHeight + "px";
 }
 
+// ---- Apply state → sidenav classes + CTA visibility ----
+function syncSidenavAndCtas() {
+  document.getElementById("navMiniLesson")
+    ?.classList.toggle("ml-active", state.currentView === "miniLesson");
+  document.querySelectorAll<HTMLElement>(".subnav-item[data-material]").forEach((el) => {
+    const mat = el.dataset.material as "worksheet" | "sampleScript";
+    el.classList.toggle("generated", !!state.generated[mat]);
+    el.classList.toggle("current", state.currentView === mat);
+    // Sparkle ↔ refresh swap is driven by .is-swapped on the Button.
+    el.querySelector(".sparkle-btn")?.classList.toggle("is-swapped", !!state.generated[mat]);
+  });
+  document.querySelectorAll<HTMLElement>(".pdf-cta[data-material]").forEach((cta) => {
+    const mat = cta.dataset.material as "worksheet" | "sampleScript";
+    cta.classList.toggle("is-generated", !!state.generated[mat]);
+  });
+  updateNavSlider();
+}
+
+function hideCtasNow() {
+  clearTimeout(ctasDelayTimer);
+  html.classList.remove("ctas-visible");
+}
+
 // ---- Render the mini-lesson preview (schedules the CTA reveal once loaded) ----
 function renderMiniLesson(webpUrl: string) {
   const img = document.getElementById("lessonPreviewMiniLesson") as HTMLImageElement | null;
@@ -163,5 +187,70 @@ window.setTimeout(() => {
   renderMiniLesson(state.currentSet.miniLesson);
   state.generatedAt.miniLesson = formatNow();
   setTimestamp(state.generatedAt.miniLesson);
-  updateNavSlider();
+  syncSidenavAndCtas();
 }, LOADING_MS);
+
+// ---- Generate / recreate flow ----
+// 2b: only the Mini Lesson recreate (material === null) is wired. 2c adds the
+// worksheet / sample-script generation + A1↔A2 toggle branches.
+function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null) {
+  hideCtasNow();
+  setTimestamp("");
+  const isMiniLessonRecreate = material === null;
+  if (isMiniLessonRecreate) {
+    document.querySelector(".page-area")?.scrollTo({ top: 0 });
+    html.classList.add("recreating");
+  }
+  startLoadingCycle();
+  window.setTimeout(() => {
+    stopLoadingCycle();
+    html.classList.remove("recreating");
+    if (isMiniLessonRecreate) {
+      // Dependent materials were aligned to the old lesson — reset to ungenerated.
+      state.generated.worksheet = false;
+      state.generated.sampleScript = false;
+      state.generatedAt.worksheet = null;
+      state.generatedAt.sampleScript = null;
+      for (const id of ["section-worksheet", "section-sampleScript"]) {
+        document.getElementById(id)?.classList.remove("visible");
+      }
+      for (const id of ["lessonPreviewWorksheet", "lessonPreviewSampleScript"]) {
+        const img = document.getElementById(id) as HTMLImageElement | null;
+        if (img) { img.removeAttribute("src"); img.classList.remove("img-loaded"); }
+      }
+      // Draw the next mini lesson from the shuffle bag.
+      const next = nextMiniLesson();
+      state.currentSet = next;
+      state.currentView = "miniLesson";
+      syncSidenavAndCtas();
+      renderMiniLesson(next.miniLesson);
+      state.generatedAt.miniLesson = formatNow();
+      setTimestamp(state.generatedAt.miniLesson);
+    }
+  }, LOADING_MS);
+}
+
+// ---- Modal wiring: Before You Go (back) + Are You Sure (recreate) ----
+const byg = wireModal("#bygModal");
+const ays = wireModal("#aysModal");
+let skipAysModal = false; // in-memory only (resets on reload)
+
+// Back to Tower Alerts → confirm via byg (its primary <a> then navigates).
+document.querySelector<HTMLAnchorElement>("a.back-btn")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  byg?.open();
+});
+// TODO (2d): wire #bygPrint → printCurrentMaterials.
+
+// Top RECREATE → ays (or straight to recreate if "don't show again" was set).
+document.getElementById("recreateBtn")?.addEventListener("click", () => {
+  if (skipAysModal) triggerLoadingThenRender(null);
+  else ays?.open();
+});
+document.getElementById("aysCancel")?.addEventListener("click", () => ays?.close());
+document.getElementById("aysRecreate")?.addEventListener("click", () => {
+  const dontShow = document.getElementById("aysDontShow") as HTMLInputElement | null;
+  if (dontShow?.checked) skipAysModal = true;
+  ays?.close();
+  triggerLoadingThenRender(null);
+});

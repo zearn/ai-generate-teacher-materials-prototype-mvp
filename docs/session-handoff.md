@@ -133,9 +133,15 @@ Follow `astro-migration-plan.md`. Immediate:
      `src/styles/create-resources.css` (global, page-imported, since it crosses
      components). SideNavAI got the skeleton; its placeholder slider script was
      removed (script's `updateNavSlider` owns it now). Verified in-browser.
-     **Next:** 2b recreate (ays) + back (byg) modal wiring → 2c on-demand
-     generation (random 1-of-N) + A1↔A2 toggle + sidenav generated/current sync →
-     2d print + `?student=` → title + `.no-worksheet`.
+     ✅ **2b done:** recreate — top RECREATE → ays modal → confirm → loading →
+     draws the **next** mini lesson from the bag + **resets** dependent materials
+     to ungenerated + new timestamp; "Don't show again" sets in-memory
+     `skipAysModal`; back-link → byg modal (its primary `<a>` navigates to
+     `/tower-alerts`). Added the `.recreating` gating; `wireModal` (modal.ts)
+     drives both modals. Reset happens on *confirm* (not on RECREATE-click, so
+     Cancel loses nothing — a small improvement over the prototype). Verified.
+     **Next:** 2c on-demand generation (random 1-of-N) + A1↔A2 toggle + sidenav
+     generated/current sync → 2d print + `?student=` → title + `.no-worksheet`.
 6. Remaining cleanup: drop unused tokens (`--fuchsia-spark`, `--fuchsia-5`,
    `--gray-55`, `--help-bg`); rewrite `claude.md` for the Astro architecture
    **after** the structure lands. **Doc nits (we matched the prototype on both,
@@ -148,8 +154,11 @@ Follow `astro-migration-plan.md`. Immediate:
   pre-approved. **`.claude/` files are gated as "sensitive" and will prompt**
   regardless of allow-rules — that's why the docs were moved to `docs/`.
   `claude.md`/`summary.md` must stay in `.claude/`.
-- **Git:** never commit/push unless asked; never commit on the default branch
-  (branch first). Repo identity is `AngyBrooksZ <angy@zearn.org>`.
+- **Git:** **commit after each completed, verified migration phase** (Angy's
+  standing OK, 2026-06-18) — on branch `astro-migration` (never `main`), stage
+  specific files, identity `AngyBrooksZ <angy@zearn.org>`, Co-Authored-By trailer.
+  **Don't push** unless asked. (Outside the phased migration the default
+  "ask before committing" still applies.)
 - **Style:** clone the design 1:1; don't invent UI; announce `docs/` + `.claude/`
   doc edits; ask 3–5 clarifying questions before building something new.
 - **Effort:** mechanical porting is fine at medium; reserve max for genuinely
