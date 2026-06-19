@@ -38,7 +38,6 @@ const PREVIEW_IDS: Record<string, string> = {
   worksheet: "lessonPreviewWorksheet",
   sampleScript: "lessonPreviewSampleScript",
 };
-
 // ---- Mini-lesson shuffle bag: unique random cycle, no repeats until exhausted ----
 let bag: LessonSet[] = [];
 let lastShown: LessonSet | null = null;
@@ -172,10 +171,7 @@ function revealSection(material: "worksheet" | "sampleScript", webp: string | nu
   const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
   if (!section || !img) return;
   section.classList.add("visible");
-  img.classList.add("fade-in-img");
-  img.classList.remove("img-loaded");
   img.onload = () => {
-    requestAnimationFrame(() => img.classList.add("img-loaded"));
     adjustPageAreaHeight();
     if (!html.classList.contains("ctas-visible")) scheduleCtas();
   };
@@ -186,10 +182,7 @@ function revealSection(material: "worksheet" | "sampleScript", webp: string | nu
 function reRenderSection(material: "worksheet" | "sampleScript", webp: string | null) {
   const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
   if (!img) return;
-  img.classList.add("fade-in-img");
-  img.classList.remove("img-loaded");
   img.onload = () => {
-    requestAnimationFrame(() => img.classList.add("img-loaded"));
     adjustPageAreaHeight();
   };
   if (webp) img.src = webp;

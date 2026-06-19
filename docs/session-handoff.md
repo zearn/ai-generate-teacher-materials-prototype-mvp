@@ -220,33 +220,72 @@ Follow `astro-migration-plan.md`. Immediate:
    labels are 16px but the prototype's RECREATE is 14px; design.md says the modal
    top stripe is aqua-75 but the prototype uses aqua-40 (#1CC7E6).
 
-## Current repo state (after cleanup)
+## Current repo state (as of 2026-06-18 end of session)
 - **Astro is the only implementation.** Two live pages: `/tower-alerts` and
   `/create-resources`. No more HTML prototype files. Server: `npm run dev` (4321).
-- **Branch `astro-migration`** is 7+ commits ahead of `main`. Ready to open a PR
-  when Angy approves.
-- **`npm run build` is green.**
+- **`main` is fully up to date.** The `astro-migration` branch was fast-forward
+  merged directly into `main` (no PR). All migration + visual-regression fixes are
+  on `main`. `npm run build` is green.
+- **Visual regression fixes applied to `tower-alerts` (commit `324565c`):**
+  card borders/colors (`var(--purple)` → `var(--purple-90)`), link underlines
+  (hover-only, 4px), card gap (removed double margin), content list (342px,
+  all 9 grades visible), new `sparkles-link.svg` icon, event rows (24px, no
+  inter-row margin), separator (8px bottom margin).
 
-## Working notes for the agent
-- **Permissions:** read/grep/glob/inspect + `docs/**` and `src/**` edits are
-  pre-approved. **`.claude/` files are gated as "sensitive" and will prompt**
-  regardless of allow-rules — that's why the docs were moved to `docs/`.
-  `claude.md`/`summary.md` must stay in `.claude/`.
-- **Git:** **commit after each completed, verified migration phase** (Angy's
-  standing OK, 2026-06-18) — on branch `astro-migration` (never `main`), stage
-  specific files, identity `AngyBrooksZ <angy@zearn.org>`, Co-Authored-By trailer.
-  **Don't push** unless asked. (Outside the phased migration the default
-  "ask before committing" still applies.)
-- **Style:** clone the design 1:1; don't invent UI; announce `docs/` + `.claude/`
-  doc edits; ask 3–5 clarifying questions before building something new.
-- **Model / effort + STOP-POINTS:** the agent **cannot switch its own
-  model/effort** — the user sets it (`/model`, `/fast`, `/config`). So **stop at a
-  tier boundary and tell the user what to switch to before continuing; do NOT
-  proceed past it on your own.** This worked as intended for the tower-alerts port:
-  - ✅ **T1b + T1c** ran on **Sonnet 4.6, medium–high**.
-  - ✅ **Phase 2** (modal + nav/state wiring) ran on **Opus 4.8, high** after the
-    user switched at the stop-point.
-  The remaining post-port cleanup (retire old HTML, token cleanup, claude.md
-  rewrite) is low-risk and fine on **Sonnet 4.6**.
-  Non-negotiable at any tier: screenshot-diff each page against the `:8765`
-  prototype before claiming it's faithful (memory `port-css-verbatim-visual-diff`).
+---
+
+## Next task: CSS consolidation (branch `css-consolidation`)
+
+### Goal
+Merge all CSS (except `tokens.css`) into a single `src/styles/styles.css`.
+`tokens.css` stays **untouched and separate** — it's the hex source of truth.
+
+### What gets merged into `styles.css`
+| Source | Status |
+|---|---|
+| `src/styles/base.css` | Move entirely into `styles.css` |
+| `src/styles/create-resources.css` | Move entirely into `styles.css` |
+| `<style>` block inside `src/pages/tower-alerts.astro` | Extract + move |
+| `<style>` block inside `src/pages/create-resources.astro` | Extract + move |
+
+After consolidation: delete `base.css` and `create-resources.css`. Remove both
+`<style>` blocks from the `.astro` pages.
+
+### Organization inside `styles.css`
+```
+/* ===== SHARED (used by both pages) ===== */
+/* … rules common to both pages … */
+
+/* ===== TOWER ALERTS ===== */
+/* … tower-alerts-specific rules … */
+
+/* ===== CREATE RESOURCES ===== */
+/* … create-resources-specific rules … */
+```
+
+Audit all four sources for **duplicate or near-identical rules** — merge them
+into one shared rule and update class references in the `.astro` files if you
+rename anything.
+
+### Wiring
+- `BaseLayout.astro` currently imports `base.css`. After consolidation, change
+  that import to `styles.css` (so both pages pick it up automatically).
+- Remove the per-page CSS import (`import "../styles/create-resources.css"`)
+  from `create-resources.astro`.
+- No new imports needed in `tower-alerts.astro` — it inherits from `BaseLayout`.
+
+### Critical gotcha: Astro style scoping
+Astro **auto-scopes** `<style>` blocks by adding a `data-astro-cid-*` hash
+attribute to every selector. Once those styles move to a global external file
+they are **no longer scoped** — they apply to both pages. Before combining rules,
+audit for class name collisions between the two pages (e.g. `.sep`, `.event`,
+`.alert` exist in tower-alerts; check whether create-resources uses the same
+names for different things). Prefix or rename any colliding classes.
+
+### Working notes
+- Branch off `main` as `css-consolidation` before starting.
+- Commit once: after the full consolidation is verified (both pages screenshot-
+  diffed against their current state — no visual regressions).
+- **Recommended model + effort: Sonnet 4.6, normal effort.** This is methodical
+  reading + reorganization, not deep reasoning.
+- Announce any class renames so Angy can follow along.

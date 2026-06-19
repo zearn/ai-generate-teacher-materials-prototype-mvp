@@ -303,7 +303,7 @@ const ALERTS: Array<{
                        data-lesson={a.lesson}
                        data-loc={a.loc}
                        data-desc={a.desc}>
-                      <Icon name="link-sparkle" size={18} />
+                      <Icon name="sparkles-link" size={18} />
                       Create Targeted Materials
                     </a>
                     <span class="alert-divider"></span>
@@ -757,17 +757,18 @@ const ALERTS: Array<{
   }
   .list .row.partially-selected:active { border-color: #003e4d; color: #003e4d; }
 
-  /* Content list */
-  .list.content-list { padding: 17px 9px 13px; }
+  /* Content list — 342px fits ALL pill + 9 grades with no inter-row margin */
+  .list.content-list { padding: 17px 9px 13px; max-height: 342px; overflow: hidden; }
+  .list.content-list .row { margin-top: 0; border: none; }
   .list.content-list .row { padding: 0; margin-bottom: 0; }
   .list.content-list .row .twirl {
-    width: 24px; height: 24px; margin: 8px 0;
+    width: 24px; height: 24px; margin: 4px 0;
     display: inline-flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     color: var(--charcoal-95);
   }
   .list.content-list .row .label-wrap {
-    flex: 1; padding: 8px;
+    flex: 1; padding: 4px 8px;
     display: flex; align-items: center; justify-content: space-between;
     border-radius: 12px;
   }
@@ -817,11 +818,10 @@ const ALERTS: Array<{
   .alert {
     position: relative;
     background: var(--white);
-    border: 1px solid var(--purple);
-    border-left: 8px solid var(--purple);
+    border: 1px solid var(--purple-90);
+    border-left: 8px solid var(--purple-90);
     border-radius: 4px;
     padding: 16px 24px 24px 36px;
-    margin-bottom: 16px;
   }
   .alert-icon {
     position: absolute; left: -28px; top: 16px;
@@ -838,22 +838,23 @@ const ALERTS: Array<{
     color: var(--aqua-75);
   }
   .breadcrumb-meta {
-    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95); margin: 8px 0;
+    font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95); margin: 4px 0;
   }
   .lesson-link {
     font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua-75);
-    max-width: 568px; display: block;
+    max-width: 568px; display: block; text-decoration: none;
   }
-  .lesson-link:hover { text-decoration: underline; }
+  .lesson-link:hover { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 4px; }
   .alert-side {
     display: flex; align-items: center; margin-left: 16px;
-    font-weight: 600; color: var(--purple);
+    font-weight: 600; color: var(--purple-90);
   }
   .create-resources {
     display: inline-flex; align-items: center; gap: 8px;
     color: var(--aqua-75);
     font-weight: 600; font-size: 16px; line-height: 1.5;
     white-space: nowrap;
+    text-decoration: none;
     text-decoration-thickness: 4px;
     text-underline-offset: 4px;
   }
@@ -874,29 +875,29 @@ const ALERTS: Array<{
     margin: 0 16px;
   }
   .alert-count {
-    font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple);
+    font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple-90);
   }
   .bang-icon {
     width: 24px; height: 24px;
     display: inline-flex; align-items: center; justify-content: center;
+    color: var(--purple-90);
   }
   .alert-desc {
-    padding: 8px 0 16px;
+    padding: 4px 0 8px;
     font-weight: 400; font-size: 14px; line-height: 21px;
     color: var(--charcoal-95); max-width: 567px;
   }
-  .sep { border-top: 1px solid var(--gray-30); }
+  .sep { border-top: 1px solid var(--gray-30); margin-bottom: 8px; }
   .event {
     display: flex; align-items: center;
-    height: 24px; margin-top: 8px;
+    height: 24px;
     border: none; background: transparent;
   }
-  .event:first-of-type { margin-top: 12px; }
   .event .ico {
     width: 14.5px; height: 14.5px;
     margin-left: 4.7px; margin-right: 13px;
     display: inline-flex; flex-shrink: 0;
-    color: var(--purple);
+    color: var(--purple-90);
   }
   .event.evt-completed .ico {
     background: var(--green-80); border-radius: 50%;
