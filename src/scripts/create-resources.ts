@@ -1,14 +1,10 @@
 /**
  * create-resources page script (Astro deferred module — runs after DOM parse).
  *
- * PHASE 2a (this file so far): the loading flow + mini-lesson shuffle bag + the
- * initial render. On load we show the loading state (skeleton + sparkle + cycling
- * message), then after LOADING_MS add `.loaded`, draw a random mini lesson from a
- * unique-cycle bag, and render it.
- *
- * TODO (2b/2c/2d): recreate (ays) + back (byg) modal wiring, on-demand generation
- * of student materials / sample script (random 1-of-N + A1↔A2 toggle on recreate),
- * sidenav generated/current sync, print, ?student= → title, .no-worksheet.
+ * Handles the full state machine: loading flow, mini-lesson shuffle bag, on-demand
+ * generation of student materials / sample script (random 1-of-N, A1↔A2 toggle on
+ * recreate), recreate (AYS modal), back (BYG modal), sidenav sync, print,
+ * and ?student= → page title.
  */
 import { MINI_LESSONS, type LessonSet } from "../data/lessonSets";
 import { wireModal } from "./modal";
