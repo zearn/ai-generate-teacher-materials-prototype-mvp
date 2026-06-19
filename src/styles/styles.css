@@ -1766,6 +1766,17 @@ html.loading-samplescript #section-sampleScript > .pdf-cta { display: none !impo
 }
 
 /* ============================================================
-   PAGE: index
-   (index.astro scaffold inline styles; filled in Phase 5)
+   PAGE: index — throwaway scaffold. Unique class names, so global is fine.
    ============================================================ */
+
+.index-main {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.index-title {
+  color: var(--charcoal-95);
+}
+.index-note {
+  color: var(--gray-75);
+}
