@@ -92,6 +92,9 @@ was just merged:
    the local delete needs `git branch -D <branch>` (git's safe `-d` won't recognize
    a squashed branch as merged); the remote is `git push origin --delete <branch>`
    (skip if GitHub auto-deleted it on merge).
+3. Prune stale remote-tracking refs: `git fetch --prune` — clears local refs for
+   branches already deleted on GitHub (including ones from outside this session),
+   so local and remote fully match.
 
 Do this only after confirming the merge succeeded. **Never** delete `main` or any
 branch that wasn't just merged. (This is a convention followed in-session when you
