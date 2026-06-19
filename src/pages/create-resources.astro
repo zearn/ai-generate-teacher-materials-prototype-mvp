@@ -68,12 +68,10 @@ const generatedAt = "Generated April 6, 2026 - 3:52pm";
 
           <div class="material-section" id="section-miniLesson">
             <img class="lesson-preview" id="lessonPreviewMiniLesson" alt="Mini Lesson preview" />
-            <iframe class="lesson-preview pdf-preview" id="lessonPreviewMiniLessonPdf" title="Mini Lesson preview"></iframe>
           </div>
 
           <div class="material-section" id="section-worksheet">
             <img class="lesson-preview" id="lessonPreviewWorksheet" alt="Student Materials preview" />
-            <iframe class="lesson-preview pdf-preview" id="lessonPreviewWorksheetPdf" title="Student Materials preview"></iframe>
             <div class="pdf-cta" data-material="worksheet">
               <div class="pdf-cta-frame">
                 <div class="pdf-cta-content">
@@ -90,7 +88,6 @@ const generatedAt = "Generated April 6, 2026 - 3:52pm";
 
           <div class="material-section" id="section-sampleScript">
             <img class="lesson-preview" id="lessonPreviewSampleScript" alt="Sample Script preview" />
-            <iframe class="lesson-preview pdf-preview" id="lessonPreviewSampleScriptPdf" title="Sample Script preview"></iframe>
             <div class="pdf-cta" data-material="sampleScript">
               <div class="pdf-cta-frame">
                 <div class="pdf-cta-content">
@@ -254,14 +251,6 @@ const generatedAt = "Generated April 6, 2026 - 3:52pm";
     width: 792px;
     height: auto;
     background: var(--white);
-  }
-  .pdf-preview {
-    display: none;
-    border: none;
-    height: 1056px;
-  }
-  .pdf-preview.active {
-    display: block;
   }
   /* Section / CTA / loading visibility lives in create-resources.css (global,
      since it gates across components by the <html> state classes). */

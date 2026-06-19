@@ -110,10 +110,10 @@ html.loaded .loading-content { opacity: 0; pointer-events: none; }
    holds either its CTA card (before generation) or the generated preview. */
 .loaded #section-worksheet,
 .loaded #section-sampleScript { display: block; }
-#section-worksheet > img.lesson-preview,
-#section-sampleScript > img.lesson-preview { display: none; }
-#section-worksheet.visible > img.lesson-preview,
-#section-sampleScript.visible > img.lesson-preview { display: block; }
+#section-worksheet > .lesson-preview,
+#section-sampleScript > .lesson-preview { display: none; }
+#section-worksheet.visible > .lesson-preview,
+#section-sampleScript.visible > .lesson-preview { display: block; }
 .material-section > .pdf-cta { margin: 36px; }
 .material-section.visible > .pdf-cta { display: none; }
 .material-section.visible { display: block; }
