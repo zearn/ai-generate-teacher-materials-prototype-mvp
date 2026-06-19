@@ -154,7 +154,8 @@ Key tokens by usage:
 --purple-5:      #FAF1FF    BETA pill bg, sidenav active bg, objective-card bg, CTA card bg
 --purple-15:     #F1D9FE    objective-card border
 --fuchsia-45:    #F182EA    CTM modal top stripe; sidenav active left border; sparkle icon
---fuchsia-50:    #EA74E3    sparkle animation fill (via CSS @keyframes)
+--fuchsia-5:     #FFEFFE    sparkle animation fill — lightest (via @keyframes)
+--fuchsia-60:    #D65CD0    sparkle animation fill — darkest (via @keyframes)
 --charcoal-95:   #303B40    primary text
 --charcoal-90:   #414C52    breadcrumb text, modal close-X
 --gray-5:        #F6F6F6    page background
@@ -215,14 +216,36 @@ root convention so `wireModal` drives them identically.
 Astro `<script>` tags are deferred modules (run after DOM parse) — **no
 `DOMContentLoaded` wrapper needed** when the script imports from a page `.astro`.
 
+### Page-scope CSS (`bodyClass` / `body.page-*`)
+
+All CSS is global (one `styles.css`), so page-/component-specific rules that share
+a **generic class name** can collide once they're no longer Astro-scoped.
+`BaseLayout` takes a `bodyClass` prop and renders it on `<body>`; each page passes
+its own (`page-tower-alerts` / `page-create-resources`), and rules that would
+otherwise bleed across pages are scoped under that class.
+
+- It's **server-rendered** (in the initial HTML), so it is NOT subject to the
+  "Claude Preview strips body classes added during load" quirk below — that only
+  affects classes JS adds at runtime.
+- Currently scoped this way: `.page-area`, `.top-nav`, `.modal-card` /
+  `.modal-close`, bare `main` → `body.page-*`; sidenav `.coming-soon` → `.sidenav`
+  (an existing ancestor — preferred when one exists). Identical rules across pages
+  (`.header-wrap`, `.nav-inner`, `.modal-overlay`) are written once, global.
+- **Adding a page:** if it reuses a generic class name another page/component
+  styles differently, give it a `bodyClass` and scope the conflicting rules under
+  it — don't rename the class. If the class name is unique, plain global is fine.
+
 ### Loading / loaded CSS gating
 
-The create-resources page uses class flags on `<html>` to gate visibility:
+The create-resources page gates visibility with state classes on `<html>` (the
+gating CSS lives in the PAGE: create-resources section of `styles.css`):
 ```
-.loading    → initial skeleton state (default)
-.loaded     → real content visible (added via setTimeout after generation)
-.recreating → mid-generation (sidenav + button-group stay; page area shows loader)
-.ctas-visible → end-of-page CTAs revealed (1.5s after initial render)
+(none/default)        → loading skeleton + loader card (unconditional rules until .loaded)
+.loaded               → real content visible (added after the load delay)
+.recreating           → mini-lesson recreate (sidenav + button-group stay; page area shows the loader)
+.loading-worksheet    → generating Student Materials (in-place loader in that section)
+.loading-samplescript → generating Sample Script (in-place loader in that section)
+.ctas-visible         → end-of-page CTAs revealed after initial render
 ```
 
 Add `.loaded` to `document.documentElement` (not `document.body`) — Claude
