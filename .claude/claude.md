@@ -80,6 +80,24 @@ When the user does ask for a commit:
   commit needs adjusting).
 - Never skip hooks (`--no-verify`).
 
+### Post-merge tidy-up (standing permission)
+
+Merging a PR still needs its own explicit request — but **once a PR is merged to
+`main`, immediately run the post-merge tidy-up without asking again.** This is the
+one standing exception to the rules above, and it only ever touches the branch that
+was just merged:
+
+1. Sync local `main`: `git checkout main && git pull`.
+2. Delete the just-merged feature branch, local + remote. After a **squash** merge
+   the local delete needs `git branch -D <branch>` (git's safe `-d` won't recognize
+   a squashed branch as merged); the remote is `git push origin --delete <branch>`
+   (skip if GitHub auto-deleted it on merge).
+
+Do this only after confirming the merge succeeded. **Never** delete `main` or any
+branch that wasn't just merged. (This is a convention followed in-session when you
+perform the merge — not a hard hook; if something else does the merge it won't
+fire.)
+
 ---
 
 ## File map
