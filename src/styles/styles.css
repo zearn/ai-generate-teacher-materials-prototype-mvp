@@ -1552,6 +1552,31 @@ body.page-create-resources .page-area::-webkit-scrollbar-thumb:hover {
   align-items: center;
   justify-content: center;
 }
+/* Selecting a sidenav row and scrolling its section into view fires one fuchsia
+   "ring" pulse around the CTA card: a box-shadow that grows 0 → 4px (ease-in),
+   holds at the peak (linear plateau), then recedes to 0 (ease-out) over 1.3s.
+   Box-shadow only — no reflow, and nothing shows at rest. JS toggles .pulse once
+   scrolling settles (see create-resources.ts pulseCta). */
+@keyframes cta-border-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--fuchsia-45);
+    animation-timing-function: ease-in;
+  }
+  27% {
+    box-shadow: 0 0 0 4px var(--fuchsia-45);
+    animation-timing-function: linear;
+  }
+  73% {
+    box-shadow: 0 0 0 4px var(--fuchsia-45);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--fuchsia-45);
+  }
+}
+.pdf-cta.pulse {
+  animation: cta-border-pulse 1.3s;
+}
 .pdf-cta-frame {
   width: 100%;
   display: flex;
