@@ -358,32 +358,43 @@ function wireSparkle(subnavId: string, material: "worksheet" | "sampleScript") {
 wireSparkle("navStudentMaterials", "worksheet");
 wireSparkle("navSampleScript", "sampleScript");
 
-// Pulse the CTA card's border fuchsia once its section has scrolled into view —
-// only for an ungenerated material (the light-purple "Create" card). Gated on the
-// page-area's `scrollend` so it fires on the settled card, with a 700ms fallback
-// for when the card is already in view (no scroll happens). A `fired` flag means
-// only one of the two paths runs.
+// Pulse the CTA card's border fuchsia once its section has finished scrolling into
+// view — only for an ungenerated material (the light-purple "Create" card). Fires
+// on the page-area's `scrollend` so it waits for the smooth scroll to complete; if
+// the section is already in view (no scroll will happen, so no scrollend) it fires
+// right away. A long safety timeout covers the rare case scrollend never arrives.
 function pulseCta(material: "miniLesson" | "worksheet" | "sampleScript") {
   if (material === "miniLesson" || state.generated[material]) return;
-  const cta = document
-    .getElementById(SECTION_IDS[material])
-    ?.querySelector<HTMLElement>(".pdf-cta");
+  const section = document.getElementById(SECTION_IDS[material]);
+  const cta = section?.querySelector<HTMLElement>(".pdf-cta");
   const pageArea = document.querySelector<HTMLElement>(".page-area");
-  if (!cta || !pageArea) return;
+  if (!section || !cta || !pageArea) return;
 
-  let fired = false;
   const fire = () => {
-    if (fired) return;
-    fired = true;
-    clearTimeout(fallback);
-    pageArea.removeEventListener("scrollend", fire);
     cta.classList.remove("pulse");
     void cta.offsetWidth; // reflow so the animation replays on repeat triggers
     cta.classList.add("pulse");
     cta.addEventListener("animationend", () => cta.classList.remove("pulse"), { once: true });
   };
-  const fallback = setTimeout(fire, 700); // already in view → no scroll, fire anyway
-  pageArea.addEventListener("scrollend", fire, { once: true });
+
+  // Already in view? scrollToSection won't move (target clamped to max scroll), so
+  // there's no scrollend coming — fire now. Otherwise wait for the scroll to end.
+  const maxTop = pageArea.scrollHeight - pageArea.clientHeight;
+  const targetTop = Math.min(section.offsetTop, Math.max(0, maxTop));
+  if (Math.abs(pageArea.scrollTop - targetTop) <= 1) {
+    fire();
+    return;
+  }
+  let fired = false;
+  const onScrollEnd = () => {
+    if (fired) return;
+    fired = true;
+    clearTimeout(safety);
+    pageArea.removeEventListener("scrollend", onScrollEnd);
+    fire();
+  };
+  const safety = setTimeout(onScrollEnd, 2500); // only if scrollend never fires
+  pageArea.addEventListener("scrollend", onScrollEnd, { once: true });
 }
 
 // Sidenav row navigation: highlight the clicked row (current) and scroll to its
