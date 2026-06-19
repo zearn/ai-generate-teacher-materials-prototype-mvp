@@ -18,7 +18,7 @@ interface Props {
 const { id = "bygModal", href = `${import.meta.env.BASE_URL}/tower-alerts-iBGSV5YMFky3cZJiZNEY` } = Astro.props;
 ---
 
-<Modal id={id} title="Before you go" width={600}>
+<Modal id={id} title="Before you go">
   <p class="byg-msg">
     This BETA version does not save your documents.<br />
     If you want to keep a copy, use the print button below before you go back to
@@ -29,14 +29,3 @@ const { id = "bygModal", href = `${import.meta.env.BASE_URL}/tower-alerts-iBGSV5
     <Button variant="icon" size="md" icon="print-btn" iconSize={17} id="bygPrint" aria-label="Print" />
   </Fragment>
 </Modal>
-
-<style>
-  .byg-msg {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    color: var(--black);
-    text-align: center;
-  }
-</style>

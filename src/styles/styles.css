@@ -92,9 +92,732 @@ a:active {
 }
 
 /* ============================================================
-   COMPONENTS — TopNavAI, SubNavAI, SideNavAI, Modal, Button, Icon, etc.
-   (one section per component; filled in Phase 2)
+   COMPONENTS — one block per component (Icon.astro has no styles).
+   Selectors are global EXCEPT confirmed cross-page/-component collisions:
+   .top-nav and .modal-card/.modal-close use the body.page-* hook (no
+   distinguishing ancestor existed); the sidenav's .coming-soon uses its
+   existing .sidenav ancestor. Identical duplicates (.nav-inner across
+   TopNav/SubNav, .modal-overlay across Modal/CTM) are written once.
    ============================================================ */
+
+/* ---- Button (shared by both pages; class names unique -> global) ---- */
+.btn {
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* ---- fills ---- */
+.btn--primary {
+  background: var(--aqua-75);
+  color: var(--white);
+  border-color: var(--aqua-75);
+}
+.btn--primary:hover {
+  background: var(--aqua-85);
+  border-color: var(--aqua-85);
+}
+.btn--primary:active {
+  background: var(--aqua-95);
+  border-color: var(--aqua-95);
+}
+
+.btn--secondary,
+.btn--icon {
+  background: var(--white);
+  color: var(--aqua-75);
+  border-color: var(--aqua-75);
+}
+/* outline buttons invert on interaction; icons knock out via currentColor */
+.btn--secondary:hover,
+.btn--icon:hover {
+  background: var(--aqua-75);
+  color: var(--white);
+}
+.btn--secondary:active,
+.btn--icon:active {
+  background: var(--aqua-85);
+  border-color: var(--aqua-85);
+  color: var(--white);
+}
+
+/* ---- glyphs (wrapped so swap can toggle visibility) ---- */
+.btn-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-glyph--swap {
+  display: none;
+}
+.btn.is-swapped .btn-glyph:not(.btn-glyph--swap) {
+  display: none;
+}
+.btn.is-swapped .btn-glyph--swap {
+  display: inline-flex;
+}
+
+/* ---- sizes ---- */
+.btn--xs {
+  height: 24px;
+  font-size: 12px;
+}
+.btn--sm {
+  height: 32px;
+  font-size: 14px;
+}
+.btn--md {
+  height: 40px;
+  font-size: 16px;
+}
+.btn--cta {
+  height: 32px;
+  font-size: 16px;
+}
+.btn:not(.btn--icon) {
+  gap: 6px;
+}
+.btn--sm:not(.btn--icon),
+.btn--cta:not(.btn--icon) {
+  padding: 0 12px;
+}
+.btn--md:not(.btn--icon) {
+  padding: 0 16px;
+}
+
+.btn--icon {
+  padding: 0;
+  flex: none;
+}
+.btn--icon.btn--xs {
+  width: 24px;
+}
+.btn--icon.btn--sm {
+  width: 32px;
+}
+.btn--icon.btn--md {
+  width: 40px;
+}
+
+/* ---- TopNavAI (create-resources). .top-nav collides with the tower-alerts
+        inline nav -> page-scoped. .nav-inner is shared with SubNavAI and is
+        written here once (create-resources-only, no tower-alerts .nav-inner). */
+body.page-create-resources .top-nav {
+  background: var(--white);
+  height: 64px;
+  border-bottom: 4px solid var(--yellow-20);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.nav-inner {
+  width: 992px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 64px;
+  width: 112px;
+  display: flex;
+  align-items: center;
+}
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 33px;
+}
+.sparkle {
+  flex: none;
+  display: inline-flex;
+}
+.title-text {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--charcoal-95);
+}
+.beta-pill {
+  height: 18px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--purple-5);
+  border: 1px solid var(--purple-90);
+  color: var(--purple-90);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---- SubNavAI (create-resources). Shares .nav-inner (defined above). ---- */
+.sub-nav {
+  background: var(--white);
+  height: 48px;
+  border-bottom: 1px solid var(--gray-30);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.center-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.back-btn {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--charcoal-95);
+  text-decoration: none;
+}
+.back-icon {
+  flex: none;
+  display: inline-flex;
+  /* back-arrow ring+arrow are currentColor (white disc stays literal) */
+  color: var(--aqua-75);
+}
+.back-btn .label {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--charcoal-95);
+  /* Pre-set thickness/offset so :hover only turns the line on. */
+  text-decoration-thickness: 4px;
+  text-underline-offset: 4px;
+}
+.back-btn:hover .label {
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-75);
+}
+.back-btn:active .label {
+  color: var(--charcoal-100);
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-95);
+}
+
+/* ---- SideNavAI (create-resources). .coming-soon scoped under its .sidenav
+        ancestor so the bare rule can't bleed into the CTM modal's "Coming
+        Soon" pill. ---- */
+.sidenav {
+  width: 214px;
+  flex: none;
+  background: var(--white);
+  border-radius: 4px;
+  box-shadow: var(--card-dropshadow);
+  padding: 16px 7px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  position: relative;
+}
+
+/* The purple highlight is one element the script slides to the active item;
+   it provides the active row's background. */
+.nav-slider {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  background: var(--purple-5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+}
+
+.sidenav-active {
+  width: 100%;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--gray-15);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: border-left-color 0.2s ease;
+}
+.sidenav-active:hover {
+  background: var(--purple-5);
+}
+.sidenav-active.ml-active {
+  border-left-color: var(--fuchsia-45);
+}
+.sidenav-active .label {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  white-space: nowrap;
+}
+.sidenav-active.ml-active .label {
+  font-weight: 600;
+}
+
+.subnav-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.subnav-item .content {
+  /* padding-right 8px insets the sparkle button (was a button margin) */
+  padding: 12px 8px 12px 28px;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--gray-15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.subnav-item .text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+/* "Current view" indicator: short fuchsia bar, fades in when current/pending. */
+.subnav-item::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: var(--fuchsia-45);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.subnav-item.current::before,
+.subnav-item.nav-pending::before {
+  opacity: 1;
+}
+.subnav-item.current .text,
+.subnav-item.nav-pending .text {
+  font-weight: 600;
+}
+/* hover overlay (backgrounds otherwise handled by .nav-slider) */
+.subnav-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--purple-5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.15s ease;
+}
+.subnav-item:hover::after {
+  opacity: 1;
+}
+
+.sidenav .coming-soon {
+  width: 100%;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.sidenav .coming-soon .label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--gray-75);
+  white-space: nowrap;
+}
+.sidenav .coming-soon .tag {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--gray-60);
+  white-space: nowrap;
+}
+
+/* ---- Modal.astro shell (byg/ays; create-resources). The overlay is identical
+        to the CTM modal's, so it is written once (global). The card + close-X
+        differ from CTM's, so they are page-scoped. Per-instance card width
+        (was an inline CSS var) is set by id. ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+body.page-create-resources .modal-card {
+  position: relative;
+  background: var(--white);
+  border-top: 16px solid var(--aqua-40);
+  border-radius: 4px;
+  box-shadow: 1px 1px 1.5px rgba(128, 128, 128, 0.5);
+  width: 600px;
+  max-width: 100%;
+  padding: 0 64px;
+  color: var(--charcoal-95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#aysModal .modal-card {
+  width: 470px;
+}
+body.page-create-resources .modal-close {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 0;
+  color: var(--charcoal-90); /* modal-close-x is currentColor (was #414C52) */
+}
+/* 64px top (under the stripe) + 64px before the footer rule — matches the
+   prototype's body-padding-top + msg-margin-bottom rhythm. */
+.modal-body {
+  padding: 64px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-title {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-transform: uppercase;
+  text-align: center;
+}
+.modal-buttons {
+  width: 100%;
+  border-top: 1px solid var(--gray-30);
+  padding: 32px 0;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- BeforeYouGoModal (create-resources) ---- */
+.byg-msg {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  text-align: center;
+}
+
+/* ---- AreYouSureModal (create-resources). #aysCancel min-width was a Button
+        prop-driven inline style. ---- */
+.ays-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.ays-msg {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  text-align: center;
+}
+.ays-dontshow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  cursor: pointer;
+}
+.ays-dontshow input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  position: relative;
+  border: 1px solid var(--charcoal-80);
+  border-radius: 3px;
+  background: var(--white);
+  cursor: pointer;
+}
+.ays-dontshow input[type="checkbox"]:checked {
+  background: var(--aqua-75);
+  border-color: var(--aqua-75);
+}
+.ays-dontshow input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+#aysCancel {
+  min-width: 125px;
+}
+
+/* ---- CreateTargetedMaterialsModal (tower-alerts). Uses the shared
+        .modal-overlay above. Its .modal-card + .modal-close collide with
+        Modal.astro's, so those two are page-scoped; the rest of its classes
+        are unique -> global. ---- */
+body.page-tower-alerts .modal-card {
+  position: relative;
+  background: var(--white);
+  border-top: 16px solid var(--fuchsia-45);
+  border-radius: 4px;
+  box-shadow: 1px 1px 1.5px rgba(128, 128, 128, 0.5);
+  width: 604px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 48px 32px 32px;
+  color: var(--charcoal-95);
+}
+body.page-tower-alerts .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 0;
+  color: var(--charcoal-90); /* modal-close-x is currentColor (was #414C52) */
+}
+.modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.modal-heading .sparkles {
+  width: 21.1654px;
+  height: 20.7946px;
+  flex: none;
+}
+.modal-heading h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 48px;
+  color: var(--charcoal-95);
+  white-space: nowrap;
+}
+.modal-beta {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 15px;
+  color: var(--purple-90);
+  background: var(--purple-5);
+  border: 1px solid var(--purple-90);
+  border-radius: 3.5px;
+  vertical-align: middle;
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+}
+.modal-intro {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-align: center;
+  margin: 0 0 24px;
+}
+.modal-intro strong {
+  font-weight: 600;
+}
+.objective-card {
+  background: var(--purple-5);
+  border: 1px solid var(--purple-15);
+  border-radius: 10px;
+  padding: 24px 8px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.objective-card p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.modal-select-label {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--black);
+  text-align: center;
+  margin: 0 0 8px;
+}
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.modal-option {
+  width: 302px;
+  height: 60px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  background: var(--white);
+  box-sizing: border-box;
+}
+.modal-option.selected {
+  background: var(--aqua-10);
+  border: 3px solid var(--aqua-60);
+}
+.modal-option.disabled {
+  border: 1px solid #DDE0E3;
+  color: var(--gray-40);
+  justify-content: flex-start;
+}
+.modal-option .checkbox {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+}
+/* Empty checkbox: sized to match the inner square of the checked SVG above
+   (15x15, 2.5px radius). Border matches the disabled label's gray so the
+   whole row reads as one disabled unit. */
+.modal-option .checkbox-empty {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--gray-45);
+  background: var(--white);
+  border-radius: 2.5px;
+  box-sizing: border-box;
+}
+.modal-option .label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.modal-option.disabled .label {
+  color: var(--gray-40);
+}
+.modal-option.disabled .label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex: 1;
+  min-width: 0;
+}
+.modal-option.disabled .coming-soon {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--gray-40);
+  margin-left: auto;
+}
+.modal-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--aqua-75);
+  color: var(--white);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 24px;
+  margin: 0 auto 24px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.modal-create-btn:hover {
+  background: var(--aqua-85);
+}
+.modal-disclaimer {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--black);
+}
+.modal-disclaimer a {
+  color: var(--aqua-75);
+  font-weight: 600;
+  text-decoration: none;
+}
+.modal-disclaimer a:hover {
+  text-decoration: underline;
+}
 
 /* ============================================================
    PAGE: tower-alerts
