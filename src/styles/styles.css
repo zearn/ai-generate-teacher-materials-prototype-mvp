@@ -1,3 +1,8 @@
+/* ============================================================
+   GLOBAL — @font-face, resets, typography, shared utilities
+   (content of base.css)
+   ============================================================ */
+
 /* Resets + global typography. Color values come only from tokens.css. */
 
 /* Self-hosted fonts (Latin subset). Files live in src/styles/fonts/ and are
@@ -85,3 +90,23 @@ a:hover {
 a:active {
   color: var(--aqua-95);
 }
+
+/* ============================================================
+   COMPONENTS — TopNavAI, SubNavAI, SideNavAI, Modal, Button, Icon, etc.
+   (one section per component; filled in Phase 2)
+   ============================================================ */
+
+/* ============================================================
+   PAGE: tower-alerts
+   (scoped under body.page-tower-alerts; filled in Phase 3)
+   ============================================================ */
+
+/* ============================================================
+   PAGE: create-resources
+   (scoped under body.page-create-resources; filled in Phase 4)
+   ============================================================ */
+
+/* ============================================================
+   PAGE: index
+   (index.astro scaffold inline styles; filled in Phase 5)
+   ============================================================ */
