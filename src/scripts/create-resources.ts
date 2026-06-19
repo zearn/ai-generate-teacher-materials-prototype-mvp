@@ -358,13 +358,14 @@ function wireSparkle(subnavId: string, material: "worksheet" | "sampleScript") {
 wireSparkle("navStudentMaterials", "worksheet");
 wireSparkle("navSampleScript", "sampleScript");
 
-// Sidenav row navigation: scroll to the section; set current view for Mini Lesson
-// or an already-generated material. (Scroll-position tracking of currentView is a
-// later polish pass.)
+// Sidenav row navigation: highlight the clicked row (current) and scroll to its
+// section — even before it's generated, so selecting Student Materials / Sample
+// Script shows the selected state. Only a generated material (or the mini lesson)
+// also swaps in the "Generated …" timestamp.
 function navScrollTo(material: "miniLesson" | "worksheet" | "sampleScript") {
+  state.currentView = material;
+  syncSidenavAndCtas();
   if (material === "miniLesson" || state.generated[material]) {
-    state.currentView = material;
-    syncSidenavAndCtas();
     setTimestamp(state.generatedAt[material]);
   }
   scrollToSection(SECTION_IDS[material]);
