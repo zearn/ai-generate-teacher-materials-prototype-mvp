@@ -62,6 +62,16 @@
   box-sizing: border-box;
 }
 
+/* Form controls don't inherit font-family by default, so unstyled buttons /
+   inputs / selects fall back to the UA default (Arial/Helvetica). Opt them all
+   in so they render in Source Sans Pro. They keep their own size/weight. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 html,
 body {
   margin: 0;
