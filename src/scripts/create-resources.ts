@@ -38,36 +38,6 @@ const PREVIEW_IDS: Record<string, string> = {
   worksheet: "lessonPreviewWorksheet",
   sampleScript: "lessonPreviewSampleScript",
 };
-const PDF_PREVIEW_IDS: Record<string, string> = {
-  miniLesson: "lessonPreviewMiniLessonPdf",
-  worksheet: "lessonPreviewWorksheetPdf",
-  sampleScript: "lessonPreviewSampleScriptPdf",
-};
-
-function isPdf(url: string): boolean {
-  return url.toLowerCase().endsWith(".pdf");
-}
-
-function showPdf(iframeId: string, imgId: string, url: string) {
-  const iframe = document.getElementById(iframeId) as HTMLIFrameElement | null;
-  const img = document.getElementById(imgId) as HTMLImageElement | null;
-  if (!iframe) return;
-  img?.style.setProperty("display", "none");
-  iframe.src = url;
-  iframe.classList.add("active");
-}
-
-function showImg(iframeId: string, imgId: string, url: string, onLoad?: () => void) {
-  const iframe = document.getElementById(iframeId) as HTMLIFrameElement | null;
-  const img = document.getElementById(imgId) as HTMLImageElement | null;
-  if (!img) return;
-  iframe?.classList.remove("active");
-  iframe && (iframe.src = "");
-  img.style.removeProperty("display");
-  if (onLoad) img.onload = onLoad;
-  if (url) img.src = url;
-}
-
 // ---- Mini-lesson shuffle bag: unique random cycle, no repeats until exhausted ----
 let bag: LessonSet[] = [];
 let lastShown: LessonSet | null = null;
@@ -166,17 +136,14 @@ function hideCtasNow() {
 }
 
 // ---- Render the mini-lesson preview (schedules the CTA reveal once loaded) ----
-function renderMiniLesson(url: string) {
-  const onLoad = () => {
+function renderMiniLesson(webpUrl: string) {
+  const img = document.getElementById("lessonPreviewMiniLesson") as HTMLImageElement | null;
+  if (!img) return;
+  img.onload = () => {
     adjustPageAreaHeight();
     if (!html.classList.contains("ctas-visible")) scheduleCtas();
   };
-  if (isPdf(url)) {
-    showPdf(PDF_PREVIEW_IDS.miniLesson, "lessonPreviewMiniLesson", url);
-    onLoad();
-  } else {
-    showImg(PDF_PREVIEW_IDS.miniLesson, "lessonPreviewMiniLesson", url, onLoad);
-  }
+  if (webpUrl) img.src = webpUrl;
 }
 
 function scrollToSection(sectionId: string) {
@@ -199,41 +166,26 @@ function pickMaterialWebp(material: "worksheet" | "sampleScript"): string | null
 }
 
 // Reveal a freshly generated section (fade its preview in).
-function revealSection(material: "worksheet" | "sampleScript", url: string | null) {
+function revealSection(material: "worksheet" | "sampleScript", webp: string | null) {
   const section = document.getElementById(SECTION_IDS[material]);
   const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
   if (!section || !img) return;
   section.classList.add("visible");
-  if (url && isPdf(url)) {
-    showPdf(PDF_PREVIEW_IDS[material], PREVIEW_IDS[material], url);
+  img.onload = () => {
     adjustPageAreaHeight();
     if (!html.classList.contains("ctas-visible")) scheduleCtas();
-  } else {
-    img.classList.add("fade-in-img");
-    img.classList.remove("img-loaded");
-    showImg(PDF_PREVIEW_IDS[material], PREVIEW_IDS[material], url ?? "", () => {
-      requestAnimationFrame(() => img.classList.add("img-loaded"));
-      adjustPageAreaHeight();
-      if (!html.classList.contains("ctas-visible")) scheduleCtas();
-    });
-  }
+  };
+  if (webp) img.src = webp;
 }
 
 // Re-render an already-visible section's preview (recreate toggle).
-function reRenderSection(material: "worksheet" | "sampleScript", url: string | null) {
+function reRenderSection(material: "worksheet" | "sampleScript", webp: string | null) {
   const img = document.getElementById(PREVIEW_IDS[material]) as HTMLImageElement | null;
   if (!img) return;
-  if (url && isPdf(url)) {
-    showPdf(PDF_PREVIEW_IDS[material], PREVIEW_IDS[material], url);
+  img.onload = () => {
     adjustPageAreaHeight();
-  } else {
-    img.classList.add("fade-in-img");
-    img.classList.remove("img-loaded");
-    showImg(PDF_PREVIEW_IDS[material], PREVIEW_IDS[material], url ?? "", () => {
-      requestAnimationFrame(() => img.classList.add("img-loaded"));
-      adjustPageAreaHeight();
-    });
-  }
+  };
+  if (webp) img.src = webp;
 }
 
 // ---- Loading messages (cycle every 3s; clip-fade via .fade-in) ----
