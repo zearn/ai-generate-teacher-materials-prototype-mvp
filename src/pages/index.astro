@@ -3,9 +3,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 // Placeholder index for the Astro scaffold. Real screens get ported from the
 // existing HTML / built from Figma frames — see docs/astro-migration-plan.md.
+// Dynamic hrefs aren't rewritten with the GitHub Pages base path the way static
+// literal hrefs are, so prepend BASE_URL explicitly (no trailing slash on it).
 const screens = [
-  { href: "/tower-alerts-iBGSV5YMFky3cZJiZNEY", label: "Tower Alerts" },
-  { href: "/create-resources-95a534VKBScVGb3WUOvN", label: "AI Targeted Materials" },
+  { href: `${import.meta.env.BASE_URL}/tower-alerts-iBGSV5YMFky3cZJiZNEY`, label: "Tower Alerts" },
+  { href: `${import.meta.env.BASE_URL}/create-resources-95a534VKBScVGb3WUOvN`, label: "AI Targeted Materials" },
 ];
 ---
 
