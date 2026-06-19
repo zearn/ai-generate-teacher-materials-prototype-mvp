@@ -15,14 +15,17 @@ for the migration plan + architecture decisions see `docs/astro-migration-plan.m
 ## What this project is
 
 High-fidelity interactive prototypes for the **Zearn AI Targeted Materials** flow,
-built as an **Astro** static site (v5.7). Two pages:
+built as an **Astro** static site (v6). Two pages, served under the GitHub Pages
+base path `/ai-generate-teacher-materials-prototype-mvp/` with obfuscated route
+names (private-by-obfuscation — see "Route naming" below):
 
-- `/tower-alerts` — Reports → Tower Alerts page (alert cards, filters, modal).
-- `/create-resources` — AI Targeted Materials page (webp preview images, loading
-  state, modals, recreate flow, sidenav state machine).
+- `…/tower-alerts-iBGSV5YMFky3cZJiZNEY` — Reports → Tower Alerts page (alert cards, filters, modal).
+- `…/create-resources-95a534VKBScVGb3WUOvN` — AI Targeted Materials page (webp preview
+  images, loading state, modals, recreate flow, sidenav state machine).
 
 Served locally via `npm run dev` (port 4321). `npm run build` produces a static
-site in `dist/`.
+site in `dist/`, auto-deployed to GitHub Pages on push to `main`
+(`.github/workflows/deploy.yml`).
 
 ---
 
@@ -83,8 +86,8 @@ When the user does ask for a commit:
 
 | Path | What it is |
 |---|---|
-| `src/pages/tower-alerts.astro` | Tower Alerts page — ALERTS data + full markup + page-scoped CSS |
-| `src/pages/create-resources.astro` | AI Targeted Materials page — static markup; all state in client script |
+| `src/pages/tower-alerts-iBGSV5YMFky3cZJiZNEY.astro` | Tower Alerts page — ALERTS data + full markup + page-scoped CSS (obfuscated filename → obfuscated route) |
+| `src/pages/create-resources-95a534VKBScVGb3WUOvN.astro` | AI Targeted Materials page — static markup; all state in client script (obfuscated filename → obfuscated route) |
 | `src/scripts/tower-alerts.ts` | Tower Alerts interactivity: panel collapse, toggle, tooltip, scroll-shadow, CTM modal |
 | `src/scripts/create-resources.ts` | Create Resources state machine: loading, shuffle bag, sidenav sync, modals, print |
 | `src/scripts/modal.ts` | Shared `wireModal(selector)` helper — open/close/Esc/overlay-click/scroll-lock |
@@ -99,11 +102,14 @@ When the user does ask for a commit:
 | `src/components/CreateTargetedMaterialsModal.astro` | CTM modal on Tower Alerts (fuchsia stripe, student/objective fields, CREATE) |
 | `src/data/lessonSets.ts` | Lesson set data: MINI_LESSONS pool (4 sets → 5 planned), aligned student/script variants |
 | `src/icons/` | 36 cleaned SVG source files consumed by Icon.astro at build time |
-| `src/layouts/BaseLayout.astro` | `<html>`, `<head>`, fonts, global CSS (`tokens.css`, `base.css`) |
+| `src/layouts/BaseLayout.astro` | `<html>`, `<head>`, `bodyClass` page-scope prop, global CSS imports (`tokens.css`, `styles.css`) — no font markup (fonts are `@font-face` in styles.css) |
 | `src/styles/tokens.css` | 290 brand tokens as CSS custom properties — the ONLY place hex values live |
-| `src/styles/base.css` | Resets, typography, `--card-dropshadow`, link states (`a` → aqua-75/85/95) |
-| `src/styles/create-resources.css` | Global CSS for create-resources (crosses components; imported by the page) |
-| `public/previews/` | Webp preview images served as-is by the dev/build server |
+| `src/styles/styles.css` | **All** non-token CSS, in one file (the only stylesheet besides tokens.css). Sections: GLOBAL (`@font-face` relative `url()` to `src/styles/fonts/`, resets, typography, `--card-dropshadow`, link states, form-control font reset) → COMPONENTS → per-page (tower-alerts / create-resources / index). Cross-page collisions (`.page-area`, `.top-nav`, `.modal-card`/`.modal-close`, bare `main`) are scoped under `body.page-tower-alerts` / `body.page-create-resources`; sidenav `.coming-soon` under `.sidenav` |
+| `src/styles/fonts/` | Self-hosted woff2 (Source Sans Pro 400/600/700 + italic, Oxygen 400); Vite fingerprints + base-prefixes them at build |
+| `public/previews/` | Webp preview images served as-is; JS prepends `import.meta.env.BASE_URL` to the `/previews/…` paths |
+| `README.md` | Contributor guide (setup, session workflow, live URLs) — repo front page |
+| `astro.config.mjs` | `site` + `base` config for GitHub Pages subpath hosting |
+| `.github/workflows/deploy.yml` | Builds (Node 22) + deploys to GitHub Pages on push to `main` |
 | `assets/images/svg/` | Original icon SVG downloads (historical reference; not loaded at runtime) |
 | `assets/not-used/` | Archived design refs, legacy PDFs, per-key preview PNGs — nothing here is live |
 | `.claude/launch.json` | Preview server config (Astro dev server on port 4321) |
@@ -117,7 +123,11 @@ When the user does ask for a commit:
 mcp__Claude_Preview__preview_start({ name: "astro" })
 ```
 
-Then `http://localhost:4321/tower-alerts` or `/create-resources`.
+Then (note the base path is required locally too):
+- `http://localhost:4321/ai-generate-teacher-materials-prototype-mvp/tower-alerts-iBGSV5YMFky3cZJiZNEY`
+- `http://localhost:4321/ai-generate-teacher-materials-prototype-mvp/create-resources-95a534VKBScVGb3WUOvN`
+
+The index at `…/ai-generate-teacher-materials-prototype-mvp/` links to both.
 Reuses the running dev server if already started.
 
 For verification, prefer `preview_inspect` (computed styles) over screenshots
@@ -158,10 +168,12 @@ Key tokens by usage:
 --gray-75:       #6E6E6E    Problem Set label
 --green-80:      #007041    completed alert check circle bg
 --red-75:        #D2000F    red italic answer text in problems
---card-dropshadow: 1px 1px 3px 0 rgba(0,0,0,0.24)   white card shadow (base.css)
+--card-dropshadow: 1px 1px 3px 0 rgba(0,0,0,0.24)   white card shadow (styles.css)
 ```
 
 Fonts: Source Sans Pro 400 / 600 / 700 for the app; Oxygen on footer elements.
+Self-hosted (woff2 in `src/styles/fonts/`, declared via `@font-face` in styles.css) —
+not loaded from Google Fonts.
 
 ---
 
@@ -288,8 +300,10 @@ state = {
   literal fills. Naming: kebab-case (`back-arrow.svg`, `modal-close-x.svg`).
   These are NOT fetched at runtime — they're inlined by the build.
 - **`public/previews/*.webp`** — preview images fetched at runtime by the
-  create-resources page. Paths are referenced as `/previews/filename.webp`
-  (absolute, served from `public/`). Naming keeps the original format:
+  create-resources page. Paths in `lessonSets.ts` are `/previews/filename.webp`;
+  the page script prepends `import.meta.env.BASE_URL` when setting `img.src` so they
+  resolve under the GitHub Pages base path (see the base-path gotcha below). Naming
+  keeps the original format:
   `mini_lesson_{set}_{variant}.webp`, `student_materials_{set}_{variant}@2x.webp`,
   `sample_script_{set}_{variant}.webp`.
 - **No runtime PDFs.** The app renders webp previews only. Legacy PDFs and the
@@ -300,11 +314,29 @@ state = {
   Nothing here is loaded. Don't delete or rely on these.
 
 ### Route naming (Astro pages)
-Astro pages use clean routes: `/tower-alerts`, `/create-resources`. No obfuscated
-suffixes on `.astro` files. If you need a new page:
-1. Create `src/pages/my-page.astro` → route becomes `/my-page`.
-2. No random suffix needed — Astro routes aren't guessable by content.
-3. Update internal `<a href>` references and docs as needed.
+The two pages use **obfuscated** route names (private-by-obfuscation) — the `.astro`
+filename ends in a 20-char alphanumeric suffix, and the route inherits it:
+- `tower-alerts-iBGSV5YMFky3cZJiZNEY.astro` → `/tower-alerts-iBGSV5YMFky3cZJiZNEY`
+- `create-resources-95a534VKBScVGb3WUOvN.astro` → `/create-resources-95a534VKBScVGb3WUOvN`
+
+If you need a new private page, give it a similar random suffix and update all
+internal `<a href>` references + docs. Keep the suffix stable once chosen.
+
+### GitHub Pages base path (recurring gotcha)
+`astro.config.mjs` sets `base: '/ai-generate-teacher-materials-prototype-mvp'`, so
+the site is served from that subpath both in `dist/` **and on the local dev server**.
+
+Astro rewrites the base into **static** `href`/`src` attributes in `.astro` markup
+automatically, but it does NOT touch:
+- **Template-literal / dynamic hrefs** — prefix with `import.meta.env.BASE_URL`
+  (e.g. the create-resources link built in the Tower Alerts page, `SubNavAI` backHref,
+  `BeforeYouGoModal` href). Note `BASE_URL` has **no trailing slash**, so write
+  `` `${import.meta.env.BASE_URL}/your-route` `` with an explicit slash.
+- **JS-set URLs** — `window.location.href = …` and `img.src = …` bypass Astro's
+  rewriter; build the base path in yourself (create-resources prepends `BASE_URL` to
+  webp `src`; `tower-alerts.ts` navigates to an href that already includes it).
+- **CSS `url()`** — handled automatically *only* for assets under `src/` referenced
+  relatively (Vite rewrites them); assets in `public/` need the base added manually.
 
 ---
 
