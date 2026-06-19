@@ -64,6 +64,11 @@ changes uncommitted unless they say "commit and push" (or similar). Showing
 `git status` / `git diff` to summarize what changed is fine; making a commit
 is not.
 
+**Each commit and each push requires its own explicit request.** A prior "commit"
+or "push" instruction in the same session does NOT authorize the next one.
+There is no standing permission — not across sessions, not within a session.
+Every git write action needs a fresh "yes, do it now" from the user.
+
 When the user does ask for a commit:
 - Use the repo-local identity `AngyBrooksZ <angy@zearn.org>` (already configured;
   don't touch global config).

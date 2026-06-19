@@ -143,7 +143,7 @@ function renderMiniLesson(webpUrl: string) {
     adjustPageAreaHeight();
     if (!html.classList.contains("ctas-visible")) scheduleCtas();
   };
-  if (webpUrl) img.src = webpUrl;
+  if (webpUrl) img.src = import.meta.env.BASE_URL + webpUrl;
 }
 
 function scrollToSection(sectionId: string) {
@@ -175,7 +175,7 @@ function revealSection(material: "worksheet" | "sampleScript", webp: string | nu
     adjustPageAreaHeight();
     if (!html.classList.contains("ctas-visible")) scheduleCtas();
   };
-  if (webp) img.src = webp;
+  if (webp) img.src = import.meta.env.BASE_URL + webp;
 }
 
 // Re-render an already-visible section's preview (recreate toggle).
@@ -185,7 +185,7 @@ function reRenderSection(material: "worksheet" | "sampleScript", webp: string | 
   img.onload = () => {
     adjustPageAreaHeight();
   };
-  if (webp) img.src = webp;
+  if (webp) img.src = import.meta.env.BASE_URL + webp;
 }
 
 // ---- Loading messages (cycle every 3s; clip-fade via .fade-in) ----
