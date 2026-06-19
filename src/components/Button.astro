@@ -36,8 +36,6 @@ interface Props {
   iconSize?: number | string;
   /** Render as a link to this href instead of a <button>. */
   href?: string;
-  /** Optional min-width (px) — e.g. the AYS CANCEL button is 125px. */
-  minWidth?: number;
   type?: "button" | "submit";
   id?: string;
   class?: string;
@@ -52,7 +50,6 @@ const {
   label,
   iconSize,
   href,
-  minWidth,
   type = "button",
   id,
   class: className,
@@ -63,7 +60,6 @@ const Tag = href ? "a" : "button";
 const cls = ["btn", `btn--${variant}`, `btn--${size}`, className]
   .filter(Boolean)
   .join(" ");
-const style = minWidth ? `min-width:${minWidth}px` : undefined;
 ---
 
 <Tag
@@ -71,118 +67,9 @@ const style = minWidth ? `min-width:${minWidth}px` : undefined;
   id={id}
   href={href}
   type={href ? undefined : type}
-  style={style}
   aria-label={ariaLabel}
 >
   {icon && <span class="btn-glyph"><Icon name={icon} size={iconSize} /></span>}
   {swapIcon && <span class="btn-glyph btn-glyph--swap"><Icon name={swapIcon} size={iconSize} /></span>}
   {variant !== "icon" && (label ? <span>{label}</span> : <slot />)}
 </Tag>
-
-<style>
-  .btn {
-    font-family: inherit;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    font-weight: 600;
-    line-height: 1.5;
-    text-transform: uppercase;
-    text-decoration: none;
-  }
-
-  /* ---- fills ---- */
-  .btn--primary {
-    background: var(--aqua-75);
-    color: var(--white);
-    border-color: var(--aqua-75);
-  }
-  .btn--primary:hover {
-    background: var(--aqua-85);
-    border-color: var(--aqua-85);
-  }
-  .btn--primary:active {
-    background: var(--aqua-95);
-    border-color: var(--aqua-95);
-  }
-
-  .btn--secondary,
-  .btn--icon {
-    background: var(--white);
-    color: var(--aqua-75);
-    border-color: var(--aqua-75);
-  }
-  /* outline buttons invert on interaction; icons knock out via currentColor */
-  .btn--secondary:hover,
-  .btn--icon:hover {
-    background: var(--aqua-75);
-    color: var(--white);
-  }
-  .btn--secondary:active,
-  .btn--icon:active {
-    background: var(--aqua-85);
-    border-color: var(--aqua-85);
-    color: var(--white);
-  }
-
-  /* ---- glyphs (wrapped so swap can toggle visibility) ---- */
-  .btn-glyph {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .btn-glyph--swap {
-    display: none;
-  }
-  .btn.is-swapped .btn-glyph:not(.btn-glyph--swap) {
-    display: none;
-  }
-  .btn.is-swapped .btn-glyph--swap {
-    display: inline-flex;
-  }
-
-  /* ---- sizes ---- */
-  .btn--xs {
-    height: 24px;
-    font-size: 12px;
-  }
-  .btn--sm {
-    height: 32px;
-    font-size: 14px;
-  }
-  .btn--md {
-    height: 40px;
-    font-size: 16px;
-  }
-  .btn--cta {
-    height: 32px;
-    font-size: 16px;
-  }
-  .btn:not(.btn--icon) {
-    gap: 6px;
-  }
-  .btn--sm:not(.btn--icon),
-  .btn--cta:not(.btn--icon) {
-    padding: 0 12px;
-  }
-  .btn--md:not(.btn--icon) {
-    padding: 0 16px;
-  }
-
-  .btn--icon {
-    padding: 0;
-    flex: none;
-  }
-  .btn--icon.btn--xs {
-    width: 24px;
-  }
-  .btn--icon.btn--sm {
-    width: 32px;
-  }
-  .btn--icon.btn--md {
-    width: 40px;
-  }
-</style>

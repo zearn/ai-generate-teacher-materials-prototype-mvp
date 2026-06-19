@@ -1,7 +1,7 @@
 /**
  * wireModal — verbatim port of the prototype's shared modal helper.
  *
- * Wires open/close + Escape + overlay-click + body scroll-lock on a modal whose
+ * Wires open/close + Escape + overlay-click + scroll-lock on a modal whose
  * root is the `.modal-overlay` element (Modal.astro's root, matched by `selector`,
  * usually `#id`) and which contains a `.modal-close` button somewhere inside.
  * Returns { open, close } so triggers elsewhere on the page can drive it.
@@ -18,15 +18,21 @@ export function wireModal(selector: string): ModalHandle | null {
   const modal = document.querySelector<HTMLElement>(selector);
   if (!modal) return null;
 
+  // Lock background scroll while the modal is open. overflow:hidden removes the
+  // page scrollbar, which would shift the page ~15px sideways; compensate by
+  // padding the body with the scrollbar's width so nothing behind the modal moves.
   const open = () => {
     modal.hidden = false;
     modal.classList.add("open");
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
   };
   const close = () => {
     modal.classList.remove("open");
     modal.hidden = true;
     document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
   };
 
   modal

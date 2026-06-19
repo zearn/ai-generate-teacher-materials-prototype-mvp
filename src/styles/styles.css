@@ -1,0 +1,1782 @@
+/* ============================================================
+   GLOBAL — @font-face, resets, typography, shared utilities
+   (content of base.css)
+   ============================================================ */
+
+/* Resets + global typography. Color values come only from tokens.css. */
+
+/* Self-hosted fonts (Latin subset). Files live in src/styles/fonts/ and are
+   referenced relatively so Vite fingerprints them and rewrites the URL with the
+   GitHub Pages base path at build time — no manual base handling needed.
+   font-display: block keeps text invisible during the brief load (no FOUT). */
+@font-face {
+  font-family: "Oxygen";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./fonts/oxygen-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: italic;
+  font-weight: 400;
+  font-display: block;
+  src: url("./fonts/source-sans-pro-400-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./fonts/source-sans-pro-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url("./fonts/source-sans-pro-600.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url("./fonts/source-sans-pro-700.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Shared non-color tokens. The standard white-card shadow (X1Y1B3) used by the
+   sidenav, button-group, and page-area cards. */
+:root {
+  --card-dropshadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.24);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Form controls don't inherit font-family by default, so unstyled buttons /
+   inputs / selects fall back to the UA default (Arial/Helvetica). Opt them all
+   in so they render in Source Sans Pro. They keep their own size/weight. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Source Sans Pro", system-ui, -apple-system, sans-serif;
+  color: var(--charcoal-95);
+  background: var(--gray-5);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Footer is the one place that uses Oxygen (see design.md typography). */
+footer,
+.footer {
+  font-family: "Oxygen", "Source Sans Pro", sans-serif;
+}
+
+a {
+  color: var(--aqua-75);
+}
+a:hover {
+  color: var(--aqua-85);
+}
+a:active {
+  color: var(--aqua-95);
+}
+
+/* ============================================================
+   COMPONENTS — one block per component (Icon.astro has no styles).
+   Selectors are global EXCEPT confirmed cross-page/-component collisions:
+   .top-nav and .modal-card/.modal-close use the body.page-* hook (no
+   distinguishing ancestor existed); the sidenav's .coming-soon uses its
+   existing .sidenav ancestor. Identical duplicates (.nav-inner across
+   TopNav/SubNav, .modal-overlay across Modal/CTM) are written once.
+   ============================================================ */
+
+/* ---- Button (shared by both pages; class names unique -> global) ---- */
+.btn {
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* ---- fills ---- */
+.btn--primary {
+  background: var(--aqua-75);
+  color: var(--white);
+  border-color: var(--aqua-75);
+}
+.btn--primary:hover {
+  background: var(--aqua-85);
+  border-color: var(--aqua-85);
+}
+.btn--primary:active {
+  background: var(--aqua-95);
+  border-color: var(--aqua-95);
+}
+
+.btn--secondary,
+.btn--icon {
+  background: var(--white);
+  color: var(--aqua-75);
+  border-color: var(--aqua-75);
+}
+/* outline buttons invert on interaction; icons knock out via currentColor */
+.btn--secondary:hover,
+.btn--icon:hover {
+  background: var(--aqua-75);
+  color: var(--white);
+}
+.btn--secondary:active,
+.btn--icon:active {
+  background: var(--aqua-85);
+  border-color: var(--aqua-85);
+  color: var(--white);
+}
+
+/* ---- glyphs (wrapped so swap can toggle visibility) ---- */
+.btn-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-glyph--swap {
+  display: none;
+}
+.btn.is-swapped .btn-glyph:not(.btn-glyph--swap) {
+  display: none;
+}
+.btn.is-swapped .btn-glyph--swap {
+  display: inline-flex;
+}
+
+/* ---- sizes ---- */
+.btn--xs {
+  height: 24px;
+  font-size: 12px;
+}
+.btn--sm {
+  height: 32px;
+  font-size: 14px;
+}
+.btn--md {
+  height: 40px;
+  font-size: 16px;
+}
+.btn--cta {
+  height: 32px;
+  font-size: 16px;
+}
+.btn:not(.btn--icon) {
+  gap: 6px;
+}
+.btn--sm:not(.btn--icon),
+.btn--cta:not(.btn--icon) {
+  padding: 0 12px;
+}
+.btn--md:not(.btn--icon) {
+  padding: 0 16px;
+}
+
+.btn--icon {
+  padding: 0;
+  flex: none;
+}
+.btn--icon.btn--xs {
+  width: 24px;
+}
+.btn--icon.btn--sm {
+  width: 32px;
+}
+.btn--icon.btn--md {
+  width: 40px;
+}
+
+/* ---- TopNavAI (create-resources). .top-nav collides with the tower-alerts
+        inline nav -> page-scoped. .nav-inner is shared with SubNavAI and is
+        written here once (create-resources-only, no tower-alerts .nav-inner). */
+body.page-create-resources .top-nav {
+  background: var(--white);
+  height: 64px;
+  border-bottom: 4px solid var(--yellow-20);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.nav-inner {
+  width: 992px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 64px;
+  width: 112px;
+  display: flex;
+  align-items: center;
+}
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 33px;
+}
+.sparkle {
+  flex: none;
+  display: inline-flex;
+}
+.title-text {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--charcoal-95);
+}
+.beta-pill {
+  height: 18px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--purple-5);
+  border: 1px solid var(--purple-90);
+  color: var(--purple-90);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---- SubNavAI (create-resources). Shares .nav-inner (defined above). ---- */
+.sub-nav {
+  background: var(--white);
+  height: 48px;
+  border-bottom: 1px solid var(--gray-30);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.center-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.back-btn {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--charcoal-95);
+  text-decoration: none;
+}
+.back-icon {
+  flex: none;
+  display: inline-flex;
+  /* back-arrow ring+arrow are currentColor (white disc stays literal) */
+  color: var(--aqua-75);
+}
+.back-btn .label {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--charcoal-95);
+  /* Pre-set thickness/offset so :hover only turns the line on. */
+  text-decoration-thickness: 4px;
+  text-underline-offset: 4px;
+}
+.back-btn:hover .label {
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-75);
+}
+.back-btn:active .label {
+  color: var(--charcoal-100);
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-95);
+}
+
+/* ---- SideNavAI (create-resources). .coming-soon scoped under its .sidenav
+        ancestor so the bare rule can't bleed into the CTM modal's "Coming
+        Soon" pill. ---- */
+.sidenav {
+  width: 214px;
+  flex: none;
+  background: var(--white);
+  border-radius: 4px;
+  box-shadow: var(--card-dropshadow);
+  padding: 16px 7px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  position: relative;
+}
+
+/* The purple highlight is one element the script slides to the active item;
+   it provides the active row's background. */
+.nav-slider {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  background: var(--purple-5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+}
+
+.sidenav-active {
+  width: 100%;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--gray-15);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: border-left-color 0.2s ease;
+}
+.sidenav-active:hover {
+  background: var(--purple-5);
+}
+.sidenav-active.ml-active {
+  border-left-color: var(--fuchsia-45);
+}
+.sidenav-active .label {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  white-space: nowrap;
+}
+.sidenav-active.ml-active .label {
+  font-weight: 600;
+}
+
+.subnav-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.subnav-item .content {
+  /* padding-right 8px insets the sparkle button (was a button margin) */
+  padding: 12px 8px 12px 28px;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--gray-15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.subnav-item .text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+/* "Current view" indicator: short fuchsia bar, fades in when current/pending. */
+.subnav-item::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: var(--fuchsia-45);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.subnav-item.current::before,
+.subnav-item.nav-pending::before {
+  opacity: 1;
+}
+.subnav-item.current .text,
+.subnav-item.nav-pending .text {
+  font-weight: 600;
+}
+/* hover overlay (backgrounds otherwise handled by .nav-slider) */
+.subnav-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--purple-5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.15s ease;
+}
+.subnav-item:hover::after {
+  opacity: 1;
+}
+
+.sidenav .coming-soon {
+  width: 100%;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.sidenav .coming-soon .label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--gray-75);
+  white-space: nowrap;
+}
+.sidenav .coming-soon .tag {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--gray-60);
+  white-space: nowrap;
+}
+
+/* ---- Modal.astro shell (byg/ays; create-resources). The overlay is identical
+        to the CTM modal's, so it is written once (global). The card + close-X
+        differ from CTM's, so they are page-scoped. Per-instance card width
+        (was an inline CSS var) is set by id. ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+body.page-create-resources .modal-card {
+  position: relative;
+  background: var(--white);
+  border-top: 16px solid var(--aqua-40);
+  border-radius: 4px;
+  box-shadow: 1px 1px 1.5px rgba(128, 128, 128, 0.5);
+  width: 600px;
+  max-width: 100%;
+  padding: 0 64px;
+  color: var(--charcoal-95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#aysModal .modal-card {
+  width: 470px;
+}
+body.page-create-resources .modal-close {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 0;
+  color: var(--charcoal-90); /* modal-close-x is currentColor (was #414C52) */
+}
+/* 64px top (under the stripe) + 64px before the footer rule — matches the
+   prototype's body-padding-top + msg-margin-bottom rhythm. */
+.modal-body {
+  padding: 64px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-title {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-transform: uppercase;
+  text-align: center;
+}
+.modal-buttons {
+  width: 100%;
+  border-top: 1px solid var(--gray-30);
+  padding: 32px 0;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- BeforeYouGoModal (create-resources) ---- */
+.byg-msg {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  text-align: center;
+}
+
+/* ---- AreYouSureModal (create-resources). #aysCancel min-width was a Button
+        prop-driven inline style. ---- */
+.ays-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.ays-msg {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--black);
+  text-align: center;
+}
+.ays-dontshow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  cursor: pointer;
+}
+.ays-dontshow input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  position: relative;
+  border: 1px solid var(--charcoal-80);
+  border-radius: 3px;
+  background: var(--white);
+  cursor: pointer;
+}
+.ays-dontshow input[type="checkbox"]:checked {
+  background: var(--aqua-75);
+  border-color: var(--aqua-75);
+}
+.ays-dontshow input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+#aysCancel {
+  min-width: 125px;
+}
+
+/* ---- CreateTargetedMaterialsModal (tower-alerts). Uses the shared
+        .modal-overlay above. Its .modal-card + .modal-close collide with
+        Modal.astro's, so those two are page-scoped; the rest of its classes
+        are unique -> global. ---- */
+body.page-tower-alerts .modal-card {
+  position: relative;
+  background: var(--white);
+  border-top: 16px solid var(--fuchsia-45);
+  border-radius: 4px;
+  box-shadow: 1px 1px 1.5px rgba(128, 128, 128, 0.5);
+  width: 604px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 48px 32px 32px;
+  color: var(--charcoal-95);
+}
+body.page-tower-alerts .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 0;
+  color: var(--charcoal-90); /* modal-close-x is currentColor (was #414C52) */
+}
+.modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.modal-heading .sparkles {
+  width: 21.1654px;
+  height: 20.7946px;
+  flex: none;
+}
+.modal-heading h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 48px;
+  color: var(--charcoal-95);
+  white-space: nowrap;
+}
+.modal-beta {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 15px;
+  color: var(--purple-90);
+  background: var(--purple-5);
+  border: 1px solid var(--purple-90);
+  border-radius: 3.5px;
+  vertical-align: middle;
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+}
+.modal-intro {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-align: center;
+  margin: 0 0 24px;
+}
+.modal-intro strong {
+  font-weight: 600;
+}
+.objective-card {
+  background: var(--purple-5);
+  border: 1px solid var(--purple-15);
+  border-radius: 10px;
+  padding: 24px 8px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.objective-card p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.modal-select-label {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--black);
+  text-align: center;
+  margin: 0 0 8px;
+}
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.modal-option {
+  width: 302px;
+  height: 60px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  background: var(--white);
+  box-sizing: border-box;
+}
+.modal-option.selected {
+  background: var(--aqua-10);
+  border: 3px solid var(--aqua-60);
+}
+.modal-option.disabled {
+  border: 1px solid #DDE0E3;
+  color: var(--gray-40);
+  justify-content: flex-start;
+}
+.modal-option .checkbox {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+}
+/* Empty checkbox: sized to match the inner square of the checked SVG above
+   (15x15, 2.5px radius). Border matches the disabled label's gray so the
+   whole row reads as one disabled unit. */
+.modal-option .checkbox-empty {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--gray-45);
+  background: var(--white);
+  border-radius: 2.5px;
+  box-sizing: border-box;
+}
+.modal-option .label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+}
+.modal-option.disabled .label {
+  color: var(--gray-40);
+}
+.modal-option.disabled .label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex: 1;
+  min-width: 0;
+}
+.modal-option.disabled .coming-soon {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--gray-40);
+  margin-left: auto;
+}
+.modal-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--aqua-75);
+  color: var(--white);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 24px;
+  margin: 0 auto 24px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.modal-create-btn:hover {
+  background: var(--aqua-85);
+}
+.modal-disclaimer {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--black);
+}
+.modal-disclaimer a {
+  color: var(--aqua-75);
+  font-weight: 600;
+  text-decoration: none;
+}
+.modal-disclaimer a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================
+   PAGE: tower-alerts — collisions (.top-nav, .page-area, main) scoped under
+   body.page-tower-alerts. .header-wrap is global (identical on both pages).
+   ============================================================ */
+
+.header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+}
+
+/* ===== Top Nav ===== */
+body.page-tower-alerts .top-nav {
+  background: var(--white);
+  height: 64px;
+  display: flex;
+  justify-content: center;
+}
+.yellow-bar { height: 4px; background: var(--yellow-20); }
+.header-wrap.scrolled .breadcrumb {
+  box-shadow: inset 0 -1px 0 0 var(--gray-30), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+.top-nav .nav { display: flex; justify-content: space-between; width: 992px; }
+.top-nav .left { display: flex; align-items: center; }
+.logo-wrap { width: 112px; padding-right: 16px; display: flex; align-items: center; }
+.top-tab {
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  text-transform: uppercase;
+  color: var(--charcoal-95);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.top-tab.active { background: var(--yellow-20); color: var(--black); }
+
+.top-nav .right { position: relative; width: 566px; height: 64px; }
+.top-nav .right .link {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--charcoal-95);
+  background: var(--white);
+  text-decoration: none;
+}
+.link-assignments { left: 0; }
+.link-roster { left: 119.56px; }
+.link-resources { left: 195.77px; }
+.link-help { left: 297.6px; }
+.account-box {
+  position: absolute;
+  left: 381.68px;
+  top: 0;
+  bottom: 0;
+  min-width: 120px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border-left: 1px solid var(--gray-30);
+  border-right: 1px solid var(--gray-30);
+}
+.school-chip {
+  background: var(--green-80);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 14.4px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 4px 8px;
+}
+.account-name {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--charcoal-95);
+  margin-right: 4px;
+}
+.account-box .caret { display: inline-flex; color: var(--charcoal-95); }
+
+/* ===== Breadcrumb ===== */
+.breadcrumb {
+  background: var(--gray-5);
+  box-shadow: inset 0 -1px 0 0 var(--gray-30);
+  height: 56px;
+  display: flex;
+  justify-content: center;
+}
+.breadcrumb ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  width: 992px;
+  height: 100%;
+}
+.breadcrumb li { height: 56px; display: flex; align-items: center; }
+.breadcrumb .crumb-link {
+  color: var(--charcoal-90);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 21px;
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 1px;
+}
+.breadcrumb .crumb-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 1px;
+  background: var(--charcoal-90);
+  transition: height 0.12s ease;
+}
+.breadcrumb .crumb-link:hover::after { height: 4px; }
+.breadcrumb .crumb-sep {
+  padding: 0 13.58px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--charcoal-90);
+}
+.breadcrumb .crumb-select {
+  background: var(--white);
+  border: 1px solid var(--gray-30);
+  padding: 1px 29px 1px 9px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  color: var(--aqua-75);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  position: relative;
+  min-width: 64px;
+  cursor: pointer;
+}
+.crumb-select .caret {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  color: var(--aqua-75);
+}
+
+/* ===== Page area / card ===== */
+body.page-tower-alerts .page-area {
+  background: var(--gray-5);
+  padding: 24px 32px 48px;
+  display: flex;
+  justify-content: center;
+}
+body.page-tower-alerts main {
+  width: 1024px;
+  background: var(--white);
+  padding: 0 16px;
+  border-radius: 4px;
+  box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 3px 0;
+}
+
+.page-header { padding: 24px 0 32px; text-align: center; }
+.page-header h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--charcoal-95);
+}
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  cursor: help;
+  color: var(--aqua-75);
+}
+.page-header .subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--charcoal-95);
+}
+
+.selector { padding: 0 84px 0 100px; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gray-5);
+  padding: 8px 16px;
+  color: var(--aqua-75);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  border: 0;
+  cursor: pointer;
+}
+.pill .caret { margin-left: 8px; display: inline-flex; color: var(--aqua-75); }
+
+.hero {
+  padding: 16px 84px 56px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.hero .left { display: flex; align-items: flex-start; gap: 16px; }
+.hero .icon { width: 72px; height: 72px; padding-top: 6px; display: inline-flex; }
+.hero h2 {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 48px;
+  margin: 0;
+  color: var(--charcoal-95);
+  white-space: nowrap;
+}
+.hero .meta { font-size: 20px; line-height: 30px; color: var(--charcoal-95); }
+.print-btn {
+  margin-top: 38px;
+  height: 40px;
+  min-width: 104px;
+  border: 1px solid var(--aqua-75);
+  border-radius: 25px;
+  background: var(--white);
+  color: var(--aqua-75);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 0 21px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* 2-col layout */
+.columns { display: grid; grid-template-columns: 320px 636px; gap: 36px; }
+
+/* ===== Filter sidebar ===== */
+.filter-header {
+  height: 56px; display: flex; align-items: center;
+  padding: 0 16px; font-weight: 400;
+}
+.filter-header span { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+.filter-box {
+  background: var(--gray-5);
+  padding: 24px 16px 16px;
+  display: flex; flex-direction: column; gap: 16px;
+  margin-bottom: 16px;
+}
+.filter-row { display: flex; align-items: center; justify-content: space-between; }
+.filter-row > label { color: var(--charcoal-95); font-size: 16px; line-height: 24px; }
+
+.toggle {
+  position: relative; width: 117px; height: 24px;
+  display: flex; align-items: center;
+}
+.toggle .label-hide { position: absolute; left: 0; }
+.toggle .label-show { position: absolute; left: 79px; }
+.toggle .switch {
+  position: absolute; left: 39px; top: 1px;
+  width: 32px; height: 22px; cursor: pointer;
+}
+.toggle .switch .track {
+  position: absolute; inset: 1px 0;
+  background: var(--gray-30);
+  border: 1px solid var(--aqua-75);
+  border-radius: 10px;
+  box-shadow: inset 0 0 1px 1px var(--aqua-75);
+  overflow: hidden;
+}
+.toggle .switch .track::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 20px; background: var(--aqua-75);
+  transition: width 0.15s ease;
+}
+.toggle .switch .knob {
+  position: absolute; left: 10px; top: 0;
+  width: 22px; height: 22px;
+  background: var(--white);
+  border: 2px solid var(--aqua-75); border-radius: 50%;
+  box-shadow: 1px 1px 3px 0 #b3b3b3;
+  transition: left 0.15s ease;
+}
+.toggle.off .switch .track::before { width: 0; }
+.toggle.off .switch .knob { left: 0; }
+
+.dropdown { position: relative; width: 136px; height: 40px; }
+.dropdown.wide { width: 184px; }
+.dropdown select {
+  appearance: none; -webkit-appearance: none;
+  width: 100%; height: 100%;
+  background: var(--white);
+  border: 1px solid var(--gray-55); border-radius: 4px;
+  padding: 8px 35px 8px 11px;
+  font: inherit; color: var(--charcoal-95);
+  font-size: 14px; line-height: 21px;
+}
+.dropdown.lg select { font-size: 16px; line-height: 24px; }
+.dropdown .caret {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px;
+  pointer-events: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--charcoal-95);
+}
+
+/* Students / Content panels */
+.panel {
+  background: var(--gray-5); padding: 0 0 16px 0;
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 16px;
+}
+.panel:last-child { margin-bottom: 0; }
+.panel-header {
+  width: 100%; padding: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: var(--aqua-75); font-weight: 600; font-size: 16px; line-height: 24px;
+  background: none; border: none; cursor: pointer;
+}
+.panel-header .chev {
+  width: 16px; height: 8.298px; display: inline-flex;
+  transition: transform 0.15s ease;
+}
+.panel.collapsed .chev { transform: rotate(180deg); }
+.panel.collapsed .list { display: none; }
+.panel.collapsed { padding-bottom: 0; }
+
+.list {
+  width: 288px;
+  background: var(--white);
+  border: 1px solid var(--gray-55);
+  border-radius: 4px;
+  max-height: 258px; overflow: auto;
+  padding: 16px;
+}
+.list .row {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  line-height: 1.5;
+  border-radius: 12px;
+  padding: 0 8px;
+  margin-top: 8px;
+  color: var(--charcoal-95);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-color: transparent;
+  transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+}
+.list .row > span:first-child {
+  width: 172px;
+  text-align: left;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list .row .count { font-size: 16px; overflow: initial; }
+.list .row.regular { font-weight: 400; }
+.list .row:hover,
+.list .row:focus,
+.list .row:active { background-color: rgba(0, 0, 0, 0.078); }
+.list .row.selected {
+  background-color: var(--aqua-75);
+  color: var(--white);
+  font-weight: 600;
+}
+.list .row.selected .count { color: var(--white); }
+.list .row.selected:hover,
+.list .row.selected:focus { background-color: var(--aqua-85); }
+.list .row.selected:active { background-color: #003e4d; }
+.list .row.partially-selected {
+  border-color: var(--aqua-75);
+  color: var(--aqua-75);
+  background-color: transparent;
+}
+.list .row.partially-selected:hover,
+.list .row.partially-selected:focus {
+  border-color: var(--aqua-85);
+  color: var(--aqua-85);
+  background-color: var(--white);
+}
+.list .row.partially-selected:active { border-color: #003e4d; color: #003e4d; }
+
+/* Content list — 342px fits ALL pill + 9 grades with no inter-row margin */
+.list.content-list { padding: 17px 9px 13px; max-height: 342px; overflow: hidden; }
+.list.content-list .row { margin-top: 0; border: none; }
+.list.content-list .row { padding: 0; margin-bottom: 0; }
+.list.content-list .row .twirl {
+  width: 24px; height: 24px; margin: 4px 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--charcoal-95);
+}
+.list.content-list .row .label-wrap {
+  flex: 1; padding: 4px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: 12px;
+}
+.list.content-list .row:first-child .label-wrap { padding: 0 8px; }
+.list.content-list .row.selected .label-wrap { background: var(--aqua-75); color: var(--white); }
+.list.content-list .row.selected .label-wrap .count { color: var(--white); }
+.list.content-list .row.selected { background: transparent; color: var(--charcoal-95); }
+
+/* Right column: Sort + results */
+.sort-row {
+  display: flex; align-items: center; justify-content: space-between; height: 56px;
+}
+.sort-left { display: flex; align-items: center; }
+.sort-left .label { padding: 0 16px 0 24px; font-weight: 600; font-size: 16px; line-height: 24px; }
+.results-count {
+  padding: 16px;
+  font-weight: 600; font-size: 16px; line-height: 24px; color: var(--charcoal-95);
+}
+.results-count .rest { font-weight: 400; }
+
+.alerts { display: flex; flex-direction: column; gap: 16px; }
+
+.load-more-wrap {
+  height: 56px;
+  display: flex; justify-content: center; align-items: flex-end;
+  margin-bottom: 48px;
+}
+.load-more {
+  height: 40px; min-width: 104px;
+  border: 1px solid var(--aqua-75); border-radius: 25px;
+  background: var(--white); color: var(--aqua-75);
+  font-weight: 600; font-size: 16px;
+  text-transform: uppercase;
+  padding: 0 21px;
+  cursor: pointer;
+}
+.print-btn:hover,
+.load-more:hover { background: var(--aqua-75); color: var(--white); }
+.print-btn:active,
+.load-more:active {
+  background: var(--aqua-85);
+  border-color: var(--aqua-85);
+  color: var(--white);
+}
+
+/* ===== Alert cards (T1c) ===== */
+.alert {
+  position: relative;
+  background: var(--white);
+  border: 1px solid var(--purple-90);
+  border-left: 8px solid var(--purple-90);
+  border-radius: 4px;
+  padding: 16px 24px 24px 36px;
+}
+.alert-icon {
+  position: absolute; left: -28px; top: 16px;
+  width: 48px; height: 48px;
+}
+.alert-head { display: flex; align-items: flex-start; justify-content: space-between; }
+.alert-info { display: flex; flex-direction: column; gap: 8px; }
+.student-row { display: flex; align-items: center; gap: 8px; }
+.student-name {
+  font-weight: 400; font-size: 20px; line-height: 30px; color: var(--charcoal-95);
+}
+.student-report-link {
+  display: inline-flex; align-items: center; height: 24px; padding-left: 8px;
+  color: var(--aqua-75);
+}
+.breadcrumb-meta {
+  font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95); margin: 4px 0;
+}
+.lesson-link {
+  font-weight: 600; font-size: 20px; line-height: 30px; color: var(--aqua-75);
+  max-width: 568px; display: block; text-decoration: none;
+}
+.lesson-link:hover { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 4px; }
+.alert-side {
+  display: flex; align-items: center; margin-left: 16px;
+  font-weight: 600; color: var(--purple-90);
+}
+.create-resources {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--aqua-75);
+  font-weight: 600; font-size: 16px; line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 4px;
+}
+.create-resources:hover {
+  color: var(--aqua-85);
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-75);
+}
+.create-resources:active {
+  color: #00485a;
+  text-decoration-line: underline;
+  text-decoration-color: var(--aqua-85);
+}
+.alert-divider {
+  width: 1px; align-self: stretch;
+  background: var(--gray-30);
+  min-height: 32px;
+  margin: 0 16px;
+}
+.alert-count {
+  font-weight: 600; font-size: 20px; line-height: 1.5; color: var(--purple-90);
+}
+.bang-icon {
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--purple-90);
+}
+.alert-desc {
+  padding: 4px 0 8px;
+  font-weight: 400; font-size: 14px; line-height: 21px;
+  color: var(--charcoal-95); max-width: 567px;
+}
+.sep { border-top: 1px solid var(--gray-30); margin-bottom: 8px; }
+.event {
+  display: flex; align-items: center;
+  height: 24px;
+  border: none; background: transparent;
+}
+.event .ico {
+  width: 14.5px; height: 14.5px;
+  margin-left: 4.7px; margin-right: 13px;
+  display: inline-flex; flex-shrink: 0;
+  color: var(--purple-90);
+}
+.event.evt-completed .ico {
+  background: var(--green-80); border-radius: 50%;
+  color: var(--white); align-items: center; justify-content: center;
+}
+.alert-check {
+  background: var(--green-80);
+  color: var(--white);
+  border-radius: 50%;
+  width: 14.5px; height: 14.5px;
+  padding: 3px;
+}
+.event .label {
+  font-weight: 600; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+  margin-right: 8px;
+}
+.event .ts {
+  font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--charcoal-95);
+}
+
+/* ===== Help tooltip ===== */
+.tooltip {
+  position: absolute; pointer-events: none;
+  max-width: 280px;
+  background: var(--charcoal-95); color: var(--white);
+  padding: 8px 10px; border-radius: 4px;
+  font-size: 13px; line-height: 1.4;
+  z-index: 50; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(calc(-100% - 8px));
+  opacity: 0; transition: opacity 0.12s;
+}
+.tooltip.show { opacity: 1; }
+
+/* ============================================================
+   PAGE: create-resources — .page-area scoped under body.page-create-resources
+   (collides with tower-alerts). .header-wrap deduped (now global). State-gating
+   rules (html.loaded / .recreating / .loading-*) come AFTER the page-area rules
+   so their box-shadow/padding overrides still win at equal specificity. Other
+   classes (.content-wrap, .disclaimer, sidenav skeleton, .pdf-cta, …) are
+   unique to this page and stay global.
+   ============================================================ */
+
+/* ----- page layout (was the create-resources.astro <style> block) ----- */
+
+.content-wrap {
+  width: 1024px;
+  margin: 0 auto;
+  padding-top: 16px;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.disclaimer {
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--black);
+  text-align: center;
+}
+.disclaimer a {
+  color: var(--aqua-75);
+  font-weight: 600;
+}
+.disclaimer a:hover {
+  text-decoration: underline;
+}
+
+.side-by-side {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.main-col {
+  width: 792px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Button-group bar */
+.button-group {
+  position: relative;
+  height: 48px;
+  margin-bottom: 4px;
+  background: var(--white);
+  box-shadow: var(--card-dropshadow);
+}
+.button-group .generated {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--gray-65);
+}
+.button-group .btn-cluster {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Page-area card — loaded state (sections carry their own shadow, so the
+   container has none). 4px side padding + negative margin lets the 792px
+   sections' shadows bleed without widening past the 792 button-group. */
+body.page-create-resources .page-area {
+  position: relative;
+  width: 800px;
+  margin: 0 -4px;
+  padding: 0 4px;
+  max-height: 920px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--gray-5);
+  border-radius: 0 0 4px 4px;
+  box-shadow: var(--card-dropshadow); /* loading state; .loaded drops it (state gating below) */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.35) var(--gray-10);
+}
+body.page-create-resources .page-area::-webkit-scrollbar {
+  width: 8px;
+  background: var(--gray-10);
+}
+body.page-create-resources .page-area::-webkit-scrollbar-track {
+  background: var(--gray-10);
+}
+body.page-create-resources .page-area::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+}
+body.page-create-resources .page-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.material-section {
+  width: 792px;
+  flex-shrink: 0;
+  background: var(--white);
+  box-shadow: var(--card-dropshadow);
+}
+.lesson-preview {
+  display: block;
+  width: 792px;
+  height: auto;
+  background: var(--white);
+}
+/* Section / CTA / loading visibility lives in the state-gating section below
+   (it gates across components by the <html> state classes). */
+
+/* CTA cards */
+.pdf-cta {
+  margin: 36px;
+  background: var(--purple-5);
+  border: 1px solid var(--purple-15);
+  border-radius: 4px;
+  padding: 9px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-cta-frame {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px;
+}
+.pdf-cta-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdf-cta-icon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  background: var(--white);
+  border: 1.167px solid var(--purple-15);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-cta-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--charcoal-95);
+}
+.pdf-cta-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.pdf-cta-desc {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ----- state gating (was create-resources.css) ----- */
+
+/*
+ * create-resources state gating (global, but only imported by create-resources.astro).
+ * Controls DISPLAY by the <html> state classes — .loading (default) / .loaded /
+ * .recreating / .loading-worksheet / .loading-samplescript / .no-worksheet — and
+ * per-section .visible. Component scoped styles handle appearance; this handles
+ * which pieces show in each state. Lives here (not scoped) because the rules
+ * cross component boundaries (sidenav items, page sections, button-group).
+ *
+ * DEFAULT = loading. The client script adds `.loaded` to <html> after the load
+ * delay; the inverted default means the loading state survives even if a preview
+ * environment strips classes added during load.
+ */
+
+/* ===== Sidenav loading skeleton ===== */
+.nav-skeleton {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.nav-skeleton .skel-bar {
+  height: 18px;
+  border-radius: 5px;
+  margin: 12px 16px;
+  background-color: var(--gray-15);
+  background-image: linear-gradient(
+    90deg,
+    rgba(225, 225, 225, 0.1) 0%,
+    rgba(225, 225, 225, 1) 50%,
+    rgba(225, 225, 225, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.5s ease-in-out infinite;
+}
+@keyframes skel-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ===== Loading content (message + sparkle illustration) ===== */
+.loading-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  padding: 64px 36px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--white);
+  transition: opacity 0.5s ease;
+}
+/* Loader message + sparkle (shared by .loading-content and .new-material-loading). */
+.loading-message {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--charcoal-95);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.loading-message.fade-in {
+  opacity: 1;
+}
+.sparkle-anim {
+  margin-top: 48px;
+  width: 147.333px;
+  height: 176.661px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sparkle-anim svg {
+  width: 130.447px;
+  height: 163.54px;
+  transform: rotate(6.19deg);
+}
+/* Each sparkle cycles fill between fuchsia-5 (lightest) and fuchsia-60 (darkest),
+   staggered so they're out of sync. */
+@keyframes sparkle-fade {
+  0%, 100% { fill: var(--fuchsia-5); }
+  50% { fill: var(--fuchsia-60); }
+}
+.sparkle-anim .sparkle-1 { animation: sparkle-fade 2.4s ease-in-out infinite; }
+.sparkle-anim .sparkle-2 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -0.8s; }
+.sparkle-anim .sparkle-3 { animation: sparkle-fade 2.4s ease-in-out infinite; animation-delay: -1.6s; }
+
+/* ===== DEFAULT (loading): hide real content, show skeleton + loading card ===== */
+.sidenav > .sidenav-active,
+.sidenav > .subnav-item,
+.sidenav > .coming-soon,
+.main-col > .button-group,
+.material-section { display: none; }
+.nav-skeleton { display: flex; }
+body.page-create-resources .page-area { height: 532px; }
+
+/* ===== Loaded: hide loading, show real ===== */
+.loaded .nav-skeleton { display: none; }
+html.loaded .loading-content { opacity: 0; pointer-events: none; }
+.loaded .sidenav > .sidenav-active { display: flex; }
+.loaded .sidenav > .subnav-item { display: flex; }
+.loaded .sidenav > .coming-soon { display: flex; }
+.loaded .main-col > .button-group { display: block; }
+.loaded #section-miniLesson { display: block; }
+/* Worksheet / Sample Script sections stay as "slots" in the loaded state — each
+   holds either its CTA card (before generation) or the generated preview. */
+.loaded #section-worksheet,
+.loaded #section-sampleScript { display: block; }
+#section-worksheet > .lesson-preview,
+#section-sampleScript > .lesson-preview { display: none; }
+#section-worksheet.visible > .lesson-preview,
+#section-sampleScript.visible > .lesson-preview { display: block; }
+.material-section > .pdf-cta { margin: 36px; }
+.material-section.visible > .pdf-cta { display: none; }
+.material-section.visible { display: block; }
+/* Loaded: sections carry their own shadow, so drop the container's. */
+html.loaded .page-area {
+  box-shadow: none;
+  padding-bottom: 6px;
+}
+
+/* A CTA hides once its material is generated (the section's preview shows instead). */
+.pdf-cta.is-generated { display: none; }
+
+/* ===== Recreating (mini-lesson recreate): overlay on top of .loaded ===== */
+/* Sidenav stays; the page-area shows the loading overlay; button-group + sections
+   hide. The html.recreating qualifier outranks the .loaded rules above. */
+html.recreating .material-section { display: none !important; }
+html.recreating .loading-content { opacity: 1; pointer-events: auto; }
+html.recreating .page-area {
+  height: 532px;
+  box-shadow: var(--card-dropshadow);
+  padding-bottom: 0;
+}
+html.recreating .main-col > .button-group { display: none; }
+
+/* ===== Material generation (worksheet / sample script) ===== */
+/* While generating, hide that section's CTA + preview; the loader (moved into the
+   section by the script) shows in its place. Mini lesson + button-group stay. */
+html.loading-worksheet #section-worksheet > .lesson-preview,
+html.loading-worksheet #section-worksheet > .pdf-cta { display: none !important; }
+html.loading-samplescript #section-sampleScript > .lesson-preview,
+html.loading-samplescript #section-sampleScript > .pdf-cta { display: none !important; }
+
+/* The inline loader: a white card by default; sheds its chrome once moved into a
+   material-section (the section already provides the background + shadow). */
+.new-material-loading {
+  display: none;
+  width: 792px;
+  min-height: 532px;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 36px 0;
+  box-sizing: border-box;
+  background: var(--white);
+  box-shadow: var(--card-dropshadow);
+}
+.material-section > .new-material-loading {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ============================================================
+   PAGE: index — throwaway scaffold. Unique class names, so global is fine.
+   ============================================================ */
+
+.index-main {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.index-title {
+  color: var(--charcoal-95);
+}
+.index-note {
+  color: var(--gray-75);
+}

@@ -14,7 +14,7 @@ interface Props {
 const { id = "aysModal" } = Astro.props;
 ---
 
-<Modal id={id} title="Are you sure?" width={470}>
+<Modal id={id} title="Are you sure?">
   <div class="ays-stack">
     <p class="ays-msg">This BETA version does not save your documents.</p>
     <label class="ays-dontshow">
@@ -23,64 +23,7 @@ const { id = "aysModal" } = Astro.props;
     </label>
   </div>
   <Fragment slot="footer">
-    <Button variant="secondary" size="md" minWidth={125} id="aysCancel" label="Cancel" />
+    <Button variant="secondary" size="md" id="aysCancel" label="Cancel" />
     <Button variant="primary" size="md" icon="modal-sparkles-white" id="aysRecreate" label="Recreate" />
   </Fragment>
 </Modal>
-
-<style>
-  .ays-stack {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .ays-msg {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    color: var(--black);
-    text-align: center;
-  }
-  .ays-dontshow {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--charcoal-95);
-    cursor: pointer;
-  }
-  .ays-dontshow input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    flex: none;
-    position: relative;
-    border: 1px solid var(--charcoal-80);
-    border-radius: 3px;
-    background: var(--white);
-    cursor: pointer;
-  }
-  .ays-dontshow input[type="checkbox"]:checked {
-    background: var(--aqua-75);
-    border-color: var(--aqua-75);
-  }
-  .ays-dontshow input[type="checkbox"]:checked::after {
-    content: "";
-    position: absolute;
-    left: 4px;
-    top: 1px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--white);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-</style>
