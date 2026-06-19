@@ -309,26 +309,34 @@ body.page-create-resources .top-nav {
 .back-icon {
   flex: none;
   display: inline-flex;
-  /* back-arrow ring+arrow are currentColor (white disc stays literal) */
+  /* At rest: white disc (.ba-disc), aqua-75 ring + arrow (.ba-ring/.ba-arrow via
+     currentColor). Hover/press below invert it like the icon Buttons. */
   color: var(--aqua-75);
+}
+/* Hovering or pressing the back link (icon OR label) inverts the arrow circle to
+   match the icon Buttons: fill aqua-75 + white arrow on hover, aqua-85 on press. */
+.back-btn:hover .ba-disc,
+.back-btn:hover .ba-ring {
+  fill: var(--aqua-75);
+}
+.back-btn:hover .ba-arrow {
+  fill: var(--white);
+}
+.back-btn:active .ba-disc,
+.back-btn:active .ba-ring {
+  fill: var(--aqua-85);
+}
+.back-btn:active .ba-arrow {
+  fill: var(--white);
 }
 .back-btn .label {
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
   color: var(--charcoal-95);
-  /* Pre-set thickness/offset so :hover only turns the line on. */
-  text-decoration-thickness: 4px;
-  text-underline-offset: 4px;
-}
-.back-btn:hover .label {
-  text-decoration-line: underline;
-  text-decoration-color: var(--aqua-75);
 }
 .back-btn:active .label {
   color: var(--charcoal-100);
-  text-decoration-line: underline;
-  text-decoration-color: var(--aqua-95);
 }
 
 /* ---- SideNavAI (create-resources). .coming-soon scoped under its .sidenav
