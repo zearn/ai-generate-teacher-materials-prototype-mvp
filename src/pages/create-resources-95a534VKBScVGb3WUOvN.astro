@@ -2,15 +2,13 @@
 /**
  * AI Targeted Materials page.
  *
- * PHASE 1 (this): static loaded state — chrome + disclaimer + sidenav + main
- * column with the page-area showing a mini lesson at rest and the two CTA
- * cards. No state machine yet.
- *
- * PHASE 2 (next): the shuffle-bag + state machine in src/scripts/create-resources.ts
- * — random unique mini-lesson cycle, on-demand generation of aligned student
- * materials / sample script (random 1-of-N, A1↔A2 toggle on recreate), the 9s
- * (currently 3s) loading flow, recreate (ays) + back (byg) modal wiring, sidenav
- * sync, print. Reset-to-ungenerated when the mini lesson is recreated.
+ * Static markup — chrome + disclaimer + sidenav + main column (page-area, the two
+ * CTA cards) + the loading skeleton + the three modals. All behaviour lives in
+ * src/scripts/create-resources.ts: the shuffle-bag state machine (random unique
+ * mini-lesson cycle, on-demand generation of aligned student materials / sample
+ * script with random 1-of-N + A1↔A2 toggle on recreate, reset-to-ungenerated when
+ * the mini lesson is recreated), the loading flow, recreate (ays) + back (byg)
+ * modal wiring, sidenav sync, and print.
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TopNavAI from "../components/TopNavAI.astro";
