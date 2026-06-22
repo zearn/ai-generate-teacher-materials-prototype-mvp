@@ -18,6 +18,12 @@ export function wireModal(selector: string): ModalHandle | null {
   const modal = document.querySelector<HTMLElement>(selector);
   if (!modal) return null;
 
+  // Close on Escape — only bound while the modal is open (added in open(), torn
+  // down in close()), so nothing lingers on document for the page's lifetime.
+  const onKeydown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") close();
+  };
+
   // Lock background scroll while the modal is open. overflow:hidden removes the
   // page scrollbar, which would shift the page ~15px sideways; compensate by
   // padding the body with the scrollbar's width so nothing behind the modal moves.
@@ -27,12 +33,14 @@ export function wireModal(selector: string): ModalHandle | null {
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = "hidden";
     if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.addEventListener("keydown", onKeydown);
   };
   const close = () => {
     modal.classList.remove("open");
     modal.hidden = true;
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
+    document.removeEventListener("keydown", onKeydown);
   };
 
   modal
@@ -40,9 +48,6 @@ export function wireModal(selector: string): ModalHandle | null {
     ?.addEventListener("click", close);
   modal.addEventListener("click", (e) => {
     if (e.target === modal) close();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal.hidden) close();
   });
 
   return { open, close };

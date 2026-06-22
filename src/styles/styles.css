@@ -687,7 +687,8 @@ body.page-tower-alerts .modal-close {
 }
 .modal-beta {
   display: inline-block;
-  padding: 1px 6px;
+  /* 0.5px/1.5px top/bottom nudges the BETA text up 0.5px without changing box height */
+  padding: 0.5px 6px 1.5px;
   font-size: 11px;
   font-weight: 700;
   line-height: 15px;
@@ -778,6 +779,28 @@ body.page-tower-alerts .modal-close {
   border-radius: 2.5px;
   box-sizing: border-box;
 }
+/* Mini Lesson is toggleable: checked SVG when selected, the empty box (same as
+   the disabled Problem Set row) when not. Problem Set has no .checkbox-checked,
+   so its empty box always shows. */
+#ctmMiniLesson {
+  cursor: pointer;
+}
+#ctmMiniLesson .checkbox-empty {
+  display: none;
+}
+#ctmMiniLesson .checkbox-checked {
+  position: relative;
+  top: 2px;
+}
+#ctmMiniLesson:not(.selected) {
+  border: 1px solid var(--gray-45);
+}
+#ctmMiniLesson:not(.selected) .checkbox-checked {
+  display: none;
+}
+#ctmMiniLesson:not(.selected) .checkbox-empty {
+  display: block;
+}
 .modal-option .label {
   font-size: 16px;
   font-weight: 600;
@@ -819,8 +842,12 @@ body.page-tower-alerts .modal-close {
   line-height: 1.5;
   text-transform: uppercase;
 }
-.modal-create-btn:hover {
+.modal-create-btn:not(:disabled):hover {
   background: var(--aqua-85);
+}
+.modal-create-btn:disabled {
+  background: var(--gray-40);
+  cursor: not-allowed;
 }
 .modal-disclaimer {
   text-align: center;
