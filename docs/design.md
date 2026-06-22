@@ -258,9 +258,21 @@ Click "Create Resources" link on any alert card:
 1. **"Create Targeted Materials" modal** opens. Populated with student name,
    mission/lesson extracted from the card data, and the learning objective
    description.
-2. Two material options: Mini Lesson (selected by default, aqua-75) and Problem
-   Set (disabled, "Coming Soon").
-3. Click CREATE in modal: navigates to
+2. Two material options:
+   - **Mini Lesson** — selected by default: aqua-10 background, 3px aqua-60 border,
+     checked checkbox (the checkmark is nudged 2px lower so it reads centered against
+     the label). It is **toggleable** — click the row to uncheck it:
+     - **Unchecked:** the row drops to a plain white row with a 1px gray-40 border
+       (matching the disabled-CREATE color below), the checkmark swaps to the small
+       empty checkbox (same box used on Problem Set), and **CREATE becomes disabled**
+       (gray-40 fill, no hover, `cursor: not-allowed`).
+     - **Re-checking** restores the selected state and re-enables CREATE. The modal
+       always **reopens with Mini Lesson checked** regardless of the prior toggle.
+   - **Problem Set** — disabled, "Coming Soon" (empty checkbox, gray-40 label).
+
+   The BETA badge text is nudged up 0.5px (top/bottom padding rebalanced; box height
+   unchanged).
+3. Click CREATE (enabled only while Mini Lesson is checked): navigates to
    `create-resources-95a534VKBScVGb3WUOvN.html?student=…&lesson=…` with URL params.
 
 ---
