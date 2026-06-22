@@ -4,12 +4,10 @@
  * Materials / Sample Script (each with a 24px sparkle Button that swaps to a
  * refresh glyph once generated) / Problem Set "Coming Soon".
  *
- * This pass ships markup + all visual states + a minimal slider positioner that
- * parks the purple highlight under the active item on load. The full state
- * machine (syncSidenavAndCtas, updateNavSlider on view change, sparkle-click →
- * generation, .is-swapped/.current/.nav-pending toggling) is wired by the page
- * script when create-resources is assembled. The loading skeleton is deferred
- * with that loading flow.
+ * Markup + all visual states + the nav-slider that parks the purple highlight
+ * under the active item. The state machine (syncSidenavAndCtas, updateNavSlider on
+ * view change, sparkle-click → generation, .is-swapped/.current/.nav-pending
+ * toggling) is wired by src/scripts/create-resources.ts.
  */
 import Button from "./Button.astro";
 ---
