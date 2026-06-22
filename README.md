@@ -66,7 +66,7 @@ component rather than the page itself.
    Only needed once, or after someone updates `package.json`.
 
 4. **Install and authenticate the GitHub CLI** — needed so Claude can open and
-   merge PRs as you (used by the `ship it` shortcut below):
+   merge PRs as you (only needed by the `ship it` shortcut below):
    ```
    brew install gh      # macOS (Homebrew); see cli.github.com for others
    gh auth login
@@ -112,9 +112,7 @@ review the diff and fix anything it finds → squash-merge to `main` → pull so
 local copy matches GitHub → delete the merged branch and tidy up. Saying `ship it`
 is itself your authorization for that run's commit/push/merge.
 
-Requirements: `gh` installed and authenticated (see One-time setup), and **Write**
-access to the repo — that's all. Your PR will also get an automatic GitHub Copilot
-review comment; it's informational and doesn't block the merge.
+Requirement: gh installed and authenticated (see One-time setup #4 above)
 
 ### Step by step (if you'd rather drive it manually)
 
