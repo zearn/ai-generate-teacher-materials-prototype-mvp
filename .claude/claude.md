@@ -4,11 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Zearn Teacher Prototype — project instructions
 
-Read this at the start of every session. **For current status + next steps, read
-`docs/session-handoff.md` first.** For full design specs see `docs/design.md`;
-for the migration plan + architecture decisions see `docs/astro-migration-plan.md`.
-`.claude/summary.md` is an older historical handoff — not kept up to date; prefer
-`docs/session-handoff.md`.
+Read this at the start of every session. For full design specs see `docs/design.md`.
+`.claude/summary.md` is an older historical handoff — not kept up to date.
 
 ---
 
@@ -41,7 +38,7 @@ value, the Figma design context is the source of truth (over PNG/PDF exports).
 **Style tweaks should be terse.** One-line acknowledgements, not paragraphs.
 
 **Docs edits are pre-approved** (see `settings.local.json`): `docs/*.md`
-(`design.md`, `astro-migration-plan.md`) and the `.claude/*.md` files. Edit them
+(`design.md`) and the `.claude/*.md` files. Edit them
 without asking, but **always announce what you changed** so Angy can follow
 along. Note: files in `.claude/` are gated by Claude Code as "sensitive" and may
 still prompt regardless of the allow-list — that's why `design.md` was moved to
@@ -79,6 +76,26 @@ When the user does ask for a commit:
 - Never `--amend` unless explicitly asked (creates a NEW commit if a previous
   commit needs adjusting).
 - Never skip hooks (`--no-verify`).
+
+### Code word: "ship it" (standing trigger)
+
+When the user — or any collaborator using Claude Code — says **"ship it"**, run the
+full pipeline below on the current work. Saying "ship it" **is** the explicit
+authorization for the commit/push/merge it entails (it satisfies the per-action
+rule above for that one run):
+
+1. If currently on `main`, create a feature branch first. Stage the relevant files
+   by name and commit (repo-local identity; no `--amend`, no `--no-verify`).
+2. Push the branch and open a PR (`gh pr create`).
+3. Run the `/code-review` skill on the PR diff and **fix anything it surfaces**
+   (follow-up commits on the branch + push).
+4. Squash-merge the PR to `main` (`gh pr merge <n> --squash --delete-branch`).
+5. Sync local `main` so it matches GitHub exactly (`git checkout main && git pull`).
+6. Run the post-merge tidy-up below (delete the merged branch local + remote,
+   `git fetch --prune`).
+
+"ship it" is the ONLY standing phrase that authorizes a merge. A plain "commit" or
+"push" still means just that single action and nothing more.
 
 ### Post-merge tidy-up (standing permission)
 
