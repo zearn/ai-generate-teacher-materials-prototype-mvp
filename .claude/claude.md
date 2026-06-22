@@ -87,8 +87,16 @@ rule above for that one run):
 1. If currently on `main`, create a feature branch first. Stage the relevant files
    by name and commit (repo-local identity; no `--amend`, no `--no-verify`).
 2. Push the branch and open a PR (`gh pr create`).
-3. Run the `/code-review` skill on the PR diff and **fix anything it surfaces**
-   (follow-up commits on the branch + push).
+3. Review the PR diff and **fix anything it surfaces** (follow-up commits on the
+   branch + push). Choose the reviewer by judgment:
+   - If the diff touches `src/scripts/**` or `src/data/**`, involves non-trivial
+     logic/state, or otherwise warrants a second unbiased pass → spawn the
+     read-only **`code-reviewer`** subagent (`.claude/agents/code-reviewer.md`) —
+     fresh context window, no author bias.
+   - Otherwise (CSS / markup / docs / config-only changes) → run the lightweight
+     **`/code-review`** skill.
+
+   Use the subagent *instead of* the skill, not in addition.
 4. Squash-merge the PR to `main` (`gh pr merge <n> --squash --delete-branch`).
 5. Sync local `main` so it matches GitHub exactly (`git checkout main && git pull`).
 6. Run the post-merge tidy-up below (delete the merged branch local + remote,
