@@ -793,7 +793,7 @@ body.page-tower-alerts .modal-close {
   top: 2px;
 }
 #ctmMiniLesson:not(.selected) {
-  border: 1px solid var(--gray-45);
+  border: 1px solid var(--gray-40);
 }
 #ctmMiniLesson:not(.selected) .checkbox-checked {
   display: none;
