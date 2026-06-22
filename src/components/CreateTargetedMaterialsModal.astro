@@ -43,8 +43,11 @@ const { id = "ctmModal" } = Astro.props;
     <p class="modal-select-label">Select what you want Zearn AI to create:</p>
 
     <div class="modal-options">
-      <div class="modal-option selected">
-        <span class="checkbox" aria-hidden="true"><Icon name="modal-checkbox-checked" size={24} /></span>
+      <div class="modal-option selected" id="ctmMiniLesson">
+        <span class="checkbox" aria-hidden="true">
+          <span class="checkbox-checked"><Icon name="modal-checkbox-checked" size={24} /></span>
+          <span class="checkbox-empty"></span>
+        </span>
         <span class="label">Mini Lesson</span>
       </div>
       <div class="modal-option disabled" aria-disabled="true">

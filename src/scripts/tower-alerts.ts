@@ -58,7 +58,17 @@ if (ctm) {
   const ctmStudent = document.getElementById("ctmStudent");
   const ctmMissionLesson = document.getElementById("ctmMissionLesson");
   const ctmObjective = document.getElementById("ctmObjective");
-  const modalCreate = document.getElementById("ctmCreateBtn");
+  const modalCreate = document.getElementById("ctmCreateBtn") as HTMLButtonElement | null;
+  const ctmMiniLesson = document.getElementById("ctmMiniLesson");
+
+  // Mini Lesson is the only selectable option; unchecking it disables CREATE.
+  function setMiniLessonSelected(on: boolean) {
+    ctmMiniLesson?.classList.toggle("selected", on);
+    if (modalCreate) modalCreate.disabled = !on;
+  }
+  ctmMiniLesson?.addEventListener("click", () => {
+    setMiniLessonSelected(!ctmMiniLesson.classList.contains("selected"));
+  });
 
   // loc:    "Grade 4 | Mission 3 | Topic B"  → "Mission 3"
   // lesson: "Lesson 4: Leftward Ho"          → "Lesson 4"
@@ -75,6 +85,7 @@ if (ctm) {
     if (ctmMissionLesson)
       ctmMissionLesson.textContent = extractMissionLesson(link.dataset.loc, link.dataset.lesson);
     if (ctmObjective) ctmObjective.textContent = link.dataset.desc ?? "";
+    setMiniLessonSelected(true); // always reopen with Mini Lesson checked
     ctm!.open();
   }
 
