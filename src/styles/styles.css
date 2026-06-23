@@ -1087,7 +1087,9 @@ body.page-tower-alerts main {
   font-size: 16px;
   line-height: 24px;
   border: 0;
-  cursor: pointer;
+  /* decorative class selector — display only, not interactive */
+  cursor: default;
+  pointer-events: none;
 }
 .pill .caret { margin-left: 8px; display: inline-flex; color: var(--aqua-75); }
 
@@ -1188,8 +1190,12 @@ body.page-tower-alerts main {
   padding: 8px 35px 8px 11px;
   font: inherit; color: var(--charcoal-95);
   font-size: 14px; line-height: 21px;
+  /* decorative filter/sort controls — display only, not interactive */
+  cursor: default; pointer-events: none;
 }
-.dropdown.lg select { font-size: 16px; line-height: 24px; }
+/* line-height = content-box height (40 − 2px border − 16px padding) so the single
+   line fills it and the label sits vertically centered (24px overflowed, rendering high) */
+.dropdown.lg select { font-size: 16px; line-height: 22px; }
 .dropdown .caret {
   position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
   width: 24px; height: 24px;
@@ -1424,14 +1430,14 @@ body.page-tower-alerts main {
   color: var(--purple-90);
 }
 .event.evt-completed .ico {
-  background: var(--green-80); border-radius: 50%;
+  background: var(--green-70); border-radius: 50%;
   color: var(--white); align-items: center; justify-content: center;
 }
 /* "Completed Towers" toggle on Hide (body.hide-completed) → hide the completed
    (green-check) rows in the alert cards. */
 body.hide-completed .event.evt-completed { display: none; }
 .alert-check {
-  background: var(--green-80);
+  background: var(--green-70);
   color: var(--white);
   border-radius: 50%;
   width: 14.5px; height: 14.5px;
