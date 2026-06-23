@@ -24,6 +24,8 @@ tog?.querySelector(".switch")?.addEventListener("click", () => {
   tog.classList.toggle("on");
   tog.classList.toggle("off");
   tog.setAttribute("aria-checked", String(tog.classList.contains("on")));
+  // "off" = Hide → hide the completed (green-check) rows in the alert cards
+  document.body.classList.toggle("hide-completed", tog.classList.contains("off"));
 });
 
 // ---- Help tooltip ----

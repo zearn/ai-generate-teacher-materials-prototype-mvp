@@ -16,43 +16,43 @@ import Icon from "../components/Icon.astro";
 import CreateTargetedMaterialsModal from "../components/CreateTargetedMaterialsModal.astro";
 
 const STUDENTS = [
-  { name: "Suzanne Alvarez",  count: 3 },
-  { name: "Brianna Barrios",  count: 5 },
-  { name: "Trina Brown",      count: 0 },
+  { name: "Suzanne Alvarez",  count: 0 },
+  { name: "Brianna Barrios",  count: 1 },
+  { name: "Trina Brown",      count: 2 },
   { name: "Paul Derrick",     count: 2 },
-  { name: "Sebastian Diaz",   count: 0 },
-  { name: "Janiya DuBuque",   count: 2 },
-  { name: "Fernando Garcia",  count: 3 },
-  { name: "Jordan Goldstein", count: 2 },
+  { name: "Sebastian Diaz",   count: 2 },
+  { name: "Janiya DuBuque",   count: 1 },
+  { name: "Fernando Garcia",  count: 0 },
+  { name: "Jordan Goldstein", count: 3 },
   { name: "Roxanne Jacobson", count: 0 },
-  { name: "Franklin Joseph",  count: 0 },
+  { name: "Franklin Joseph",  count: 1 },
   { name: "Alexia Lee",       count: 0 },
   { name: "Porter Levy",      count: 1 },
-  { name: "Alberto Martinez", count: 3 },
+  { name: "Alberto Martinez", count: 2 },
   { name: "Grace McCarty",    count: 0 },
-  { name: "Elijah Park",      count: 4 },
-  { name: "Ashin Patel",      count: 4 },
+  { name: "Elijah Park",      count: 1 },
+  { name: "Ashin Patel",      count: 3 },
   { name: "Jose Perez",       count: 3 },
   { name: "Iliana Peters",    count: 4 },
-  { name: "Naomi Sachs",      count: 1 },
-  { name: "Jaiden Thomas",    count: 0 },
+  { name: "Naomi Sachs",      count: 2 },
+  { name: "Jaiden Thomas",    count: 1 },
   { name: "Olivia Tran",      count: 0 },
   { name: "Jada Williams",    count: 0 },
-  { name: "Jesse Williamson", count: 3 },
+  { name: "Jesse Williamson", count: 1 },
   { name: "Sam Wyman",        count: 0 },
   { name: "Benjamin Young",   count: 0 },
 ];
 
 const GRADES = [
-  { name: "Kindergarten", count: null as number | null },
-  { name: "Grade 1",      count: null },
-  { name: "Grade 2",      count: null },
-  { name: "Grade 3",      count: null },
-  { name: "Grade 4",      count: 40 },
-  { name: "Grade 5",      count: null },
-  { name: "Grade 6",      count: null },
-  { name: "Grade 7",      count: null },
-  { name: "Grade 8",      count: null },
+  { name: "Kindergarten", count: 3 as number | null },
+  { name: "Grade 1",      count: 4 },
+  { name: "Grade 2",      count: 3 },
+  { name: "Grade 3",      count: 2 },
+  { name: "Grade 4",      count: 4 },
+  { name: "Grade 5",      count: 3 },
+  { name: "Grade 6",      count: 4 },
+  { name: "Grade 7",      count: 3 },
+  { name: "Grade 8",      count: 4 },
 ];
 
 const ALERTS: Array<{
@@ -61,47 +61,104 @@ const ALERTS: Array<{
   count: number;
 }> = [
   {
-    student: "Elijah Park", loc: "Grade 8 | Mission 2 | Topic C",
-    lesson: "Lesson 10: Meet Slope",
-    desc: "Find the slope of a line on a grid using properties of slope triangles.",
+    student: "Trina Brown", loc: "Grade K | Mission 2 | Topic A",
+    lesson: "Lesson 2: Introducing, The Triangle!",
+    desc: "Explain decisions about classifications of triangles into categories using variants and non-examples. Identify shapes as triangles.",
     events: [
-      { type: "alert", ts: "Wed, Apr 1, 2026, 3:37 PM" },
-      { type: "alert", ts: "Wed, Apr 1, 2026, 3:32 PM" },
-      { type: "alert", ts: "Tue, Mar 31, 2026, 3:48 PM" },
-      { type: "alert", ts: "Tue, Mar 31, 2026, 3:11 PM" },
-    ], count: 4,
+      { type: "completed", ts: "Wed, Jun 17, 2026, 3:15 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 3:01 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:53 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:47 PM" },
+    ], count: 3,
   },
   {
-    student: "Porter Levy", loc: "Grade 3 | Mission 3 | Topic B",
-    lesson: "Lesson 7: Savvy Sixes and Sevens",
-    desc: "Interpret the unknown in multiplication and division to model and solve problems using units of 6 and 7.",
+    student: "Iliana Peters", loc: "Grade 1 | Mission 3 | Topic B",
+    lesson: "Lesson 4: End to End",
+    desc: "Express the length of an object using centimeter cubes as length units to measure with no gaps or overlaps.",
     events: [
-      { type: "alert", ts: "Wed, Apr 1, 2026, 3:11 PM" },
-      { type: "alert", ts: "Wed, Apr 1, 2026, 3:06 PM" },
+      { type: "completed", ts: "Wed, Jun 17, 2026, 3:11 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:57 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:53 PM" },
     ], count: 2,
   },
   {
-    student: "Jesse Williamson", loc: "Grade 5 | Mission 6 | Topic D",
+    student: "Jose Perez", loc: "Grade 2 | Mission 5 | Topic A",
+    lesson: "Lesson 6: Easier Subtracting",
+    desc: "Use the associative property to subtract from three-digit numbers.",
+    events: [
+      { type: "completed", ts: "Wed, Jun 17, 2026, 3:05 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:51 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:47 PM" },
+    ], count: 2,
+  },
+  {
+    student: "Jaiden Thomas", loc: "Grade 3 | Mission 4 | Topic C",
+    lesson: "Lesson 9: Area Awareness",
+    desc: "Analyze different rectangles and reason about their area.",
+    events: [
+      { type: "completed", ts: "Wed, Jun 17, 2026, 3:04 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:50 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:45 PM" },
+    ], count: 2,
+  },
+  {
+    student: "Paul Derrick", loc: "Grade 4 | Mission 5 | Topic D",
+    lesson: "Lesson 16: Like Units Make It Work",
+    desc: "Use visual models to add and subtract two fractions with the same units.",
+    events: [
+      { type: "completed", ts: "Wed, Jun 17, 2026, 2:50 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:38 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:34 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:29 PM" },
+    ], count: 3,
+  },
+  {
+    student: "Iliana Peters", loc: "Grade 5 | Mission 6 | Topic D",
     lesson: "Lesson 19: Line Graph Greatness",
     desc: "Plot data on line graphs and analyze trends.",
     events: [
-      { type: "completed", ts: "Wed, Apr 1, 2026, 2:53 PM" },
-      { type: "alert",     ts: "Tue, Mar 31, 2026, 2:52 PM" },
-    ], count: 1,
+      { type: "completed", ts: "Wed, Jun 17, 2026, 2:47 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:41 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:33 PM" },
+    ], count: 2,
   },
   {
-    student: "Paul Derrick", loc: "Grade 4 | Mission 5 | Topic A",
-    lesson: "Lesson 6: Area Model - Breakdown!",
-    desc: "Decompose fractions using area models to show equivalence.",
+    student: "Ashin Patel", loc: "Grade 6 | Mission 8 | Topic B",
+    lesson: "Lesson 6: Histograms",
+    desc: "Create a histogram to represent a data set and interpret a histogram to answer statistical questions about a data set.",
     events: [
-      { type: "completed", ts: "Wed, Apr 1, 2026, 2:50 PM" },
-      { type: "alert",     ts: "Wed, Apr 1, 2026, 2:46 PM" },
-    ], count: 1,
+      { type: "completed", ts: "Wed, Jun 17, 2026, 2:46 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:41 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:33 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:28 PM" },
+    ], count: 3,
+  },
+  {
+    student: "Alberto Martinez", loc: "Grade 7 | Mission 5 | Topic C",
+    lesson: "Lesson 9: Multiplying Rational Numbers",
+    desc: "Interpret signed numbers when used to represent time in situations about speed and direction as well as understand that the product of two negative numbers is positive.",
+    events: [
+      { type: "completed", ts: "Wed, Jun 17, 2026, 2:40 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:27 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:20 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:15 PM" },
+    ], count: 3,
+  },
+  {
+    student: "Jordan Goldstein", loc: "Grade 8 | Mission 2 | Topic C",
+    lesson: "Lesson 10: Meet Slope",
+    desc: "Find the slope of a line on a grid using properties of slope triangles.",
+    events: [
+      { type: "completed", ts: "Wed, Jun 17, 2026, 2:38 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:29 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:26 PM" },
+      { type: "alert",     ts: "Wed, Jun 17, 2026, 2:22 PM" },
+    ], count: 3,
   },
 ];
 ---
 
-<BaseLayout title="Tower Alerts — Zearn" bodyClass="page-tower-alerts">
+<BaseLayout title="Tower Alerts — Zearn" bodyClass="page-tower-alerts hide-completed">
   <div class="header-wrap">
     <nav class="top-nav">
       <div class="nav">
@@ -186,7 +243,7 @@ const ALERTS: Array<{
           <div class="filter-box">
             <div class="filter-row">
               <label>Completed Towers</label>
-              <div class="toggle on" id="completedToggle" role="switch" aria-checked="true">
+              <div class="toggle off" id="completedToggle" role="switch" aria-checked="false">
                 <span class="label-hide">Hide</span>
                 <span class="switch" tabindex="0">
                   <span class="track"></span>
@@ -201,8 +258,8 @@ const ALERTS: Array<{
               <div class="dropdown">
                 <select id="dateFilter">
                   <option>All</option>
-                  <option>Past Week</option>
-                  <option selected>Past 2 Weeks</option>
+                  <option selected>Past Week</option>
+                  <option>Past 2 Weeks</option>
                   <option>Past 3 Weeks</option>
                   <option>Past Month</option>
                   <option>Past 6 Months</option>
@@ -231,7 +288,7 @@ const ALERTS: Array<{
               <span class="chev" aria-hidden="true"><Icon name="chevron-up-students" size={16} /></span>
             </button>
             <div class="list" id="studentList">
-              <div class="row selected"><span>ALL</span><span class="count">40&nbsp;Results</span></div>
+              <div class="row selected"><span>ALL</span><span class="count">30&nbsp;Results</span></div>
               {STUDENTS.map(s => (
                 <div class={`row ${s.count > 0 ? 'semibold' : 'regular'}`}>
                   <span>{s.name}</span>
@@ -249,7 +306,7 @@ const ALERTS: Array<{
             </button>
             <div class="list content-list" id="contentList">
               <div class="row selected">
-                <span class="label-wrap"><span>ALL</span><span class="count">40&nbsp;Results</span></span>
+                <span class="label-wrap"><span>ALL</span><span class="count">30&nbsp;Results</span></span>
               </div>
               {GRADES.map(g => (
                 <div class={`row ${g.count != null ? 'semibold' : 'regular'}`}>
@@ -279,7 +336,7 @@ const ALERTS: Array<{
                 <span class="caret"><Icon name="chevron-down-dropdown" size={24} /></span>
               </div>
             </div>
-            <div class="results-count"><span>40</span><span class="rest">&nbsp;Results</span></div>
+            <div class="results-count"><span>30</span><span class="rest">&nbsp;Results</span></div>
           </div>
 
           <div class="alerts" id="alerts">
