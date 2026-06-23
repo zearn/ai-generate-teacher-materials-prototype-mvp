@@ -232,9 +232,9 @@ window.setTimeout(() => {
 }, LOADING_MS);
 
 // ---- Generate / recreate flow ----
-//   null         → recreate the Mini Lesson (next set from the bag; reset materials)
-//   "worksheet"  → generate / recreate Student Materials (random 1-of-N, then toggle)
-//   "sampleScript" → generate / recreate the Sample Script
+//   null           → recreate the Mini Lesson (flip variant A↔B; reset materials)
+//   "worksheet"    → generate / recreate Student Materials (current variant's "1")
+//   "sampleScript" → generate / recreate the Sample Script (current variant's "1")
 function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null) {
   hideCtasNow();
   setTimestamp("");
