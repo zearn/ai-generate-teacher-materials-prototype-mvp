@@ -153,6 +153,8 @@ fire.)
 | `src/styles/styles.css` | **All** non-token CSS, in one file (the only stylesheet besides tokens.css). Sections: GLOBAL (`@font-face` relative `url()` to `src/styles/fonts/`, resets, typography, `--card-dropshadow`, link states, form-control font reset) → COMPONENTS → per-page (tower-alerts / create-resources / index). Cross-page collisions (`.page-area`, `.top-nav`, `.modal-card`/`.modal-close`, bare `main`) are scoped under `body.page-tower-alerts` / `body.page-create-resources`; sidenav `.coming-soon` under `.sidenav` |
 | `src/styles/fonts/` | Self-hosted woff2 (Source Sans Pro 400/600/700 + italic, Oxygen 400); Vite fingerprints + base-prefixes them at build |
 | `public/previews/` | Webp preview images served as-is; JS prepends `import.meta.env.BASE_URL` to the `/previews/…` paths |
+| `assets/pdf/` | Source PDFs for the create-resources previews — committed source-of-truth; not served |
+| `scripts/pdf-to-preview.py` | Regenerates `public/previews/*.webp` from `assets/pdf/` (rasterize 1584px → trim → 112px margins → 2px divider). Run when the PDFs change. |
 | `README.md` | Contributor guide (setup, session workflow, live URLs) — repo front page |
 | `astro.config.mjs` | `site` + `base` config for GitHub Pages subpath hosting |
 | `.github/workflows/deploy.yml` | Builds (Node 22) + deploys to GitHub Pages on push to `main` |
@@ -373,10 +375,14 @@ state = {
   the page script prepends `import.meta.env.BASE_URL` when setting `img.src` so they
   resolve under the GitHub Pages base path (see the base-path gotcha below). Naming
   keeps the original format:
-  `mini_lesson_{set}_{variant}.webp`, `student_materials_{set}_{variant}@2x.webp`,
-  `sample_script_{set}_{variant}.webp`.
-- **No runtime PDFs.** The app renders webp previews only. Legacy PDFs and the
-  Download-feature PDFs are in `assets/not-used/` pending a Download rebuild.
+  `mini_lesson_{KEY}_{A|B}.webp`, `student_materials_{KEY}_{A1|B1}@2x.webp`,
+  `sample_script_{KEY}_{A1|B1}.webp` (KEY = G{grade}M{mission}L{lesson}, e.g. `KM2L2`).
+  These are **generated from the source PDFs in `assets/pdf/`** by
+  `scripts/pdf-to-preview.py` — rerun it when the PDFs change (don't hand-edit the
+  webps). 1584px wide, displayed at 0.5 scale, so baked margins are 2× the rendered px.
+- **No runtime PDFs.** The app renders webp previews only. `assets/pdf/` holds the
+  source PDFs (committed); the retired pre-migration webps + legacy/Download PDFs
+  live in `assets/not-used/`.
 - **`assets/images/svg/`** — the original Figma SVG downloads (historical refs;
   not loaded at runtime). The `src/icons/` files are the cleaned build-time copies.
 - **`assets/not-used/`** — design references, archived PDFs, per-key preview PNGs.
