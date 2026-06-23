@@ -10,8 +10,8 @@ change.
     python3 scripts/pdf-to-preview.py --src DIR --out DIR
 
 Prerequisites (not npm deps — install once on your machine):
-    - poppler  (provides `pdftocairo`)   e.g. `brew install poppler`
-    - Pillow   (Python imaging)          e.g. `pip3 install Pillow`
+    - poppler         (provides `pdftocairo`)   e.g. `brew install poppler`
+    - Pillow + numpy  (Python imaging)           e.g. `pip3 install Pillow numpy`
 
 Format (reproduces the original prototype previews):
     - Rasterize each PDF page to 1584px wide (the preview width).
@@ -75,6 +75,7 @@ def build(pdf: str, out: str) -> tuple[int, tuple[int, int]]:
         for p in sorted(glob.glob(f"{tmp}/p-*.png")):
             im = Image.open(p).convert("RGB")
             bb = content_bbox_v(im)
+            # a genuinely blank page (bb is None) falls back to the full raster
             crops.append(im.crop((0, bb[0], im.width, bb[1] + 1)) if bb else im)
         if not crops:
             raise RuntimeError("no pages rendered")
