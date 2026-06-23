@@ -156,6 +156,16 @@ const ALERTS: Array<{
     ], count: 3,
   },
 ];
+
+// The lesson KEY for a card = G{grade}M{mission}L{lesson} (Grade K → "K"), e.g.
+// "Grade 1 | Mission 3 | Topic B" + "Lesson 4: …" → "G1M3L4". Passed to
+// create-resources as ?key= so the card opens its matching lesson's webps.
+function lessonKey(loc: string, lesson: string): string {
+  const g = loc.match(/Grade\s+(\w+)/)?.[1] ?? "";
+  const m = loc.match(/Mission\s+(\d+)/)?.[1] ?? "";
+  const l = lesson.match(/Lesson\s+(\d+)/)?.[1] ?? "";
+  return `${g === "K" ? "K" : `G${g}`}M${m}L${l}`;
+}
 ---
 
 <BaseLayout title="Tower Alerts — Zearn" bodyClass="page-tower-alerts hide-completed">
@@ -356,7 +366,7 @@ const ALERTS: Array<{
                   </div>
                   <div class="alert-side">
                     <a class="create-resources"
-                       href={`${import.meta.env.BASE_URL}/create-resources-95a534VKBScVGb3WUOvN?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}&loc=${encodeURIComponent(a.loc)}`}
+                       href={`${import.meta.env.BASE_URL}/create-resources-95a534VKBScVGb3WUOvN?student=${encodeURIComponent(a.student)}&lesson=${encodeURIComponent(a.lesson)}&loc=${encodeURIComponent(a.loc)}&key=${encodeURIComponent(lessonKey(a.loc, a.lesson))}`}
                        data-student={a.student}
                        data-lesson={a.lesson}
                        data-loc={a.loc}
