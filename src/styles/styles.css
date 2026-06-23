@@ -396,11 +396,17 @@ body.page-create-resources .top-nav {
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--black);
+  color: var(--charcoal-95);
   white-space: nowrap;
 }
 .sidenav-active.ml-active .label {
   font-weight: 600;
+  color: var(--black);
+}
+/* On the purple-5 highlight (hover/press), keep the label black for contrast */
+.sidenav-active:hover .label,
+.sidenav-active:active .label {
+  color: var(--black);
 }
 
 .subnav-item {
@@ -428,7 +434,7 @@ body.page-create-resources .top-nav {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--black);
+  color: var(--charcoal-95);
   white-space: nowrap;
 }
 
@@ -452,6 +458,12 @@ body.page-create-resources .top-nav {
 .subnav-item.current .text,
 .subnav-item.nav-pending .text {
   font-weight: 600;
+  color: var(--black);
+}
+/* On the purple-5 highlight (hover/press), keep the text black for contrast */
+.subnav-item:hover .text,
+.subnav-item:active .text {
+  color: var(--black);
 }
 /* hover overlay (backgrounds otherwise handled by .nav-slider) */
 .subnav-item::after {
@@ -566,13 +578,15 @@ body.page-create-resources .modal-close {
   justify-content: center;
 }
 
-/* ---- BeforeYouGoModal (create-resources) ---- */
-.byg-msg {
+/* ---- BeforeYouGo + AreYouSure modals (create-resources) ----
+        Both use the generic Modal shell + Button; the only shared bespoke style is
+        this centered body message. AreYouSure adds the stack + checkbox below. */
+.modal-msg {
   margin: 0;
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--black);
+  color: var(--charcoal-95);
   text-align: center;
 }
 
@@ -584,14 +598,6 @@ body.page-create-resources .modal-close {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-}
-.ays-msg {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  color: var(--black);
-  text-align: center;
 }
 .ays-dontshow {
   display: flex;
@@ -729,7 +735,7 @@ body.page-tower-alerts .modal-close {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--black);
+  color: var(--charcoal-95);
   text-align: center;
   margin: 0 0 8px;
 }
@@ -853,7 +859,7 @@ body.page-tower-alerts .modal-close {
   text-align: center;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--black);
+  color: var(--charcoal-95);
 }
 .modal-disclaimer a {
   color: var(--aqua-75);
