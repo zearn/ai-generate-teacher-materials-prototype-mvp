@@ -1227,6 +1227,10 @@ body.page-tower-alerts main {
   max-height: 258px; overflow: auto;
   padding: 16px;
 }
+/* Students list: match the Content list's top spacing for the "ALL" row
+   (17px top padding + no first-row margin, same recipe as .list.content-list). */
+.list:not(.content-list) { padding-top: 17px; }
+.list:not(.content-list) .row:first-child { margin-top: 0; }
 .list .row {
   display: flex; align-items: center; justify-content: space-between;
   width: 100%;
@@ -1423,6 +1427,9 @@ body.page-tower-alerts main {
   background: var(--green-80); border-radius: 50%;
   color: var(--white); align-items: center; justify-content: center;
 }
+/* "Completed Towers" toggle on Hide (body.hide-completed) → hide the completed
+   (green-check) rows in the alert cards. */
+body.hide-completed .event.evt-completed { display: none; }
 .alert-check {
   background: var(--green-80);
   color: var(--white);
