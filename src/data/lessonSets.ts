@@ -1,44 +1,46 @@
 /**
- * The pool of mini-lesson "sets" the page cycles through (shuffle bag).
- * Each set = a mini lesson + its aligned student-materials (1 of N) + aligned
- * sample-scripts (1 of N). The "AI" picks a set at random on create/recreate
- * (unique cycle), and within a set picks one student-material / sample-script.
+ * Lessons keyed by KEY (grade/mission/lesson, e.g. "G1M3L4", "KM2L2").
  *
- * END STATE: 5 sets, each with 2 student-materials + 2 sample-scripts.
- * CURRENT: 4 sets, 1 of each (the random-of-N + A1↔A2 toggle logic degrades
- * gracefully to the single variant until the 5th set + second variants land —
- * a pure data change here, no code change).
+ * Each lesson has two mini-lesson variants, A and B. Student materials and sample
+ * scripts are aligned to the mini-lesson variant by LETTER (A* go with mini lesson
+ * A, B* with mini lesson B) and numbered within that letter (1, 2, 3…). Only "1"
+ * exists today, so the arrays are length 1 — add A2/A3 here later with no code
+ * change (the state machine always shows index 0 for now).
+ *
+ * The KEY is chosen by the clicked Tower Alerts card (?key=…); create-resources
+ * picks a random initial mini-lesson variant and cycles A↔B on each recreate.
  */
-export interface LessonSet {
-  id: string;
-  miniLesson: string;
-  studentMaterials: string[];
-  sampleScripts: string[];
+export interface Lesson {
+  miniLesson: { A: string; B: string };
+  studentMaterials: { A: string[]; B: string[] };
+  sampleScripts: { A: string[]; B: string[] };
 }
 
-export const MINI_LESSONS: LessonSet[] = [
-  {
-    id: "G3M3L7",
-    miniLesson: "/previews/mini_lesson_G3M3L7.webp",
-    studentMaterials: ["/previews/student_materials_G3M3L7@2x.webp"],
-    sampleScripts: ["/previews/sample_script_G3M3L7.webp"],
-  },
-  {
-    id: "G4M5L6",
-    miniLesson: "/previews/mini_lesson_G4M5L6.webp",
-    studentMaterials: ["/previews/student_materials_G4M5L6@2x.webp"],
-    sampleScripts: ["/previews/sample_script_G4M5L6.webp"],
-  },
-  {
-    id: "G5M6L19",
-    miniLesson: "/previews/mini_lesson_G5M6L19.webp",
-    studentMaterials: ["/previews/student_materials_G5M6L19@2x.webp"],
-    sampleScripts: ["/previews/sample_script_G5M6L19.webp"],
-  },
-  {
-    id: "G8M2L10",
-    miniLesson: "/previews/mini_lesson_G8M2L10.webp",
-    studentMaterials: ["/previews/student_materials_G8M2L10@2x.webp"],
-    sampleScripts: ["/previews/sample_script_G8M2L10.webp"],
-  },
-];
+export const LESSON_KEYS = [
+  "KM2L2", "G1M3L4", "G2M5L6", "G3M4L9", "G4M5L16",
+  "G5M6L19", "G6M8L6", "G7M5L9", "G8M2L10",
+] as const;
+
+// Filenames are fully determined by the KEY + variant (see public/previews/), so
+// build the table instead of hand-listing 54 paths. mini lesson = "_A"/"_B";
+// student materials / sample scripts = "_A1"/"_B1" (student materials add @2x).
+const p = (name: string) => `/previews/${name}`;
+function lesson(key: string): Lesson {
+  return {
+    miniLesson: {
+      A: p(`mini_lesson_${key}_A.webp`),
+      B: p(`mini_lesson_${key}_B.webp`),
+    },
+    studentMaterials: {
+      A: [p(`student_materials_${key}_A1@2x.webp`)],
+      B: [p(`student_materials_${key}_B1@2x.webp`)],
+    },
+    sampleScripts: {
+      A: [p(`sample_script_${key}_A1.webp`)],
+      B: [p(`sample_script_${key}_B1.webp`)],
+    },
+  };
+}
+
+export const LESSONS: Record<string, Lesson> =
+  Object.fromEntries(LESSON_KEYS.map((k) => [k, lesson(k)]));

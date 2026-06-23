@@ -2,13 +2,14 @@
  * create-resources page script (Astro deferred module — runs after DOM parse).
  *
  * The full page state machine. On load: show the loading state (skeleton +
- * sparkle + cycling message), then after LOADING_MS add `.loaded`, draw a random
- * mini lesson from a unique-cycle shuffle bag, and render it. From there it drives
- * recreate (ays) + back (byg) modal wiring, on-demand generation of student
- * materials / sample script (random 1-of-N + A1↔A2 toggle on recreate), sidenav
- * generated/current sync + slider, CTA reveal/pulse, print, and ?student= → title.
+ * sparkle + cycling message), then after LOADING_MS add `.loaded`, pick the lesson
+ * (from ?key=, else a random KEY) + a random A/B mini-lesson variant, and render it.
+ * From there it drives recreate (ays) + back (byg) modal wiring, on-demand
+ * generation of student materials / sample script (always the current variant's
+ * "1"), sidenav generated/current sync + slider, CTA reveal/pulse, print,
+ * ?key= → lesson, and ?student= → title.
  */
-import { MINI_LESSONS, type LessonSet } from "../data/lessonSets";
+import { LESSONS, LESSON_KEYS } from "../data/lessonSets";
 import { wireModal } from "./modal";
 
 /** Loading duration. 3000 for testing; production is 9000. */
@@ -18,13 +19,12 @@ const html = document.documentElement;
 
 // ---- State (in-memory only; a reload wipes it, per spec) ----
 const state = {
-  currentSet: null as LessonSet | null,
+  key: null as string | null,        // which lesson (KEY) — from ?key= or random
+  miniVariant: "A" as "A" | "B",     // current mini-lesson variant; recreate cycles A↔B
   generated: { worksheet: false, sampleScript: false } as Record<string, boolean>,
   currentView: "miniLesson" as "miniLesson" | "worksheet" | "sampleScript",
   generatedAt: { miniLesson: null, worksheet: null, sampleScript: null } as
     Record<string, string | null>,
-  // Which 1-of-N variant is currently shown per material (null = not yet generated).
-  materialIndex: { worksheet: null, sampleScript: null } as Record<string, number | null>,
 };
 
 const SECTION_IDS: Record<string, string> = {
@@ -36,25 +36,15 @@ const PREVIEW_IDS: Record<string, string> = {
   worksheet: "lessonPreviewWorksheet",
   sampleScript: "lessonPreviewSampleScript",
 };
-// ---- Mini-lesson shuffle bag: unique random cycle, no repeats until exhausted ----
-let bag: LessonSet[] = [];
-let lastShown: LessonSet | null = null;
-function refillBag() {
-  bag = [...MINI_LESSONS];
-  for (let i = bag.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [bag[i], bag[j]] = [bag[j], bag[i]];
-  }
-  // Avoid an immediate repeat across a reshuffle.
-  if (lastShown && bag.length > 1 && bag[0] === lastShown) {
-    [bag[0], bag[1]] = [bag[1], bag[0]];
-  }
+// ---- Lesson selection: ?key= (if it's a real lesson) else a random KEY. The
+//      mini-lesson variant (A/B) is held in state and flips on each recreate. ----
+function pickInitialKey(): string {
+  const k = new URLSearchParams(location.search).get("key");
+  if (k && k in LESSONS) return k;
+  return LESSON_KEYS[Math.floor(Math.random() * LESSON_KEYS.length)];
 }
-function nextMiniLesson(): LessonSet {
-  if (bag.length === 0) refillBag();
-  const set = bag.shift()!;
-  lastShown = set;
-  return set;
+function miniLessonWebp(): string {
+  return LESSONS[state.key!].miniLesson[state.miniVariant];
 }
 
 // ---- Timestamp ("Generated May 15, 2026 - 3:52pm") ----
@@ -150,17 +140,16 @@ function scrollToSection(sectionId: string) {
   if (pa && section) pa.scrollTo({ top: section.offsetTop, behavior: "smooth" });
 }
 
-// Pick the webp for a material from the CURRENT set: random 1-of-N on first
-// generation; toggle to the next (A1↔A2) on recreate.
-function pickMaterialWebp(material: "worksheet" | "sampleScript"): string | null {
+// The webp for a material: the current mini-lesson variant's "1" (A → A1, B → B1).
+// Always index 0 for now — student-material / sample-script "recreate" is a fake
+// that reloads the same file (A2/A3 don't exist yet).
+function materialWebp(material: "worksheet" | "sampleScript"): string | null {
+  if (!state.key) return null;
+  const lesson = LESSONS[state.key];
   const arr = material === "worksheet"
-    ? state.currentSet?.studentMaterials
-    : state.currentSet?.sampleScripts;
-  if (!arr || arr.length === 0) return null;
-  const cur = state.materialIndex[material];
-  const idx = cur == null ? Math.floor(Math.random() * arr.length) : (cur + 1) % arr.length;
-  state.materialIndex[material] = idx;
-  return arr[idx];
+    ? lesson.studentMaterials[state.miniVariant]
+    : lesson.sampleScripts[state.miniVariant];
+  return arr?.[0] ?? null;
 }
 
 // Reveal a freshly generated section (fade its preview in).
@@ -234,17 +223,18 @@ startLoadingCycle();
 window.setTimeout(() => {
   stopLoadingCycle();
   html.classList.add("loaded");
-  state.currentSet = nextMiniLesson();
-  renderMiniLesson(state.currentSet.miniLesson);
+  state.key = pickInitialKey();
+  state.miniVariant = Math.random() < 0.5 ? "A" : "B";
+  renderMiniLesson(miniLessonWebp());
   state.generatedAt.miniLesson = formatNow();
   setTimestamp(state.generatedAt.miniLesson);
   syncSidenavAndCtas();
 }, LOADING_MS);
 
 // ---- Generate / recreate flow ----
-//   null         → recreate the Mini Lesson (next set from the bag; reset materials)
-//   "worksheet"  → generate / recreate Student Materials (random 1-of-N, then toggle)
-//   "sampleScript" → generate / recreate the Sample Script
+//   null           → recreate the Mini Lesson (flip variant A↔B; reset materials)
+//   "worksheet"    → generate / recreate Student Materials (current variant's "1")
+//   "sampleScript" → generate / recreate the Sample Script (current variant's "1")
 function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null) {
   hideCtasNow();
   setTimestamp("");
@@ -275,7 +265,7 @@ function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null)
 
     if (material === "worksheet" || material === "sampleScript") {
       const wasGenerated = state.generated[material];
-      const webp = pickMaterialWebp(material);
+      const webp = materialWebp(material);
       state.generated[material] = true;
       state.currentView = material;
       state.generatedAt[material] = formatNow();
@@ -284,14 +274,14 @@ function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null)
       else revealSection(material, webp);
       setTimestamp(state.generatedAt[material]);
     } else {
-      // Mini lesson recreate: dependent materials were aligned to the old lesson —
-      // reset them, then draw the next set from the bag.
+      // Mini lesson recreate: flip the variant A↔B (same lesson/KEY) and reset the
+      // dependent materials — they're aligned to the mini-lesson variant, so the
+      // next time they're generated they'll pull the new letter's "1".
+      state.miniVariant = state.miniVariant === "A" ? "B" : "A";
       state.generated.worksheet = false;
       state.generated.sampleScript = false;
       state.generatedAt.worksheet = null;
       state.generatedAt.sampleScript = null;
-      state.materialIndex.worksheet = null;
-      state.materialIndex.sampleScript = null;
       for (const id of ["section-worksheet", "section-sampleScript"]) {
         document.getElementById(id)?.classList.remove("visible");
       }
@@ -299,11 +289,9 @@ function triggerLoadingThenRender(material: "worksheet" | "sampleScript" | null)
         const img = document.getElementById(id) as HTMLImageElement | null;
         if (img) { img.removeAttribute("src"); img.classList.remove("img-loaded"); }
       }
-      const next = nextMiniLesson();
-      state.currentSet = next;
       state.currentView = "miniLesson";
       syncSidenavAndCtas();
-      renderMiniLesson(next.miniLesson);
+      renderMiniLesson(miniLessonWebp());
       state.generatedAt.miniLesson = formatNow();
       setTimestamp(state.generatedAt.miniLesson);
     }
@@ -453,8 +441,8 @@ document
   .querySelectorAll<HTMLButtonElement>('button[aria-label="Print"]')
   .forEach((b) => b.addEventListener("click", printCurrentMaterials));
 
-// ---- URL params: student → subnav title; lesson → doc title (context only) ----
-// The mini lesson itself is random (shuffle bag), not matched to the lesson param.
+// ---- URL params: key → which lesson (consumed at init via pickInitialKey);
+//      student → subnav title; lesson → doc title (context only) ----
 const params = new URLSearchParams(location.search);
 const student = params.get("student");
 const lesson = params.get("lesson");
@@ -463,5 +451,5 @@ if (student) {
   if (title) title.textContent = `Targeted Materials for ${student}`;
   document.title = `Create Resources – ${student}${lesson ? ` – ${lesson}` : ""} – Zearn`;
 }
-// (.no-worksheet from the prototype is intentionally not wired: in the shuffle-bag
-//  model every set has student materials, so it's unreachable.)
+// (.no-worksheet from the prototype is intentionally not wired: every lesson has
+//  student materials, so it's unreachable.)
