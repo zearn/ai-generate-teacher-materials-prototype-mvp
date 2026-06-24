@@ -2,11 +2,11 @@
 """
 Generate the create-resources preview webps from the source PDFs.
 
-The PDFs in assets/pdf/ are the source-of-truth; this regenerates the webps the
-AI Targeted Materials page renders (public/previews/). Run it whenever the PDFs
-change.
+The PDFs in public/pdf/ are the source-of-truth (also served for printing); this
+regenerates the webps the AI Targeted Materials page renders (public/previews/).
+Run it whenever the PDFs change.
 
-    python3 scripts/pdf-to-preview.py            # assets/pdf -> public/previews
+    python3 scripts/pdf-to-preview.py            # public/pdf -> public/previews
     python3 scripts/pdf-to-preview.py --src DIR --out DIR
 
 Prerequisites (not npm deps — install once on your machine):
@@ -99,7 +99,7 @@ def build(pdf: str, out: str) -> tuple[int, tuple[int, int]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="PDF -> preview webp generator.")
-    ap.add_argument("--src", default="assets/pdf", help="source PDF directory")
+    ap.add_argument("--src", default="public/pdf", help="source PDF directory")
     ap.add_argument("--out", default="public/previews", help="output webp directory")
     args = ap.parse_args()
 

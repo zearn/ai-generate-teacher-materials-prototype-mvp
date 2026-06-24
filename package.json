@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^6.4.6"
+    "astro": "^6.4.6",
+    "pdf-lib": "^1.17.1"
   }
 }

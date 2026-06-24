@@ -14,6 +14,13 @@ export interface Lesson {
   miniLesson: { A: string; B: string };
   studentMaterials: { A: string[]; B: string[] };
   sampleScripts: { A: string[]; B: string[] };
+  // Source PDFs (served from public/pdf/) — the print path uses these so output is
+  // vector + properly paginated. Same A/B + "1" variant model as the webps.
+  pdf: {
+    miniLesson: { A: string; B: string };
+    studentMaterials: { A: string[]; B: string[] };
+    sampleScripts: { A: string[]; B: string[] };
+  };
 }
 
 export const LESSON_KEYS = [
@@ -21,23 +28,38 @@ export const LESSON_KEYS = [
   "G5M6L19", "G6M8L6", "G7M5L9", "G8M2L10",
 ] as const;
 
-// Filenames are fully determined by the KEY + variant (see public/previews/), so
-// build the table instead of hand-listing 54 paths. mini lesson = "_A"/"_B";
-// student materials / sample scripts = "_A1"/"_B1" (student materials add @2x).
-const p = (name: string) => `/previews/${name}`;
+// Filenames are fully determined by the KEY + variant, so build the table instead
+// of hand-listing paths. webp (public/previews/): mini "_A"/"_B", student/script
+// "_A1"/"_B1" (student adds @2x). PDF (public/pdf/): `{KEY}_{material}_{variant}`.
+const webp = (name: string) => `/previews/${name}`;
+const pdf = (name: string) => `/pdf/${name}`;
 function lesson(key: string): Lesson {
   return {
     miniLesson: {
-      A: p(`mini_lesson_${key}_A.webp`),
-      B: p(`mini_lesson_${key}_B.webp`),
+      A: webp(`mini_lesson_${key}_A.webp`),
+      B: webp(`mini_lesson_${key}_B.webp`),
     },
     studentMaterials: {
-      A: [p(`student_materials_${key}_A1@2x.webp`)],
-      B: [p(`student_materials_${key}_B1@2x.webp`)],
+      A: [webp(`student_materials_${key}_A1@2x.webp`)],
+      B: [webp(`student_materials_${key}_B1@2x.webp`)],
     },
     sampleScripts: {
-      A: [p(`sample_script_${key}_A1.webp`)],
-      B: [p(`sample_script_${key}_B1.webp`)],
+      A: [webp(`sample_script_${key}_A1.webp`)],
+      B: [webp(`sample_script_${key}_B1.webp`)],
+    },
+    pdf: {
+      miniLesson: {
+        A: pdf(`${key}_mini_lesson_A.pdf`),
+        B: pdf(`${key}_mini_lesson_B.pdf`),
+      },
+      studentMaterials: {
+        A: [pdf(`${key}_student_materials_A1.pdf`)],
+        B: [pdf(`${key}_student_materials_B1.pdf`)],
+      },
+      sampleScripts: {
+        A: [pdf(`${key}_sample_script_A1.pdf`)],
+        B: [pdf(`${key}_sample_script_B1.pdf`)],
+      },
     },
   };
 }
