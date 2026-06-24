@@ -13,8 +13,8 @@ import { PDFDocument } from "pdf-lib";
 import { LESSONS, LESSON_KEYS } from "../data/lessonSets";
 import { wireModal } from "./modal";
 
-/** Loading duration. 3000 for testing; production is 9000. */
-const LOADING_MS = 3000;
+/** Loading duration. 9000 for demo/production; drop to 3000 for fast dev testing. */
+const LOADING_MS = 9000;
 
 const html = document.documentElement;
 
