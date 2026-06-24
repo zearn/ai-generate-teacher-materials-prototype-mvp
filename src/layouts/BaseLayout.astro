@@ -17,6 +17,10 @@ const { title = "Zearn AI Targeted Materials", bodyClass } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Keep the prototype out of search results. This is a project page under a
+        shared domain (zearn.github.io), so a subpath robots.txt is ignored by
+        crawlers — a per-page noindex meta is the path-independent way to do it. */}
+    <meta name="robots" content="noindex, nofollow" />
     <title>{title}</title>
   </head>
   <body class={bodyClass}>
