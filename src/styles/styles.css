@@ -134,10 +134,12 @@ a:active {
 .btn--primary:hover {
   background: var(--aqua-85);
   border-color: var(--aqua-85);
+  color: var(--white); /* keep white when the button is an <a> (global a:hover would override) */
 }
 .btn--primary:active {
   background: var(--aqua-95);
   border-color: var(--aqua-95);
+  color: var(--white);
 }
 
 .btn--secondary,
