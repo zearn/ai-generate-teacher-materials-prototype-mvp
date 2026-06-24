@@ -415,27 +415,32 @@ function currentPdfUrls(): string[] {
 }
 
 let printFrame: HTMLIFrameElement | null = null;
-let lastBlobUrl: string | null = null;
-function printUrl(url: string) {
-  if (!printFrame) {
-    printFrame = document.createElement("iframe");
-    Object.assign(printFrame.style, {
-      position: "fixed", left: "-9999px", top: "-9999px",
-      width: "0", height: "0", border: "0", visibility: "hidden",
-    });
-    document.body.appendChild(printFrame);
-  }
-  printFrame.onload = () => {
+let printBlobUrl: string | null = null;
+// A fresh iframe each time: re-setting src to the same URL wouldn't re-fire onload
+// (so a repeat single-material print would silently no-op). Tearing down the prior
+// frame also lets us revoke the prior merged blob exactly once.
+function printUrl(url: string, isBlob: boolean) {
+  if (printFrame) printFrame.remove();
+  if (printBlobUrl) { URL.revokeObjectURL(printBlobUrl); printBlobUrl = null; }
+  printBlobUrl = isBlob ? url : null;
+  const frame = document.createElement("iframe");
+  Object.assign(frame.style, {
+    position: "fixed", left: "-9999px", top: "-9999px",
+    width: "0", height: "0", border: "0", visibility: "hidden",
+  });
+  frame.onload = () => {
     setTimeout(() => {
       try {
-        printFrame!.contentWindow?.focus();
-        printFrame!.contentWindow?.print();
+        frame.contentWindow?.focus();
+        frame.contentWindow?.print();
       } catch {
         /* no-op */
       }
     }, 200);
   };
-  printFrame.src = url;
+  document.body.appendChild(frame);
+  frame.src = url;
+  printFrame = frame;
 }
 
 async function mergePdfs(urls: string[]): Promise<string> {
@@ -453,17 +458,17 @@ async function printCurrentMaterials() {
   const urls = currentPdfUrls();
   if (!urls.length) return;
   if (urls.length === 1) {
-    printUrl(urls[0]); // single material → print the source PDF directly
-    return;
+    printUrl(urls[0], false); // single material → print the source PDF directly
+  } else {
+    printUrl(await mergePdfs(urls), true); // several → merge client-side, then print
   }
-  if (lastBlobUrl) { URL.revokeObjectURL(lastBlobUrl); lastBlobUrl = null; }
-  lastBlobUrl = await mergePdfs(urls); // several → merge client-side, then print
-  printUrl(lastBlobUrl);
 }
 // Both Print buttons (button-group + Before-You-Go modal) carry aria-label="Print".
 document
   .querySelectorAll<HTMLButtonElement>('button[aria-label="Print"]')
-  .forEach((b) => b.addEventListener("click", () => { void printCurrentMaterials(); }));
+  .forEach((b) => b.addEventListener("click", () => {
+    printCurrentMaterials().catch((e) => console.error("Print failed:", e));
+  }));
 
 // ---- URL params: key → which lesson (consumed at init via pickInitialKey);
 //      student → subnav title; lesson → doc title (context only) ----
