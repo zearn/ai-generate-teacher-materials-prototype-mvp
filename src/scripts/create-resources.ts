@@ -9,6 +9,7 @@
  * "1"), sidenav generated/current sync + slider, CTA reveal/pulse, print,
  * ?key= → lesson, and ?student= → title.
  */
+import { PDFDocument } from "pdf-lib";
 import { LESSONS, LESSON_KEYS } from "../data/lessonSets";
 import { wireModal } from "./modal";
 
@@ -400,46 +401,74 @@ document.getElementById("navMiniLesson")?.addEventListener("click", () => navScr
 document.getElementById("navStudentMaterials")?.addEventListener("click", () => navScrollTo("worksheet"));
 document.getElementById("navSampleScript")?.addEventListener("click", () => navScrollTo("sampleScript"));
 
-// ---- Print: the on-screen webp previews (one per page) via a hidden iframe ----
-// Outputs exactly what's generated, in DOM order; prints only the materials, not
-// the surrounding UI. (Note: print() opens the native dialog — don't fire it in
-// automated checks.)
+// ---- Print: the source PDFs (vector + properly paginated) via a hidden iframe ----
+// Prints the generated materials in on-screen order. One material → print its PDF
+// directly; several → merge them into one PDF client-side (pdf-lib) and print that.
+// (Note: print() opens the native dialog — don't fire it in automated checks.)
+function currentPdfUrls(): string[] {
+  if (!state.key) return [];
+  const L = LESSONS[state.key], V = state.miniVariant;
+  const urls = [L.pdf.miniLesson[V]];                              // mini lesson always
+  if (state.generated.worksheet) urls.push(L.pdf.studentMaterials[V][0]);
+  if (state.generated.sampleScript) urls.push(L.pdf.sampleScripts[V][0]);
+  return urls.map((u) => import.meta.env.BASE_URL + u);            // JS-set URL → add base
+}
+
 let printFrame: HTMLIFrameElement | null = null;
-function printCurrentMaterials() {
-  const imgs = [...document.querySelectorAll<HTMLImageElement>("img.lesson-preview")]
-    .filter((img) => img.getAttribute("src") && img.offsetParent !== null);
-  if (!imgs.length) return;
-  const body = imgs.map((img) => `<img src="${img.src}" />`).join("");
-  const doc =
-    `<!doctype html><html><head><meta charset="utf-8" />` +
-    `<style>@page{margin:0}html,body{margin:0;padding:0}` +
-    `img{display:block;width:100%;page-break-after:always}` +
-    `img:last-child{page-break-after:auto}</style></head>` +
-    `<body>${body}</body></html>`;
-  if (!printFrame) {
-    printFrame = document.createElement("iframe");
-    Object.assign(printFrame.style, {
-      position: "fixed", left: "-9999px", top: "-9999px",
-      width: "0", height: "0", border: "0", visibility: "hidden",
-    });
-    document.body.appendChild(printFrame);
-  }
-  printFrame.onload = () => {
+let printBlobUrl: string | null = null;
+// A fresh iframe each time: re-setting src to the same URL wouldn't re-fire onload
+// (so a repeat single-material print would silently no-op). Tearing down the prior
+// frame also lets us revoke the prior merged blob exactly once.
+function printUrl(url: string, isBlob: boolean) {
+  if (printFrame) printFrame.remove();
+  if (printBlobUrl) { URL.revokeObjectURL(printBlobUrl); printBlobUrl = null; }
+  printBlobUrl = isBlob ? url : null;
+  const frame = document.createElement("iframe");
+  Object.assign(frame.style, {
+    position: "fixed", left: "-9999px", top: "-9999px",
+    width: "0", height: "0", border: "0", visibility: "hidden",
+  });
+  frame.onload = () => {
     setTimeout(() => {
       try {
-        printFrame!.contentWindow?.focus();
-        printFrame!.contentWindow?.print();
+        frame.contentWindow?.focus();
+        frame.contentWindow?.print();
       } catch {
         /* no-op */
       }
     }, 200);
   };
-  printFrame.srcdoc = doc;
+  document.body.appendChild(frame);
+  frame.src = url;
+  printFrame = frame;
+}
+
+async function mergePdfs(urls: string[]): Promise<string> {
+  const out = await PDFDocument.create();
+  for (const url of urls) {
+    const bytes = await fetch(url).then((r) => r.arrayBuffer());
+    const src = await PDFDocument.load(bytes);
+    const pages = await out.copyPages(src, src.getPageIndices());
+    pages.forEach((p) => out.addPage(p));
+  }
+  return URL.createObjectURL(new Blob([await out.save()], { type: "application/pdf" }));
+}
+
+async function printCurrentMaterials() {
+  const urls = currentPdfUrls();
+  if (!urls.length) return;
+  if (urls.length === 1) {
+    printUrl(urls[0], false); // single material → print the source PDF directly
+  } else {
+    printUrl(await mergePdfs(urls), true); // several → merge client-side, then print
+  }
 }
 // Both Print buttons (button-group + Before-You-Go modal) carry aria-label="Print".
 document
   .querySelectorAll<HTMLButtonElement>('button[aria-label="Print"]')
-  .forEach((b) => b.addEventListener("click", printCurrentMaterials));
+  .forEach((b) => b.addEventListener("click", () => {
+    printCurrentMaterials().catch((e) => console.error("Print failed:", e));
+  }));
 
 // ---- URL params: key → which lesson (consumed at init via pickInitialKey);
 //      student → subnav title; lesson → doc title (context only) ----

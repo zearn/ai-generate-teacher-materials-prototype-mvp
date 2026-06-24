@@ -153,8 +153,8 @@ fire.)
 | `src/styles/styles.css` | **All** non-token CSS, in one file (the only stylesheet besides tokens.css). Sections: GLOBAL (`@font-face` relative `url()` to `src/styles/fonts/`, resets, typography, `--card-dropshadow`, link states, form-control font reset) → COMPONENTS → per-page (tower-alerts / create-resources / index). Cross-page collisions (`.page-area`, `.top-nav`, `.modal-card`/`.modal-close`, bare `main`) are scoped under `body.page-tower-alerts` / `body.page-create-resources`; sidenav `.coming-soon` under `.sidenav` |
 | `src/styles/fonts/` | Self-hosted woff2 (Source Sans Pro 400/600/700 + italic, Oxygen 400); Vite fingerprints + base-prefixes them at build |
 | `public/previews/` | Webp preview images served as-is; JS prepends `import.meta.env.BASE_URL` to the `/previews/…` paths |
-| `assets/pdf/` | Source PDFs for the create-resources previews — committed source-of-truth; not served |
-| `scripts/pdf-to-preview.py` | Regenerates `public/previews/*.webp` from `assets/pdf/` (rasterize 1584px → trim → 112px margins → 2px divider). Run when the PDFs change. |
+| `public/pdf/` | Source PDFs for create-resources — committed source-of-truth, **served** (fetched at print time for the PDF print path) |
+| `scripts/pdf-to-preview.py` | Regenerates `public/previews/*.webp` from `public/pdf/` (rasterize 1584px → trim → 112px margins → 2px divider). Run when the PDFs change. |
 | `README.md` | Contributor guide (setup, session workflow, live URLs) — repo front page |
 | `astro.config.mjs` | `site` + `base` config for GitHub Pages subpath hosting |
 | `.github/workflows/deploy.yml` | Builds (Node 22) + deploys to GitHub Pages on push to `main` |
@@ -299,12 +299,14 @@ gating CSS lives in the PAGE: create-resources section of `styles.css`):
 Add `.loaded` to `document.documentElement` (not `document.body`) — Claude
 Preview strips body classes added at load time but leaves `<html>` alone.
 
-### Preview rendering & printing (webp)
+### Preview rendering (webp) & printing (PDF)
 
-- The app renders **webp preview images** from `public/previews/`. No PDFs at runtime.
-- **Print** (`printCurrentMaterials`) collects visible `img.lesson-preview` elements,
-  builds a hidden iframe with those images, and calls `print()` — prints exactly
-  what's on screen, in DOM order. Don't fire during automated preview verification.
+- The page **displays webp preview images** from `public/previews/` (`<img>`).
+- **Print uses the source PDFs** (`public/pdf/`), not the webps — vector + properly
+  paginated. `printCurrentMaterials()` collects the generated materials' PDF URLs in
+  on-screen order: one → load that PDF in a hidden iframe and `print()`; several →
+  `mergePdfs()` (uses `pdf-lib`) fetches + merges them into one PDF blob,
+  then prints that. Don't fire `print()` during automated verification (native dialog).
 - **Download** is unwired (button is CSS-hidden, code omitted). To be rebuilt later.
 
 ---
@@ -341,7 +343,7 @@ state = {
 | `syncSidenavAndCtas()` | Syncs all DOM classes to `state` (sidenav active/generated/current, slider, CTA `.is-generated`). Call after any `state` mutation. |
 | `updateNavSlider()` | Repositions the purple sliding highlight in the sidenav. Called by `syncSidenavAndCtas()`. |
 | `renderMaterial(material)` | Shows the webp preview for the given material; adds `.visible` to its section; updates `state`. |
-| `printCurrentMaterials()` | Prints all visible webp previews via hidden iframe. |
+| `printCurrentMaterials()` | Prints the generated materials' source PDFs via hidden iframe (single PDF directly; several merged with `pdf-lib`). |
 
 ---
 
@@ -377,12 +379,14 @@ state = {
   keeps the original format:
   `mini_lesson_{KEY}_{A|B}.webp`, `student_materials_{KEY}_{A1|B1}@2x.webp`,
   `sample_script_{KEY}_{A1|B1}.webp` (KEY = G{grade}M{mission}L{lesson}, e.g. `KM2L2`).
-  These are **generated from the source PDFs in `assets/pdf/`** by
+  These are **generated from the source PDFs in `public/pdf/`** by
   `scripts/pdf-to-preview.py` — rerun it when the PDFs change (don't hand-edit the
   webps). 1584px wide, displayed at 0.5 scale, so baked margins are 2× the rendered px.
-- **No runtime PDFs.** The app renders webp previews only. `assets/pdf/` holds the
-  source PDFs (committed); the retired pre-migration webps + legacy/Download PDFs
-  live in `assets/not-used/`.
+- **PDFs are the print source.** The page displays webp previews but **prints the
+  source PDFs** from `public/pdf/` (vector + paginated): one material prints its PDF
+  in a hidden iframe; several are merged client-side with `pdf-lib` into one PDF,
+  then printed. `assets/not-used/` holds the retired pre-migration
+  webps + legacy/Download PDFs.
 - **`assets/images/svg/`** — the original Figma SVG downloads (historical refs;
   not loaded at runtime). The `src/icons/` files are the cleaned build-time copies.
 - **`assets/not-used/`** — design references, archived PDFs, per-key preview PNGs.
@@ -432,7 +436,8 @@ and shouldn't be built:
 - **No state persistence across reloads.** In-memory only (e.g. `skipAysModal`).
 - **No cross-browser polishing.** Targeting modern Chrome.
 - **No new npm packages** beyond the Astro/TypeScript stack already in
-  `package.json`. Don't add UI libraries, component frameworks, or bundlers.
+  `package.json` (the one approved exception is **`pdf-lib`**, for the print-merge
+  path). Don't add UI libraries, component frameworks, or bundlers.
   Astro can embed a Vue island if genuinely needed — nothing currently does.
 
 ---
